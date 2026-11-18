@@ -3,6 +3,7 @@ import { DateRange } from './components/DateRange'
 import { Flag } from './components/Flag'
 import { Section } from './components/Section'
 import { ExchangeCalculator } from './components/ExchangeCalculator'
+import { CalendarSection } from './components/CalendarSection'
 import { useTripState } from './lib/tripState'
 import { diffDays } from './lib/dates'
 
@@ -64,7 +65,9 @@ export default function App() {
 
             {SECTIONS.map((s) => (
               <Section key={s.id} id={s.id} icon={s.icon} title={s.title}>
-                {s.id === 'exchange' ? (
+                {s.id === 'calendar' ? (
+                  <CalendarSection country={country} dates={dates} />
+                ) : s.id === 'exchange' ? (
                   <ExchangeCalculator country={country} />
                 ) : (
                   <p className="text-sm text-stone-400">준비 중인 기능이에요.</p>
@@ -76,7 +79,7 @@ export default function App() {
       </main>
 
       <footer className="mx-auto mt-10 max-w-3xl px-4 text-center text-xs text-stone-400">
-        국가 정보: Wikidata · 국기: flagcdn.com · 환율: Frankfurter, ExchangeRate-API
+        국가 정보: Wikidata · 국기: flagcdn.com · 환율: Frankfurter, ExchangeRate-API · 공휴일: Nager.Date · 축제: Wikidata
       </footer>
     </div>
   )

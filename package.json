@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build:countries": "node scripts/build-countries.mjs",
+    "build:festivals": "node scripts/build-festivals.mjs",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
