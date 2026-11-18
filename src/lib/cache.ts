@@ -80,6 +80,17 @@ export async function fetchJson<T>(url: string, init: RequestInit & { timeoutMs?
   }
 }
 
+const inflight = new Map<string, Promise<unknown>>()
+
+/** 같은 키로 동시에 들어온 요청은 하나의 네트워크 호출로 합친다. */
+function dedupe<T>(key: string, fn: () => Promise<T>): Promise<T> {
+  const running = inflight.get(key) as Promise<T> | undefined
+  if (running) return running
+  const p = fn().finally(() => inflight.delete(key))
+  inflight.set(key, p)
+  return p
+}
+
 /**
  * 캐시 우선 조회. 캐시가 유효하면 네트워크를 쓰지 않는다.
  * 네트워크가 실패하면 만료된 캐시라도 돌려주고 stale=true로 표시한다.
@@ -95,12 +106,28 @@ export async function cachedJson<T>(
     if (hit) return { ...hit, stale: false }
   }
   try {
-    const data = await loader()
-    writeCache(key, data)
+    const data = await dedupe(key, async () => {
+      const d = await loader()
+      writeCache(key, d)
+      return d
+    })
     return { data, savedAt: Date.now(), stale: false }
   } catch (err) {
     const old = readStale<T>(key)
     if (old) return { ...old, stale: true }
     throw err
   }
+}
+
+/** 화면에 보여 줄 한국어 오류 원인 */
+export function errorReasonKo(e: unknown): string {
+  if (e instanceof HttpError) {
+    if (e.status === 429) return '요청이 너무 많아 서버가 잠시 막았어요. 잠시 뒤 다시 시도해 주세요.'
+    if (e.status >= 500) return `서버에 일시적인 문제가 있어요. (오류 ${e.status})`
+    return `서버가 요청을 처리하지 못했어요. (오류 ${e.status})`
+  }
+  if (e instanceof DOMException && (e.name === 'AbortError' || e.name === 'TimeoutError')) return '서버 응답이 너무 늦어요.'
+  if (e instanceof TypeError) return '인터넷 연결을 확인해 주세요.'
+  if (e instanceof SyntaxError) return '서버 응답을 읽지 못했어요.'
+  return e instanceof Error && /[가-힣]/.test(e.message) ? e.message : '알 수 없는 오류가 났어요.'
 }

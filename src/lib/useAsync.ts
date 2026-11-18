@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 export type AsyncState<T> =
-  | { status: 'idle' | 'loading'; data?: undefined; error?: undefined }
+  | { status: 'idle'; data?: undefined; error?: undefined }
+  | { status: 'loading'; data?: undefined; error?: undefined }
   | { status: 'success'; data: T; error?: undefined }
   | { status: 'error'; data?: undefined; error: Error }
 
@@ -35,5 +36,5 @@ export function useAsync<T>(fn: ((force: boolean) => Promise<T>) | null, deps: u
     run(false)
   }, [run])
 
-  return { ...state, retry: () => run(true) }
+  return { ...state, retry: () => run(true) } as AsyncState<T> & { retry: () => void }
 }
