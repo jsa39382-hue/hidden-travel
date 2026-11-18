@@ -4,6 +4,7 @@ import { Flag } from './components/Flag'
 import { Section } from './components/Section'
 import { ExchangeCalculator } from './components/ExchangeCalculator'
 import { CalendarSection } from './components/CalendarSection'
+import { BudgetCalculator } from './components/BudgetCalculator'
 import { useTripState } from './lib/tripState'
 import { diffDays } from './lib/dates'
 
@@ -69,6 +70,8 @@ export default function App() {
                   <CalendarSection country={country} dates={dates} />
                 ) : s.id === 'exchange' ? (
                   <ExchangeCalculator country={country} />
+                ) : s.id === 'budget' ? (
+                  <BudgetCalculator country={country} dates={dates} />
                 ) : (
                   <p className="text-sm text-stone-400">준비 중인 기능이에요.</p>
                 )}

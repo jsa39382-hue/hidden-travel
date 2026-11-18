@@ -1,0 +1,316 @@
+{
+ "_설명": "하루 여행 경비 추정치. 각 값은 [알뜰, 보통, 고급]. lodging=숙소 1박·1실, food=식비 1인·1일, transport=현지 교통 1인·1일, sightseeing=관광·입장료 1인·1일. currency는 USD 또는 현지 통화 코드(예: JPY). 항공권은 포함하지 않는다. 2025~2026년 여행 물가를 바탕으로 한 대략적인 값이다.",
+ "updated": "2026-11",
+ "countries": {
+  "JP": {
+   "currency": "USD",
+   "lodging": [70, 150, 400],
+   "food": [30, 60, 150],
+   "transport": [10, 20, 50],
+   "sightseeing": [10, 25, 60]
+  },
+  "CN": {
+   "currency": "USD",
+   "lodging": [35, 90, 250],
+   "food": [15, 35, 100],
+   "transport": [5, 12, 40],
+   "sightseeing": [10, 25, 60]
+  },
+  "HK": {
+   "currency": "USD",
+   "lodging": [80, 180, 450],
+   "food": [30, 60, 150],
+   "transport": [8, 15, 40],
+   "sightseeing": [15, 35, 80]
+  },
+  "MO": {
+   "currency": "USD",
+   "lodging": [80, 170, 400],
+   "food": [30, 60, 140],
+   "transport": [5, 12, 35],
+   "sightseeing": [5, 20, 60]
+  },
+  "TW": {
+   "currency": "USD",
+   "lodging": [45, 110, 280],
+   "food": [20, 40, 100],
+   "transport": [6, 12, 35],
+   "sightseeing": [8, 20, 50]
+  },
+  "MN": {
+   "currency": "USD",
+   "lodging": [30, 70, 180],
+   "food": [12, 25, 60],
+   "transport": [8, 20, 60],
+   "sightseeing": [10, 30, 80]
+  },
+  "VN": {
+   "currency": "USD",
+   "lodging": [20, 55, 180],
+   "food": [10, 25, 70],
+   "transport": [4, 10, 30],
+   "sightseeing": [5, 15, 45]
+  },
+  "TH": {
+   "currency": "USD",
+   "lodging": [25, 70, 220],
+   "food": [12, 30, 80],
+   "transport": [5, 12, 35],
+   "sightseeing": [8, 20, 60]
+  },
+  "PH": {
+   "currency": "USD",
+   "lodging": [30, 75, 220],
+   "food": [12, 30, 80],
+   "transport": [5, 12, 35],
+   "sightseeing": [10, 25, 70]
+  },
+  "SG": {
+   "currency": "USD",
+   "lodging": [90, 200, 450],
+   "food": [30, 60, 150],
+   "transport": [8, 15, 40],
+   "sightseeing": [20, 45, 100]
+  },
+  "MY": {
+   "currency": "USD",
+   "lodging": [25, 70, 200],
+   "food": [12, 28, 75],
+   "transport": [5, 10, 30],
+   "sightseeing": [8, 20, 50]
+  },
+  "ID": {
+   "currency": "USD",
+   "lodging": [25, 70, 250],
+   "food": [10, 25, 80],
+   "transport": [5, 12, 40],
+   "sightseeing": [8, 20, 60]
+  },
+  "KH": {
+   "currency": "USD",
+   "lodging": [18, 50, 160],
+   "food": [10, 22, 60],
+   "transport": [5, 12, 30],
+   "sightseeing": [10, 40, 80]
+  },
+  "IN": {
+   "currency": "USD",
+   "lodging": [20, 60, 200],
+   "food": [8, 20, 60],
+   "transport": [5, 12, 40],
+   "sightseeing": [5, 15, 45]
+  },
+  "AE": {
+   "currency": "USD",
+   "lodging": [70, 160, 450],
+   "food": [25, 60, 160],
+   "transport": [8, 20, 60],
+   "sightseeing": [20, 60, 150]
+  },
+  "TR": {
+   "currency": "USD",
+   "lodging": [35, 90, 250],
+   "food": [15, 35, 90],
+   "transport": [6, 12, 35],
+   "sightseeing": [15, 40, 90]
+  },
+  "US": {
+   "currency": "USD",
+   "lodging": [120, 220, 450],
+   "food": [45, 80, 180],
+   "transport": [15, 30, 80],
+   "sightseeing": [20, 50, 120]
+  },
+  "CA": {
+   "currency": "USD",
+   "lodging": [100, 190, 400],
+   "food": [40, 70, 160],
+   "transport": [12, 25, 70],
+   "sightseeing": [15, 40, 100]
+  },
+  "GU": {
+   "currency": "USD",
+   "lodging": [100, 200, 400],
+   "food": [35, 60, 140],
+   "transport": [15, 35, 70],
+   "sightseeing": [20, 50, 120]
+  },
+  "AU": {
+   "currency": "USD",
+   "lodging": [90, 180, 400],
+   "food": [40, 70, 160],
+   "transport": [12, 25, 60],
+   "sightseeing": [15, 40, 100]
+  },
+  "NZ": {
+   "currency": "USD",
+   "lodging": [80, 170, 380],
+   "food": [35, 65, 150],
+   "transport": [15, 30, 70],
+   "sightseeing": [15, 50, 120]
+  },
+  "GB": {
+   "currency": "USD",
+   "lodging": [100, 200, 450],
+   "food": [40, 75, 170],
+   "transport": [12, 25, 60],
+   "sightseeing": [15, 40, 100]
+  },
+  "FR": {
+   "currency": "USD",
+   "lodging": [90, 180, 420],
+   "food": [35, 70, 170],
+   "transport": [10, 20, 55],
+   "sightseeing": [15, 35, 90]
+  },
+  "IT": {
+   "currency": "USD",
+   "lodging": [80, 160, 400],
+   "food": [30, 60, 150],
+   "transport": [10, 20, 50],
+   "sightseeing": [15, 35, 90]
+  },
+  "ES": {
+   "currency": "USD",
+   "lodging": [70, 140, 350],
+   "food": [30, 55, 130],
+   "transport": [8, 18, 45],
+   "sightseeing": [12, 30, 80]
+  },
+  "DE": {
+   "currency": "USD",
+   "lodging": [80, 150, 350],
+   "food": [30, 55, 130],
+   "transport": [10, 20, 50],
+   "sightseeing": [12, 30, 80]
+  },
+  "CH": {
+   "currency": "USD",
+   "lodging": [130, 250, 550],
+   "food": [50, 90, 200],
+   "transport": [20, 40, 90],
+   "sightseeing": [20, 50, 120]
+  },
+  "AT": {
+   "currency": "USD",
+   "lodging": [80, 150, 350],
+   "food": [30, 55, 130],
+   "transport": [10, 20, 50],
+   "sightseeing": [15, 30, 80]
+  },
+  "CZ": {
+   "currency": "USD",
+   "lodging": [50, 100, 250],
+   "food": [20, 40, 100],
+   "transport": [5, 12, 35],
+   "sightseeing": [10, 25, 60]
+  },
+  "PT": {
+   "currency": "USD",
+   "lodging": [60, 120, 300],
+   "food": [25, 45, 110],
+   "transport": [8, 15, 40],
+   "sightseeing": [10, 25, 70]
+  },
+  "GR": {
+   "currency": "USD",
+   "lodging": [60, 120, 320],
+   "food": [25, 45, 110],
+   "transport": [8, 18, 45],
+   "sightseeing": [15, 30, 80]
+  }
+ },
+ "regions": {
+  "동아시아": {
+   "currency": "USD",
+   "lodging": [60, 140, 350],
+   "food": [25, 50, 130],
+   "transport": [8, 18, 45],
+   "sightseeing": [10, 25, 65]
+  },
+  "동남아시아": {
+   "currency": "USD",
+   "lodging": [25, 65, 200],
+   "food": [12, 28, 75],
+   "transport": [5, 12, 35],
+   "sightseeing": [8, 20, 55]
+  },
+  "남아시아": {
+   "currency": "USD",
+   "lodging": [20, 55, 180],
+   "food": [8, 20, 55],
+   "transport": [5, 12, 35],
+   "sightseeing": [5, 15, 45]
+  },
+  "중앙아시아": {
+   "currency": "USD",
+   "lodging": [30, 70, 180],
+   "food": [12, 25, 60],
+   "transport": [6, 15, 40],
+   "sightseeing": [8, 20, 50]
+  },
+  "중동": {
+   "currency": "USD",
+   "lodging": [50, 120, 350],
+   "food": [20, 45, 120],
+   "transport": [8, 18, 50],
+   "sightseeing": [15, 40, 100]
+  },
+  "서·북유럽": {
+   "currency": "USD",
+   "lodging": [90, 180, 420],
+   "food": [35, 65, 160],
+   "transport": [12, 25, 60],
+   "sightseeing": [15, 35, 90]
+  },
+  "남유럽": {
+   "currency": "USD",
+   "lodging": [65, 130, 330],
+   "food": [28, 50, 120],
+   "transport": [8, 18, 45],
+   "sightseeing": [12, 30, 80]
+  },
+  "동유럽": {
+   "currency": "USD",
+   "lodging": [45, 90, 230],
+   "food": [18, 35, 90],
+   "transport": [5, 12, 35],
+   "sightseeing": [8, 20, 55]
+  },
+  "북아메리카": {
+   "currency": "USD",
+   "lodging": [110, 200, 420],
+   "food": [40, 75, 170],
+   "transport": [14, 28, 75],
+   "sightseeing": [18, 45, 110]
+  },
+  "중남미·카리브": {
+   "currency": "USD",
+   "lodging": [40, 90, 250],
+   "food": [15, 35, 90],
+   "transport": [6, 15, 40],
+   "sightseeing": [10, 25, 70]
+  },
+  "아프리카": {
+   "currency": "USD",
+   "lodging": [35, 90, 280],
+   "food": [15, 30, 80],
+   "transport": [8, 18, 50],
+   "sightseeing": [15, 40, 120]
+  },
+  "오세아니아": {
+   "currency": "USD",
+   "lodging": [70, 150, 350],
+   "food": [30, 60, 140],
+   "transport": [12, 25, 60],
+   "sightseeing": [12, 35, 90]
+  },
+  "전체": {
+   "currency": "USD",
+   "lodging": [60, 130, 320],
+   "food": [25, 50, 120],
+   "transport": [10, 20, 50],
+   "sightseeing": [12, 30, 75]
+  }
+ }
+}

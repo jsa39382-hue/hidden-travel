@@ -1,0 +1,15 @@
+{
+  "_설명": "UN M49 지역 분류를 바탕으로 비용 평균을 낼 지역 묶음. costs.json에 없는 나라는 이 지역 평균을 쓴다.",
+  "동아시아": ["CN", "HK", "MO", "JP", "KR", "KP", "MN", "TW"],
+  "동남아시아": ["BN", "KH", "ID", "LA", "MY", "MM", "PH", "SG", "TH", "TL", "VN"],
+  "남아시아": ["AF", "BD", "BT", "IN", "IR", "LK", "MV", "NP", "PK"],
+  "중앙아시아": ["KZ", "KG", "TJ", "TM", "UZ"],
+  "중동": ["AE", "AM", "AZ", "BH", "CY", "GE", "IL", "IQ", "JO", "KW", "LB", "OM", "PS", "QA", "SA", "SY", "TR", "YE"],
+  "서·북유럽": ["AT", "BE", "CH", "DE", "FR", "LI", "LU", "MC", "NL", "DK", "EE", "FI", "FO", "GB", "GG", "IE", "IM", "IS", "JE", "LT", "LV", "NO", "SE", "SJ", "AX", "GL"],
+  "남유럽": ["AD", "AL", "BA", "ES", "GI", "GR", "HR", "IT", "ME", "MK", "MT", "PT", "RS", "SI", "SM", "VA", "XK"],
+  "동유럽": ["BG", "BY", "CZ", "HU", "MD", "PL", "RO", "RU", "SK", "UA"],
+  "북아메리카": ["US", "CA", "BM", "PM", "GU", "MP", "AS", "PR", "VI"],
+  "중남미·카리브": ["AG", "AI", "AR", "AW", "BB", "BL", "BO", "BQ", "BR", "BS", "BZ", "CL", "CO", "CR", "CU", "CW", "DM", "DO", "EC", "FK", "GD", "GF", "GP", "GT", "GY", "HN", "HT", "JM", "KN", "KY", "LC", "MF", "MQ", "MS", "MX", "NI", "PA", "PE", "PY", "SR", "SV", "SX", "TC", "TT", "UY", "VC", "VE", "VG"],
+  "아프리카": ["DZ", "EG", "EH", "LY", "MA", "SD", "TN", "BI", "KM", "DJ", "ER", "ET", "KE", "MG", "MW", "MU", "YT", "MZ", "RE", "RW", "SC", "SO", "SS", "TZ", "UG", "ZM", "ZW", "AO", "CM", "CF", "TD", "CG", "CD", "GQ", "GA", "ST", "BW", "SZ", "LS", "NA", "ZA", "BJ", "BF", "CV", "CI", "GM", "GH", "GN", "GW", "LR", "ML", "MR", "NE", "NG", "SH", "SN", "SL", "TG", "IO"],
+  "오세아니아": ["AU", "NZ", "NF", "FJ", "NC", "PG", "SB", "VU", "FM", "KI", "MH", "NR", "PW", "CK", "NU", "PF", "PN", "TK", "TO", "TV", "WF", "WS", "CC", "CX"]
+}
