@@ -39,4 +39,4 @@ npm run dev
 - [ ] 5. 숨은 명소 + 지도
 - [ ] 6. 날씨
 - [ ] 7. 캐시·에러 처리·모바일 점검
-- [ ] 8. GitHub Pages 배포
+- [x] 8. GitHub Pages 배포 (https://jsa39382-hue.github.io/hidden-travel/)
