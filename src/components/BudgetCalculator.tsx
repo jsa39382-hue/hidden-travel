@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import type { Country, TripDates } from '../types'
+import type { Country, Place, TripDates } from '../types'
 import { diffDays } from '../lib/dates'
 import { useAsync } from '../lib/useAsync'
 import { getKrwRate, formatNumber } from '../lib/exchange'
@@ -30,7 +30,7 @@ function loadPrefs(): Prefs {
   return fallback
 }
 
-export function BudgetCalculator({ country, dates }: { country: Country; dates: TripDates }) {
+export function BudgetCalculator({ country, dates, place }: { country: Country; dates: TripDates; place: Place }) {
   const [prefs, setPrefs] = useState<Prefs>(loadPrefs)
   const tripDays = Math.max(1, diffDays(dates.start, dates.end) + 1)
   const [days, setDays] = useState(tripDays)
@@ -46,7 +46,7 @@ export function BudgetCalculator({ country, dates }: { country: Country; dates: 
   const { party, tier } = prefs
   const setParty = (p: Partial<Party>) => setPrefs((s) => ({ ...s, party: { ...s.party, ...p } }))
   const { row, basis, region } = getCostRow(country.code)
-  const result = calcBudget(row, tier, party, days)
+  const result = calcBudget(row, tier, party, days, place.factor)
 
   // 비용 통화 → 원화, 현지 통화 → 원화 환율
   const rates = useAsync(
@@ -115,7 +115,7 @@ export function BudgetCalculator({ country, dates }: { country: Country; dates: 
       {rates.status === 'error' ? (
         <>
           <ErrorBox message="환율을 불러오지 못해 원화로 바꾸지 못했어요." detail={errorReasonKo(rates.error)} onRetry={rates.retry} />
-          <ResultTable result={result} toLocal={null} toKrw={null} country={country} />
+          <ResultTable result={result} toLocal={null} toKrw={null} country={country} placeName={place.name} />
         </>
       ) : rates.status !== 'success' ? (
         <Loading label="환율 불러오는 중…" />
@@ -123,6 +123,7 @@ export function BudgetCalculator({ country, dates }: { country: Country; dates: 
         <ResultTable
           result={result}
           country={country}
+          placeName={place.name}
           toKrw={(n) => n * rates.data.cost.krwPer}
           toLocal={rates.data.local ? (n) => (n * rates.data.cost.krwPer) / rates.data.local!.krwPer : null}
         />
@@ -133,7 +134,11 @@ export function BudgetCalculator({ country, dates }: { country: Country; dates: 
         <p>
           {basis === 'country' && `${country.nameKo}의 하루 물가 자료(${COSTS_UPDATED} 기준, USD)로 계산했어요.`}
           {basis === 'region' && `${country.nameKo}의 자료가 없어 ${region} 지역 평균으로 계산했어요.`}
-          {basis === 'global' && '이 지역 자료가 없어 전체 평균으로 계산했어요.'} 실제 금액은 시기·도시에 따라 크게 달라요.
+          {basis === 'global' && '이 지역 자료가 없어 전체 평균으로 계산했어요.'}{' '}
+          {place.factor !== 1
+            ? `${place.name} 물가 보정 ×${place.factor.toFixed(2)}${place.near ? `(${place.near} 기준)` : ''}을 숙소에는 그대로, 식비·교통·관광에는 절반만 반영했어요.`
+            : `${place.name} 기준으로 계산했어요.`}{' '}
+          실제 금액은 시기에 따라 크게 달라요.
         </p>
         <p>
           숙소는 방 단위(2인 1실{party.type === 'family' ? ', 가족은 한 방에 최대 4명' : ''}), 식비·교통·관광은 1인 단위로 계산하고 아이는 어른의 70%로
@@ -147,11 +152,13 @@ export function BudgetCalculator({ country, dates }: { country: Country; dates: 
 function ResultTable({
   result,
   country,
+  placeName,
   toKrw,
   toLocal,
 }: {
   result: ReturnType<typeof calcBudget>
   country: Country
+  placeName: string
   toKrw: ((n: number) => number) | null
   toLocal: ((n: number) => number) | null
 }) {
@@ -159,7 +166,7 @@ function ResultTable({
   const fmtLocal = (n: number) => `${formatNumber(Math.round(n), 0)} ${country.currency}`
   // 추정치이므로 10만 원 이상은 천 원 단위, 그 아래는 십 원 단위로 반올림
   const fmtKrw = (n: number) => `${(n >= 100000 ? Math.round(n / 1000) * 1000 : Math.round(n / 10) * 10).toLocaleString('ko-KR')}원`
-  const fmtSrc = (n: number) => `${formatNumber(n, 0)} ${result.currency}`
+  const fmtSrc = (n: number) => `${formatNumber(Math.round(n), 0)} ${result.currency}`
   const main = (n: number) => (toKrw ? fmtKrw(toKrw(n)) : fmtSrc(n))
   const sub = (n: number) => (local ? fmtLocal(local(n)) : toKrw ? fmtSrc(n) : '')
 
@@ -167,7 +174,7 @@ function ResultTable({
     <div>
       <div className="rounded-xl bg-teal-700 p-4 text-white">
         <p className="text-sm text-teal-100">
-          {result.people}명 · {result.nights}박 {result.days}일 · 방 {result.rooms}개 예상 총액
+          {placeName} · {result.people}명 · {result.nights}박 {result.days}일 · 방 {result.rooms}개 예상 총액
         </p>
         <p className="mt-1 text-3xl font-extrabold tracking-tight">{main(result.total)}</p>
         <p className="text-sm text-teal-100">{sub(result.total)}</p>

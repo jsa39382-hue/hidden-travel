@@ -15,3 +15,15 @@ export interface TripDates {
   start: string // YYYY-MM-DD
   end: string
 }
+
+/** 숨은 명소·숙소 검색, 물가 보정, 날씨의 기준이 되는 도시·지역 */
+export interface Place {
+  name: string
+  lat: number
+  lng: number
+  /** 나라 평균 물가 대비 보정값 (1.0 = 평균) */
+  factor: number
+  source: 'curated' | 'wikidata' | 'capital' | 'search'
+  /** 검색 결과일 때 가까운 기준 도시 */
+  near?: string
+}

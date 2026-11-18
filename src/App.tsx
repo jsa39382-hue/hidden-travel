@@ -5,6 +5,8 @@ import { Section } from './components/Section'
 import { ExchangeCalculator } from './components/ExchangeCalculator'
 import { CalendarSection } from './components/CalendarSection'
 import { BudgetCalculator } from './components/BudgetCalculator'
+import { PlacePicker } from './components/PlacePicker'
+import { SpotsSection } from './components/SpotsSection'
 import { useTripState } from './lib/tripState'
 import { diffDays } from './lib/dates'
 
@@ -12,12 +14,12 @@ const SECTIONS = [
   { id: 'calendar', icon: '📅', title: '공휴일·축제' },
   { id: 'exchange', icon: '💱', title: '환율' },
   { id: 'budget', icon: '🧾', title: '예상 경비' },
-  { id: 'spots', icon: '🧭', title: '숨은 명소' },
+  { id: 'spots', icon: '🧭', title: '숨은 명소·숙소' },
   { id: 'weather', icon: '🌤️', title: '날씨' },
 ] as const
 
 export default function App() {
-  const { country, dates, setCountry, setDates } = useTripState()
+  const { country, dates, place, setCountry, setDates, setPlace } = useTripState()
   const days = Math.max(diffDays(dates.start, dates.end) + 1, 1)
 
   return (
@@ -42,14 +44,17 @@ export default function App() {
           </div>
         ) : (
           <>
-            <div className="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-stone-200">
-              <Flag code={country.code} size="lg" />
-              <div className="min-w-0">
-                <p className="text-lg font-bold">{country.nameKo}</p>
-                <p className="truncate text-sm text-stone-500">
-                  수도 {country.capitalKo ?? country.nameKo} · 통화 {country.currencyNameKo ?? country.currency} ({country.currency}) · {days}일 일정
-                </p>
+            <div className="space-y-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-stone-200">
+              <div className="flex items-center gap-3">
+                <Flag code={country.code} size="lg" />
+                <div className="min-w-0">
+                  <p className="text-lg font-bold">{country.nameKo}</p>
+                  <p className="truncate text-sm text-stone-500">
+                    수도 {country.capitalKo ?? country.nameKo} · 통화 {country.currencyNameKo ?? country.currency} ({country.currency}) · {days}일 일정
+                  </p>
+                </div>
               </div>
+              <PlacePicker country={country} place={place!} onChange={setPlace} />
             </div>
 
             <nav aria-label="바로가기" className="sticky top-0 z-[500] -mx-4 overflow-x-auto bg-stone-50/90 px-4 py-2 backdrop-blur">
@@ -70,8 +75,10 @@ export default function App() {
                   <CalendarSection country={country} dates={dates} />
                 ) : s.id === 'exchange' ? (
                   <ExchangeCalculator country={country} />
+                ) : s.id === 'spots' ? (
+                  <SpotsSection country={country} place={place!} />
                 ) : s.id === 'budget' ? (
-                  <BudgetCalculator country={country} dates={dates} />
+                  <BudgetCalculator country={country} dates={dates} place={place!} />
                 ) : (
                   <p className="text-sm text-stone-400">준비 중인 기능이에요.</p>
                 )}
@@ -82,7 +89,7 @@ export default function App() {
       </main>
 
       <footer className="mx-auto mt-10 max-w-3xl px-4 text-center text-xs text-stone-400">
-        국가 정보: Wikidata · 국기: flagcdn.com · 환율: Frankfurter, ExchangeRate-API · 공휴일: Nager.Date · 축제: Wikidata
+        국가 정보: Wikidata · 국기: flagcdn.com · 환율: Frankfurter, ExchangeRate-API · 공휴일: Nager.Date · 축제: Wikidata · 지도·명소·숙소: © OpenStreetMap 기여자 · 설명: 위키백과
       </footer>
     </div>
   )

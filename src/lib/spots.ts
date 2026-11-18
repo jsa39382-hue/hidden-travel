@@ -1,0 +1,358 @@
+import { DAY, cachedJson, readCache, writeCache, HttpError } from './cache'
+import { distanceKm, elementLatLng, overpass, type OsmElement } from './osm'
+
+export type SpotCategory = 'nature' | 'view' | 'museum' | 'history' | 'art' | 'attraction'
+
+export interface Spot {
+  id: string // 'node/123'
+  name: string
+  nameLocal?: string
+  kind: string // 화면용 종류 (예: 폭포)
+  category: SpotCategory
+  lat: number
+  lng: number
+  distKm: number
+  /** 위키 문서 (pageviews·요약용) */
+  wiki?: { lang: string; title: string }
+  /** 한국어·영어 문서 제목 (Wikidata로 확인) */
+  koTitle?: string
+  enTitle?: string
+  /** 최근 30일 조회수. null = 확인 못 함, undefined = 위키 문서 없음 */
+  views?: number | null
+  /** 0~100, 높을수록 덜 알려진 곳 */
+  hiddenScore: number
+  /** 숨은 명소 목록 정렬용 흥미도 */
+  interest: number
+  website?: string
+}
+
+export interface SpotsResult {
+  spots: Spot[]
+  fetchedAt: number
+  viewsChecked: number
+  viewsFailed: number
+}
+
+// ---------- 태그 → 종류 ----------
+
+const KIND: Record<string, Record<string, [string, SpotCategory, number]>> = {
+  tourism: {
+    attraction: ['관광 명소', 'attraction', 10],
+    viewpoint: ['전망 포인트', 'view', 15],
+    museum: ['박물관', 'museum', 8],
+    gallery: ['미술관', 'museum', 6],
+    artwork: ['예술 작품', 'art', -10],
+  },
+  natural: {
+    waterfall: ['폭포', 'nature', 20],
+    peak: ['산봉우리', 'nature', 8],
+    beach: ['해변', 'nature', 10],
+    cave_entrance: ['동굴', 'nature', 15],
+    hot_spring: ['온천', 'nature', 15],
+  },
+  historic: {
+    castle: ['성', 'history', 12],
+    palace: ['궁전', 'history', 12],
+    ruins: ['유적', 'history', 12],
+    archaeological_site: ['고고학 유적', 'history', 12],
+    fort: ['요새', 'history', 12],
+    monastery: ['수도원', 'history', 12],
+    city_gate: ['성문', 'history', 8],
+    citywalls: ['성벽', 'history', 6],
+    castle_wall: ['성벽', 'history', 6],
+    manor: ['옛 저택', 'history', 8],
+    monument: ['기념물', 'history', -5],
+    tomb: ['옛 무덤', 'history', -5],
+    building: ['역사적 건물', 'history', 2],
+    church: ['역사적 교회', 'history', 4],
+    temple: ['옛 사원', 'history', 8],
+    shrine: ['사당·신사', 'history', 6],
+    bridge: ['옛 다리', 'history', 5],
+    aqueduct: ['수도교', 'history', 8],
+    ship: ['역사적 선박', 'history', 5],
+    battlefield: ['옛 전쟁터', 'history', 2],
+  },
+}
+
+function classify(tags: Record<string, string>): { kind: string; category: SpotCategory; bonus: number } {
+  for (const key of ['natural', 'tourism', 'historic'] as const) {
+    const v = tags[key]
+    if (!v) continue
+    const k = KIND[key][v]
+    if (k) return { kind: k[0], category: k[1], bonus: k[2] }
+    if (key === 'historic') return { kind: '역사 유적', category: 'history', bonus: 0 }
+  }
+  return { kind: '명소', category: 'attraction', bonus: 0 }
+}
+
+// historic=* 중 작은 표지판·기념비처럼 여행지로 보기 어려운 것은 뺀다
+const HISTORIC_NOISE = 'memorial|wayside_cross|wayside_shrine|boundary_stone|milestone|yes|district|heritage|railway|marker|stone|optical_telegraph|pillory|cannon|vehicle|tree_shrine|creamery|mine_shaft|mine'
+
+function buildQuery(lat: number, lng: number, radiusM: number) {
+  const a = `(around:${radiusM},${lat},${lng})`
+  return `[out:json][timeout:30];
+(
+  nwr${a}[tourism~"^(attraction|viewpoint|museum|gallery|artwork)$"][name];
+  nwr${a}[natural~"^(waterfall|peak|beach|cave_entrance|hot_spring)$"][name];
+  nwr${a}[historic][historic!~"^(${HISTORIC_NOISE})$"][name];
+);
+out tags center 700;`
+}
+
+function parseWikiTag(v?: string): Spot['wiki'] {
+  const m = /^([a-z-]{2,12}):(.+)$/.exec(v ?? '')
+  return m ? { lang: m[1], title: m[2].trim() } : undefined
+}
+
+function toSpot(e: OsmElement, center: [number, number]): (Spot & { wikidata?: string }) | null {
+  const tags = e.tags ?? {}
+  const ll = elementLatLng(e)
+  const local = tags.name
+  if (!ll || !local) return null
+  const name = tags['name:ko'] || local
+  const { kind, category, bonus } = classify(tags)
+  const wikidata = /^Q\d+$/.test(tags.wikidata ?? '') ? tags.wikidata : undefined
+  const wiki = parseWikiTag(tags.wikipedia)
+  return {
+    id: `${e.type}/${e.id}`,
+    name,
+    nameLocal: local !== name ? local : undefined,
+    kind,
+    category,
+    lat: ll[0],
+    lng: ll[1],
+    distKm: distanceKm(center, ll),
+    wiki,
+    wikidata,
+    hiddenScore: 0,
+    interest: bonus + (tags['name:ko'] ? 3 : 0) + (tags.description || tags.website ? 2 : 0),
+    website: tags.website ?? tags['contact:website'],
+  }
+}
+
+// ---------- Wikidata: 문서 제목 ----------
+
+async function resolveTitles(qids: string[]): Promise<Map<string, { ko?: string; en?: string }>> {
+  const out = new Map<string, { ko?: string; en?: string }>()
+  for (let i = 0; i < qids.length; i += 150) {
+    const part = qids.slice(i, i + 150)
+    const query = `SELECT ?item ?ko ?en WHERE { VALUES ?item { ${part.map((q) => 'wd:' + q).join(' ')} }
+  OPTIONAL { ?k schema:about ?item ; schema:isPartOf <https://ko.wikipedia.org/> ; schema:name ?ko }
+  OPTIONAL { ?e schema:about ?item ; schema:isPartOf <https://en.wikipedia.org/> ; schema:name ?en } }`
+    const ctrl = new AbortController()
+    const timer = setTimeout(() => ctrl.abort(), 20000)
+    try {
+      const res = await fetch('https://query.wikidata.org/sparql', {
+        method: 'POST',
+        headers: { Accept: 'application/sparql-results+json', 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ query }),
+        signal: ctrl.signal,
+      })
+      if (!res.ok) throw new HttpError(res.status, res.url)
+      const json = (await res.json()) as { results: { bindings: Record<string, { value: string }>[] } }
+      for (const b of json.results.bindings) {
+        const q = b.item.value.slice(b.item.value.lastIndexOf('/') + 1)
+        out.set(q, { ko: b.ko?.value, en: b.en?.value })
+      }
+    } finally {
+      clearTimeout(timer)
+    }
+  }
+  return out
+}
+
+// ---------- Wikimedia Pageviews ----------
+
+const ymd = (d: Date) => d.toISOString().slice(0, 10).replace(/-/g, '')
+
+// 응답: {"items":[{"project":"en.wikipedia","article":"...","granularity":"daily","timestamp":"2026101800","access":"all-access","agent":"user","views":1234}, ...]}
+// 기간 동안 조회 기록이 없는 문서는 404를 준다 → 0회로 본다.
+async function pageviews30(lang: string, title: string): Promise<number> {
+  const key = `pv:${lang}:${title}`
+  const hit = readCache<number>(key, 3 * DAY)
+  if (hit) return hit.data
+  const end = new Date(Date.now() - DAY)
+  const start = new Date(end.getTime() - 29 * DAY)
+  const url = `https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/${lang}.wikipedia/all-access/user/${encodeURIComponent(
+    title.replace(/ /g, '_'),
+  )}/daily/${ymd(start)}/${ymd(end)}`
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), 15000)
+  try {
+    const res = await fetch(url, { signal: ctrl.signal })
+    if (res.status === 404) {
+      writeCache(key, 0)
+      return 0
+    }
+    if (!res.ok) throw new HttpError(res.status, url)
+    const json = (await res.json()) as { items?: { views: number }[] }
+    const views = (json.items ?? []).reduce((s, x) => s + (x.views ?? 0), 0)
+    writeCache(key, views)
+    return views
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+/** 동시에 n개까지만 실행 */
+async function mapLimit<T, R>(items: T[], n: number, fn: (x: T) => Promise<R>): Promise<PromiseSettledResult<R>[]> {
+  const out: PromiseSettledResult<R>[] = new Array(items.length)
+  let i = 0
+  await Promise.all(
+    Array.from({ length: Math.min(n, items.length) }, async () => {
+      while (i < items.length) {
+        const idx = i++
+        try {
+          out[idx] = { status: 'fulfilled', value: await fn(items[idx]) }
+        } catch (reason) {
+          out[idx] = { status: 'rejected', reason }
+        }
+      }
+    }),
+  )
+  return out
+}
+
+/** 조회수 → 숨은 정도(0~100). 0회=100, 30회≈67, 300회≈45, 3천 회≈24, 3만 회≈1 */
+export const scoreFromViews = (v: number) => Math.max(0, Math.min(100, Math.round(100 - 22 * Math.log10(v + 1))))
+export const HIDDEN_THRESHOLD = 50
+const NO_WIKI_SCORE = 75
+const UNKNOWN_VIEWS_SCORE = 40
+const MAX_PAGEVIEW_LOOKUPS = 60
+
+async function loadSpots(lat: number, lng: number, radiusKm: number): Promise<SpotsResult> {
+  const center: [number, number] = [lat, lng]
+  const elements = await overpass(buildQuery(lat, lng, Math.round(radiusKm * 1000)))
+
+  // 같은 이름이 가까이 여러 개(건물·경계 등) 있으면 하나만
+  const raw = elements
+    .map((e) => toSpot(e, center))
+    .filter((s): s is NonNullable<typeof s> => !!s)
+    .sort((a, b) => (b.wiki || b.wikidata ? 1 : 0) - (a.wiki || a.wikidata ? 1 : 0) || a.distKm - b.distKm)
+  const spots: (Spot & { wikidata?: string })[] = []
+  for (const s of raw) {
+    if (spots.some((t) => t.name === s.name && distanceKm([t.lat, t.lng], [s.lat, s.lng]) < 0.5)) continue
+    spots.push(s)
+  }
+
+  // 1) Wikidata로 한국어·영어 문서 제목 확인 (실패해도 계속)
+  const qids = [...new Set(spots.map((s) => s.wikidata).filter((q): q is string => !!q))]
+  if (qids.length) {
+    try {
+      const titles = await resolveTitles(qids)
+      for (const s of spots) {
+        const t = s.wikidata ? titles.get(s.wikidata) : undefined
+        if (t) {
+          s.koTitle = t.ko
+          s.enTitle = t.en
+        }
+      }
+    } catch {
+      /* 제목 확인 실패 → 위키 태그만 사용 */
+    }
+  }
+  for (const s of spots) {
+    if (s.wiki?.lang === 'ko') s.koTitle ??= s.wiki.title
+    if (s.wiki?.lang === 'en') s.enTitle ??= s.wiki.title
+  }
+
+  // 2) 조회수: 영어 문서(나라 간 비교 가능) → 원래 위키 태그 문서 → 한국어 문서 순
+  const withWiki = spots.filter((s) => s.enTitle || s.wiki || s.koTitle).sort((a, b) => a.distKm - b.distKm)
+  const lookup = withWiki.slice(0, MAX_PAGEVIEW_LOOKUPS)
+  const results = await mapLimit(lookup, 4, (s) => {
+    const [lang, title] = s.enTitle ? ['en', s.enTitle] : s.wiki ? [s.wiki.lang, s.wiki.title] : ['ko', s.koTitle!]
+    return pageviews30(lang, title)
+  })
+  let viewsFailed = 0
+  results.forEach((r, i) => {
+    if (r.status === 'fulfilled') lookup[i].views = r.value
+    else {
+      lookup[i].views = null
+      viewsFailed++
+    }
+  })
+  for (const s of withWiki.slice(MAX_PAGEVIEW_LOOKUPS)) s.views = null
+
+  // 3) 점수
+  for (const s of spots) {
+    const hasWiki = !!(s.enTitle || s.wiki || s.koTitle)
+    s.hiddenScore = !hasWiki ? NO_WIKI_SCORE : s.views == null ? UNKNOWN_VIEWS_SCORE : scoreFromViews(s.views)
+    // 설명을 보여 줄 수 있는(문서가 있는) 숨은 곳을 더 앞에, 너무 먼 곳은 살짝 뒤로
+    s.interest += s.hiddenScore + (hasWiki ? 15 : 0) - Math.min(10, s.distKm)
+    if (!hasWiki) s.views = undefined
+  }
+
+  return {
+    spots: spots.slice(0, 400).map(({ wikidata: _w, ...s }) => s),
+    fetchedAt: Date.now(),
+    viewsChecked: lookup.length - viewsFailed,
+    viewsFailed,
+  }
+}
+
+/** 지역의 명소 (24시간 캐시) */
+export function getSpots(lat: number, lng: number, radiusKm: number, force = false) {
+  const key = `spots:v1:${lat.toFixed(3)},${lng.toFixed(3)}:${radiusKm}`
+  return cachedJson(key, DAY, () => loadSpots(lat, lng, radiusKm), { force })
+}
+
+export function splitSpots(spots: Spot[]) {
+  const hidden = spots.filter((s) => s.hiddenScore >= HIDDEN_THRESHOLD).sort((a, b) => b.interest - a.interest)
+  const famous = spots
+    .filter((s) => s.hiddenScore < HIDDEN_THRESHOLD)
+    .sort((a, b) => (b.views ?? -1) - (a.views ?? -1) || a.distKm - b.distKm)
+  return { hidden, famous }
+}
+
+// ---------- Wikipedia 요약 ----------
+
+export interface WikiSummary {
+  title: string
+  extract: string
+  thumbnail?: string
+  url: string
+  lang: string
+}
+
+// 응답: {"type":"standard","title":"...","extract":"...","thumbnail":{"source":"https://upload...","width":320,"height":240},
+//        "content_urls":{"desktop":{"page":"https://ko.wikipedia.org/wiki/..."}}}
+async function fetchSummary(lang: string, title: string): Promise<WikiSummary | null> {
+  const url = `https://${lang}.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title.replace(/ /g, '_'))}`
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), 15000)
+  try {
+    const res = await fetch(url, { signal: ctrl.signal })
+    if (res.status === 404) return null
+    if (!res.ok) throw new HttpError(res.status, url)
+    const j = (await res.json()) as {
+      type?: string
+      title?: string
+      extract?: string
+      thumbnail?: { source?: string }
+      content_urls?: { desktop?: { page?: string } }
+    }
+    if (!j.extract || j.type === 'disambiguation') return null
+    return {
+      title: j.title ?? title,
+      extract: j.extract,
+      thumbnail: j.thumbnail?.source,
+      url: j.content_urls?.desktop?.page ?? `https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title)}`,
+      lang,
+    }
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+/** 한국어 문서 → 없으면 영어 문서 요약 (7일 캐시) */
+export async function getSummary(spot: Spot): Promise<WikiSummary | null> {
+  const candidates: [string, string][] = []
+  if (spot.koTitle) candidates.push(['ko', spot.koTitle])
+  if (spot.enTitle) candidates.push(['en', spot.enTitle])
+  if (!candidates.length && spot.wiki && (spot.wiki.lang === 'ko' || spot.wiki.lang === 'en')) candidates.push([spot.wiki.lang, spot.wiki.title])
+  for (const [lang, title] of candidates) {
+    const r = await cachedJson(`sum:${lang}:${title}`, 7 * DAY, () => fetchSummary(lang, title))
+    if (r.data) return r.data
+  }
+  return null
+}

@@ -19,6 +19,7 @@ npm run dev
 | `npm run dev` | 개발 서버 |
 | `npm run build` | 타입 검사 + 배포용 빌드 (`dist/`) |
 | `npm run build:countries` | Wikidata에서 국가 목록을 받아 `src/data/countries.json` 재생성 |
+| `npm run build:cities` | Wikidata에서 나라별 주요 도시를 받아 `src/data/cities.wikidata.json` 재생성 |
 | `npm run build:festivals` | Wikidata에서 나라별 축제를 받아 `src/data/wikidata-festivals.json` 재생성 (몇 분 걸림) |
 
 ## 직접 고칠 수 있는 데이터
@@ -27,6 +28,7 @@ npm run dev
 |---|---|
 | `src/data/festivals.json` | 주요 축제 보충 (Wikidata에 없거나 부족한 나라) |
 | `src/data/costs.json` | 나라별 하루 경비 [알뜰, 보통, 고급] (31개국 + 지역 평균, USD) |
+| `src/data/cities.json` | 31개국 여행 도시 좌표와 물가 보정값(factor) |
 | `src/data/regions.json` | 비용 지역 평균에 쓰는 나라별 지역 분류 |
 | `src/data/holidays.json` | Nager.Date가 지원하지 않는 나라(태국·대만·말레이시아·인도·UAE)의 고정 공휴일 |
 
@@ -37,7 +39,9 @@ npm run dev
 - 공휴일: Nager.Date
 - 환율: Frankfurter, 백업 open.er-api.com
 - 축제: Wikidata SPARQL (나라별 실시간 조회가 40초 이상 걸려 미리 받아 둔 파일 사용)
-- 명소: Overpass API(OpenStreetMap), Wikipedia, Wikimedia Pageviews
+- 명소·숙소: Overpass API(OpenStreetMap, 실패 시 공개 미러로 전환), Wikipedia 요약, Wikimedia Pageviews
+- 지역 검색: Nominatim (OSM 서버 요청은 1초에 1번 이하로 줄 세움)
+- 지도: Leaflet + OpenStreetMap 타일
 - 날씨: Open-Meteo
 
 ## 진행 상황
@@ -46,7 +50,7 @@ npm run dev
 - [x] 2. 환율 계산기
 - [x] 3. 공휴일 캘린더, 축제
 - [x] 4. 경비 계산기
-- [ ] 5. 숨은 명소 + 지도
+- [x] 5. 숨은 명소 + 지도 (+ 도시 선택·도시별 물가 보정·주변 숙소)
 - [ ] 6. 날씨
 - [ ] 7. 캐시·에러 처리·모바일 점검
 - [x] 8. GitHub Pages 배포 (https://jsa39382-hue.github.io/hidden-travel/)

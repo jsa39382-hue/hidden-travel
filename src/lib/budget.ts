@@ -1,5 +1,6 @@
 import costsRaw from '../data/costs.json'
 import regionsRaw from '../data/regions.json'
+import { dailyFactor, lodgingFactor } from './places'
 
 export type Tier = 0 | 1 | 2
 export const TIERS = [
@@ -88,7 +89,8 @@ export interface BudgetResult {
   personUnits: number // 어른 1 + 아이 0.7 환산 인원
 }
 
-export function calcBudget(row: CostRow, tier: Tier, party: Party, days: number): BudgetResult {
+/** factor: 도시 물가 보정 (숙소는 그대로, 나머지는 절반만 반영) */
+export function calcBudget(row: CostRow, tier: Tier, party: Party, days: number, factor = 1): BudgetResult {
   const { adults, kids } = headcount(party)
   const rooms = roomCount(party)
   const nights = Math.max(0, days - 1)
@@ -99,18 +101,18 @@ export function calcBudget(row: CostRow, tier: Tier, party: Party, days: number)
   const perPerson = (key: 'food' | 'transport' | 'sightseeing', label: string): BudgetLine => ({
     key,
     label,
-    unit: row[key][tier],
+    unit: row[key][tier] * dailyFactor(factor),
     formula: `1인 1일 × ${who} × ${days}일`,
-    amount: row[key][tier] * personUnits * days,
+    amount: row[key][tier] * dailyFactor(factor) * personUnits * days,
   })
 
   const lines: BudgetLine[] = [
     {
       key: 'lodging',
       label: '숙소',
-      unit: row.lodging[tier],
+      unit: row.lodging[tier] * lodgingFactor(factor),
       formula: nights ? `1박 1실 × ${rooms}실 × ${nights}박` : '당일치기 (숙박 없음)',
-      amount: row.lodging[tier] * rooms * nights,
+      amount: row.lodging[tier] * lodgingFactor(factor) * rooms * nights,
     },
     perPerson('food', '식비'),
     perPerson('transport', '현지 교통'),
