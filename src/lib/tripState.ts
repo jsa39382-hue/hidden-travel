@@ -82,7 +82,7 @@ export function useTripState() {
     country,
     dates: state.dates,
     place,
-    setCountry: (code: string) => setState((s) => ({ ...s, countryCode: code })),
+    setCountry: (code: string | null) => setState((s) => ({ ...s, countryCode: code })),
     setDates: (dates: TripDates) => setState((s) => ({ ...s, dates })),
     setPlace: (pl: Place) => setState((s) => (s.countryCode ? { ...s, places: { ...s.places, [s.countryCode]: pl } } : s)),
   }

@@ -7,6 +7,9 @@ import { getWeather } from '../lib/weather'
 import { getHolidaysForYears } from '../lib/holidays'
 import { getFestivals } from '../lib/festivals'
 import { STYLE_CHIPS, makePlan, parseStyle, planToText, type PlanDay } from '../lib/planner'
+import { placeKeyOf, useWishlist } from '../lib/wishlist'
+import { splitSpots } from '../lib/spots'
+import { SwipeDeck } from './SwipeDeck'
 import { errorReasonKo } from '../lib/cache'
 import { formatKo } from '../lib/dates'
 import { googleMapsUrl } from '../lib/osm'
@@ -49,6 +52,7 @@ export function PlannerSection({ country, place, dates }: { country: Country; pl
   return (
     <div className="space-y-6 lg:grid lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-start lg:gap-10 lg:space-y-0">
       <div className="space-y-4 lg:sticky lg:top-28 xl:top-8">
+      <SwipePicker place={place} />
       <div>
         <label htmlFor="style-text" className="mb-1 block text-sm font-medium text-stone-600">
           어떤 여행을 원하세요? 자유롭게 적어 주세요
@@ -177,6 +181,7 @@ function PlanResult({
     [place.lat, place.lng, country.code, years.join(',')],
   )
 
+  const { wish } = useWishlist(placeKeyOf(place))
   const plan = useMemo(() => {
     if (!sp.spots || extra.status !== 'success') return null
     return makePlan({
@@ -188,8 +193,10 @@ function PlanResult({
       seed,
       ...extra.data,
       dayEateries,
+      liked: wish.liked.map((x) => x.id),
+      disliked: wish.disliked,
     })
-  }, [sp.spots, nearby, extra, place, dates, style, seed, dayEateries])
+  }, [sp.spots, nearby, extra, place, dates, style, seed, dayEateries, wish])
 
   if (sp.base.status === 'error') return <ErrorBox message="명소를 불러오지 못해 계획을 만들 수 없어요." detail={errorReasonKo(sp.base.error)} onRetry={sp.retry} />
   if (!plan) return <Loading label="명소·식당·날씨를 모아 계획을 짜는 중…" />
@@ -316,6 +323,48 @@ function DayCard({ day, onFindFood, hasOwnFood }: { day: PlanDay; onFindFood: (d
           <button type="button" onClick={findFood} disabled={state === 'loading'} className="text-xs font-medium text-teal-700 underline underline-offset-2 disabled:opacity-50">
             {state === 'loading' ? '이 날 동선 근처 식당 찾는 중…' : state === 'error' ? '식당 찾기 실패 — 다시 시도' : '이 날 동선 근처 식당 찾아 채우기'}
           </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+/** 명소 카드를 넘기며 '가고 싶다 / 별로' 고르기 → 계획에 반영 */
+function SwipePicker({ place }: { place: Place }) {
+  const [open, setOpen] = useState(false)
+  const { wish, like, dislike, reset } = useWishlist(placeKeyOf(place))
+  const sp = useSpots(place.lat, place.lng, 10)
+  // 사진 있는 숨은 명소 위주로 섞어서 20장
+  const deck = useMemo(() => {
+    if (!sp.spots) return []
+    const { hidden, famous } = splitSpots(sp.spots)
+    const seen = new Set([...wish.liked.map((x) => x.id), ...wish.disliked])
+    const pool = [...hidden.slice(0, 30), ...famous.slice(0, 10)].filter((s) => !seen.has(s.id))
+    return pool.sort((a, b) => Number(!!b.image) - Number(!!a.image)).slice(0, 20)
+    // 처음 펼칠 때의 목록으로 고정 (고를 때마다 덱이 바뀌지 않게)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sp.spots, open])
+  return (
+    <div className="rounded-2xl border border-stone-200 p-4">
+      <div className="flex items-center justify-between gap-2">
+        <div>
+          <p className="text-sm font-semibold">카드 넘기며 고르기</p>
+          <p className="text-xs text-stone-500">
+            가고 싶다 {wish.liked.length} · 별로 {wish.disliked.length}
+            {(wish.liked.length > 0 || wish.disliked.length > 0) && (
+              <button type="button" onClick={reset} className="ml-2 underline underline-offset-2">
+                초기화
+              </button>
+            )}
+          </p>
+        </div>
+        <button type="button" onClick={() => setOpen((v) => !v)} className="rounded-full bg-stone-900 px-4 py-1.5 text-xs font-semibold text-stone-50">
+          {open ? '닫기' : '시작'}
+        </button>
+      </div>
+      {open && (
+        <div className="mt-4">
+          {!sp.spots ? <Loading label="명소를 불러오는 중…" /> : <SwipeDeck spots={deck} onLike={like} onDislike={dislike} />}
         </div>
       )}
     </div>

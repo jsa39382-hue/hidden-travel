@@ -198,6 +198,9 @@ export interface PlanInput {
   festivals: Festival[]
   /** 날짜별로 따로 찾아 둔 식당 (그 날 동선 근처) */
   dayEateries?: Record<string, Eatery[]>
+  /** 스와이프로 고른 '가고 싶다' / '별로' */
+  liked?: string[]
+  disliked?: string[]
 }
 
 export function makePlan(input: PlanInput): Plan {
@@ -208,7 +211,16 @@ export function makePlan(input: PlanInput): Plan {
   if (diffDays(dates.start, dates.end) + 1 > 10) warnings.push('일정표는 앞 10일까지만 만들어요.')
 
   // 1) 점수 매기기 + 다양성(같은 종류는 뽑을수록 점수 감소)
-  const scored = spots.map((s) => scoreSpot(s, style, rand)).sort((a, b) => b.score - a.score)
+  const liked = new Set(input.liked ?? [])
+  const disliked = new Set(input.disliked ?? [])
+  const scored = spots
+    .filter((s) => !disliked.has(s.id))
+    .map((s) => {
+      const r = scoreSpot(s, style, rand)
+      // '가고 싶다'로 고른 곳은 거의 확실히 일정에 들어가게
+      return liked.has(s.id) ? { ...r, score: r.score + 40, reasons: ['가고 싶다로 고름', ...r.reasons] } : r
+    })
+    .sort((a, b) => b.score - a.score)
   const capacity = Array.from({ length: nDays }, (_, i) => {
     const n = perDay(style)
     // 첫날(도착)·마지막 날(출발)은 하나 적게

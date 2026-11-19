@@ -23,7 +23,7 @@ export interface Place {
   lng: number
   /** 나라 평균 물가 대비 보정값 (1.0 = 평균) */
   factor: number
-  source: 'curated' | 'wikidata' | 'capital' | 'search'
+  source: 'curated' | 'wikidata' | 'capital' | 'search' | 'gps'
   /** 검색 결과일 때 가까운 기준 도시 */
   near?: string
 }

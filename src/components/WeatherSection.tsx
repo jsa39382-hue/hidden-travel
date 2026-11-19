@@ -121,6 +121,7 @@ function DayRow({ d, lo, hi, inTrip }: { d: DayWeather; lo: number; hi: number; 
         <p className="mt-0.5 text-[11px] text-stone-500">
           ☂️ {d.rainProb != null ? `${d.rainProb}%` : '-'}
           {d.rainMm ? ` · ${d.rainMm.toFixed(1)}mm` : ''}
+          {d.sunrise && d.sunset && ` · 일출 ${d.sunrise.slice(11, 16)} · 일몰 ${d.sunset.slice(11, 16)}`}
         </p>
       </div>
     </li>

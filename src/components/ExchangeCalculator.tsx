@@ -5,7 +5,6 @@ import {
   NoRateError,
   currencyDigits,
   displayUnit,
-  formatKrw,
   formatNumber,
   getKrwRate,
   groupInput,
@@ -14,6 +13,7 @@ import {
 } from '../lib/exchange'
 import { ErrorBox, Loading, Notice } from './Status'
 import { errorReasonKo } from '../lib/cache'
+import { Num } from './ui/Num'
 
 export function ExchangeCalculator({ country }: { country: Country }) {
   const { currency } = country
@@ -35,6 +35,10 @@ export function ExchangeCalculator({ country }: { country: Country }) {
 }
 
 type Side = 'local' | 'krw'
+
+/** '커피 몇 잔 값' 비교 기준 (한국 물가) */
+const COFFEE_KRW = 4500
+const ONIGIRI_KRW = 1500
 
 function Calculator({ rate, country, onRefresh }: { rate: KrwRate; country: Country; onRefresh: () => void }) {
   const { currency } = rate
@@ -75,7 +79,9 @@ function Calculator({ rate, country, onRefresh }: { rate: KrwRate; country: Coun
         <p className="text-xs text-stone-500">
           {formatNumber(unit)} {currency} · {name}
         </p>
-        <p className="mt-2 text-4xl font-bold tracking-tight">{formatKrw(rate.krwPer * unit)}</p>
+        <p className="mt-2 text-4xl font-bold tracking-tight">
+          <Num value={rate.krwPer * unit} digits={rate.krwPer * unit < 100 ? 2 : 0} suffix="원" />
+        </p>
         <p className="mt-1 text-sm text-stone-500">
           1,000원 = {formatNumber(rate.perKrw * 1000, digits)} {currency}
         </p>
@@ -90,6 +96,13 @@ function Calculator({ rate, country, onRefresh }: { rate: KrwRate; country: Coun
           <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round"><path d="M8 4v16M4 8l4-4 4 4M16 20V4M12 16l4 4 4-4" /></svg>
         </div>
         <AmountInput label="대한민국 원 (KRW)" code="KRW" value={krwText} onChange={(v) => set('krw', v)} />
+        {krwValue != null && krwValue > 0 && (
+          <p className="text-right text-xs text-stone-500">
+            ≈ 아메리카노 <span className="font-semibold text-stone-800"><Num value={krwValue / COFFEE_KRW} digits={1} />잔</span> · 편의점 삼각김밥{' '}
+            <span className="font-semibold text-stone-800"><Num value={krwValue / ONIGIRI_KRW} digits={0} />개</span>
+            <span className="block text-[11px] text-stone-400">한국 기준 아메리카노 4,500원, 삼각김밥 1,500원</span>
+          </p>
+        )}
       </div>
 
       <div className="space-y-2">

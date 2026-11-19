@@ -30,6 +30,7 @@ export function PlacePicker({ country, place, onChange }: { country: Country; pl
             </button>
           )
         })}
+        <MyLocation country={country} onPick={onChange} active={place.source === 'gps'} />
         <button
           type="button"
           onClick={() => setSearching((v) => !v)}
@@ -104,5 +105,35 @@ function PlaceSearch({ country, onPick }: { country: Country; onPick: (p: Place)
         <p className="px-1 pt-1 text-[11px] text-stone-400">검색: OpenStreetMap Nominatim</p>
       </div>
     </div>
+  )
+}
+
+/** 여행 중: 현재 위치를 기준으로 근처 숨은 명소·식당을 찾는다 (위치는 이 기기에서만 쓰고 저장된 지역 외에는 보내지 않음) */
+function MyLocation({ country, onPick, active }: { country: Country; onPick: (p: Place) => void; active: boolean }) {
+  const [state, setState] = useState<'idle' | 'loading' | 'denied' | 'error'>('idle')
+  if (typeof navigator === 'undefined' || !('geolocation' in navigator)) return null
+  const go = () => {
+    setState('loading')
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude: lat, longitude: lng } = pos.coords
+        const { factor, near } = factorNear(country.code, lat, lng)
+        onPick({ name: '내 위치', lat: Number(lat.toFixed(4)), lng: Number(lng.toFixed(4)), factor, near, source: 'gps' })
+        setState('idle')
+      },
+      (err) => setState(err.code === err.PERMISSION_DENIED ? 'denied' : 'error'),
+      { enableHighAccuracy: false, timeout: 15000, maximumAge: 60000 },
+    )
+  }
+  return (
+    <button
+      type="button"
+      onClick={go}
+      aria-pressed={active}
+      title={state === 'denied' ? '브라우저 설정에서 위치 권한을 허용해 주세요' : undefined}
+      className={`rounded-full px-3 py-1.5 text-sm ring-1 ${active ? 'bg-stone-900 font-semibold text-stone-50 ring-stone-900' : 'text-teal-700 ring-teal-600/40'}`}
+    >
+      {state === 'loading' ? '위치 찾는 중…' : state === 'denied' ? '위치 권한 없음' : state === 'error' ? '위치 실패 · 다시' : '◎ 내 위치 주변'}
+    </button>
   )
 }

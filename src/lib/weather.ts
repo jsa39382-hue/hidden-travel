@@ -16,6 +16,8 @@ interface OpenMeteoRes {
     temperature_2m_min: (number | null)[]
     precipitation_sum: (number | null)[]
     precipitation_probability_max: (number | null)[]
+    sunrise?: (string | null)[]
+    sunset?: (string | null)[]
   }
 }
 
@@ -26,6 +28,9 @@ export interface DayWeather {
   min: number | null
   rainMm: number | null
   rainProb: number | null
+  /** 현지 시각 "2026-11-19T06:34" */
+  sunrise?: string | null
+  sunset?: string | null
 }
 
 export interface Weather {
@@ -44,7 +49,7 @@ async function load(lat: number, lng: number): Promise<Weather> {
     new URLSearchParams({
       latitude: lat.toFixed(4),
       longitude: lng.toFixed(4),
-      daily: 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max',
+      daily: 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,sunrise,sunset',
       current: 'temperature_2m,weather_code,relative_humidity_2m,wind_speed_10m',
       timezone: 'auto',
       forecast_days: String(FORECAST_DAYS),
@@ -69,13 +74,15 @@ async function load(lat: number, lng: number): Promise<Weather> {
       min: d.temperature_2m_min?.[i] ?? null,
       rainMm: d.precipitation_sum?.[i] ?? null,
       rainProb: d.precipitation_probability_max?.[i] ?? null,
+      sunrise: d.sunrise?.[i] ?? null,
+      sunset: d.sunset?.[i] ?? null,
     })),
   }
 }
 
 /** 지점의 16일 예보 (1시간 캐시) */
 export const getWeather = (lat: number, lng: number, force = false) =>
-  cachedJson(`weather:v2:${lat.toFixed(3)},${lng.toFixed(3)}`, HOUR, () => load(lat, lng), { force })
+  cachedJson(`weather:v3:${lat.toFixed(3)},${lng.toFixed(3)}`, HOUR, () => load(lat, lng), { force })
 
 /** WMO 날씨 코드 → [이모지, 한국어] */
 export function describeWeather(code: number | null): [string, string] {
@@ -111,4 +118,49 @@ export function packingTips(days: DayWeather[]): string[] {
   if (snowy) tips.push('❄️ 눈 예보가 있어요. 미끄럼에 강한 신발이 좋아요.')
   if (rainy) tips.push(`☂️ 비 올 확률이 높은 날이 ${rainy}일 있어요. 우산을 챙기세요.`)
   return tips
+}
+
+/** 사진 찍기 좋은 골든아워 (대략: 일출 후 1시간, 일몰 전 1시간) */
+export function goldenHours(d: DayWeather) {
+  const t = (iso?: string | null) => (iso ? iso.slice(11, 16) : null)
+  const add = (iso: string, min: number) => {
+    const [h, m] = iso.slice(11, 16).split(':').map(Number)
+    const v = h * 60 + m + min
+    return `${String(Math.floor(v / 60)).padStart(2, '0')}:${String(v % 60).padStart(2, '0')}`
+  }
+  if (!d.sunrise || !d.sunset) return null
+  return { sunrise: t(d.sunrise)!, sunset: t(d.sunset)!, morning: [t(d.sunrise)!, add(d.sunrise, 60)], evening: [add(d.sunset, -60), t(d.sunset)!] }
+}
+
+/** 여러 지점의 일별 예보를 한 번에 (Open-Meteo는 좌표를 쉼표로 이어 보내면 배열로 돌려준다, 1시간 캐시) */
+export function getWeatherMulti(points: [number, number][], force = false) {
+  const key = 'weather-multi:v1:' + points.map(([a, b]) => `${a.toFixed(2)},${b.toFixed(2)}`).join(';')
+  return cachedJson(
+    key,
+    HOUR,
+    async () => {
+      const url =
+        'https://api.open-meteo.com/v1/forecast?' +
+        new URLSearchParams({
+          latitude: points.map((p) => p[0].toFixed(3)).join(','),
+          longitude: points.map((p) => p[1].toFixed(3)).join(','),
+          daily: 'temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code',
+          timezone: 'auto',
+          forecast_days: String(FORECAST_DAYS),
+        })
+      const r = await fetchJson<OpenMeteoRes | OpenMeteoRes[]>(url)
+      const list = Array.isArray(r) ? r : [r]
+      return list.map((x) =>
+        x.daily.time.map((date, i) => ({
+          date,
+          code: x.daily.weather_code?.[i] ?? null,
+          max: x.daily.temperature_2m_max?.[i] ?? null,
+          min: x.daily.temperature_2m_min?.[i] ?? null,
+          rainMm: null,
+          rainProb: x.daily.precipitation_probability_max?.[i] ?? null,
+        })),
+      ) as DayWeather[][]
+    },
+    { force },
+  )
 }

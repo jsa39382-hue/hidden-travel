@@ -1,39 +1,52 @@
-import { useEffect, useState, type ReactNode } from 'react'
+import { Suspense, lazy, useEffect, useState, type ReactNode } from 'react'
+import { AnimatePresence, motion } from 'motion/react'
 import { CountryPicker } from './components/CountryPicker'
 import { DateRange } from './components/DateRange'
 import { Flag } from './components/Flag'
-import { ExchangeCalculator } from './components/ExchangeCalculator'
-import { CalendarSection } from './components/CalendarSection'
-import { BudgetCalculator } from './components/BudgetCalculator'
 import { PlacePicker } from './components/PlacePicker'
-import { SpotsSection } from './components/SpotsSection'
-import { WeatherSection } from './components/WeatherSection'
-import { PlannerSection } from './components/PlannerSection'
-import { TipsSection } from './components/TipsSection'
+import { HomeSection } from './components/HomeSection'
+import { Onboarding } from './components/Onboarding'
 import { SectionBoundary } from './components/SectionBoundary'
 import { OfflineBanner } from './components/OfflineBanner'
 import { Diagnostics } from './components/Diagnostics'
 import { Icon } from './components/Icon'
+import { Loading } from './components/Status'
 import { cacheSizeKb, clearCache } from './lib/cache'
 import { useTripState } from './lib/tripState'
 import { diffDays, formatKo } from './lib/dates'
-import { COUNTRIES, POPULAR_CODES } from './lib/countries'
 import type { Country, Place, TripDates } from './types'
 
+// 처음 화면(홈) 밖의 화면은 처음 열 때 불러온다 (첫 로딩을 가볍게)
+const ExchangeCalculator = lazy(() => import('./components/ExchangeCalculator').then((m) => ({ default: m.ExchangeCalculator })))
+const CalendarSection = lazy(() => import('./components/CalendarSection').then((m) => ({ default: m.CalendarSection })))
+const BudgetCalculator = lazy(() => import('./components/BudgetCalculator').then((m) => ({ default: m.BudgetCalculator })))
+const SpotsSection = lazy(() => import('./components/SpotsSection').then((m) => ({ default: m.SpotsSection })))
+const WeatherSection = lazy(() => import('./components/WeatherSection').then((m) => ({ default: m.WeatherSection })))
+const PlannerSection = lazy(() => import('./components/PlannerSection').then((m) => ({ default: m.PlannerSection })))
+const TipsSection = lazy(() => import('./components/TipsSection').then((m) => ({ default: m.TipsSection })))
+const SettleSection = lazy(() => import('./components/SettleSection').then((m) => ({ default: m.SettleSection })))
+const RetroSection = lazy(() => import('./components/RetroSection').then((m) => ({ default: m.RetroSection })))
+
+/** 여섯 개의 큰 탭. '돈'과 '정보'는 안에서 다시 나뉜다 */
 const TABS = [
-  { id: 'plan', title: '맞춤 일정', short: '일정', desc: '원하는 여행 스타일을 적으면 추천 리스트와 일정표를 만들어요' },
+  { id: 'home', title: '한눈에', short: '홈', desc: '지금 가면 이득인지, 꼭 알아야 할 것, 챙길 짐' },
+  { id: 'plan', title: '맞춤 일정', short: '일정', desc: '카드를 넘기며 고르고, 원하는 스타일로 일정표 만들기' },
   { id: 'spots', title: '명소·숙소·식당', short: '명소', desc: '덜 알려진 명소와 주변 숙소·식당을 지도와 함께' },
-  { id: 'calendar', title: '공휴일·축제', short: '캘린더', desc: '여행 기간의 공휴일과 열리는 축제' },
-  { id: 'budget', title: '예상 경비', short: '경비', desc: '인원과 스타일에 맞춘 여행 경비 추정' },
-  { id: 'exchange', title: '환율', short: '환율', desc: '원화 기준 환율과 계산기' },
-  { id: 'weather', title: '날씨', short: '날씨', desc: '선택한 지역의 16일 예보' },
-  { id: 'tips', title: '음식·여행 팁', short: '팁', desc: '대표 음식, 나라 개요, 콘센트·시차·팁 문화, 기본 현지어 표현' },
+  { id: 'money', title: '돈', short: '돈', desc: '예상 경비, 환율 계산, 더치페이 정산', subs: [['budget', '경비'], ['exchange', '환율'], ['settle', '더치페이']] },
+  { id: 'info', title: '정보', short: '정보', desc: '날씨·골든아워, 공휴일·축제, 음식·여행 팁', subs: [['weather', '날씨'], ['calendar', '캘린더'], ['tips', '음식·팁']] },
+  { id: 'retro', title: '회고 카드', short: '추억', desc: '다녀온 여행을 스토리 크기 이미지로' },
 ] as const
 type TabId = (typeof TABS)[number]['id']
+type SubId = 'budget' | 'exchange' | 'settle' | 'weather' | 'calendar' | 'tips'
 
-const readTab = (): TabId => {
+/** 주소 #탭 또는 #하위탭 (예전 주소 #budget, #weather도 그대로 열린다) */
+function readHash(): { tab: TabId; sub?: SubId } {
   const h = location.hash.slice(1)
-  return (TABS.some((t) => t.id === h) ? h : 'plan') as TabId
+  for (const t of TABS) {
+    if (t.id === h) return { tab: t.id }
+    if ('subs' in t && t.subs.some(([s]) => s === h)) return { tab: t.id, sub: h as SubId }
+  }
+  return { tab: 'home' }
 }
 
 export default function App() {
@@ -48,81 +61,62 @@ export default function App() {
           <Diagnostics />
         </div>
       )}
-      {country ? <Shell {...trip} country={country} place={trip.place!} /> : <Onboarding {...trip} />}
+      {country ? (
+        <Shell {...trip} country={country} place={trip.place!} />
+      ) : (
+        <Onboarding dates={trip.dates} setCountry={trip.setCountry} setDates={trip.setDates} footer={<Footer />} />
+      )}
       <OfflineBanner />
     </div>
   )
 }
 
-// ---------------- 처음 화면 (나라 고르기) ----------------
-
-function Onboarding({ dates, setCountry, setDates }: ReturnType<typeof useTripState>) {
-  const popular = POPULAR_CODES.map((c) => COUNTRIES.find((x) => x.code === c)).filter((c): c is Country => !!c)
-  return (
-    <div className="mx-auto flex min-h-dvh max-w-xl flex-col justify-center px-5 py-12">
-      <p className="text-sm font-medium tracking-[0.2em] text-teal-700">HIDDEN TRAVEL</p>
-      <h1 className="mt-2 text-4xl font-bold tracking-tight sm:text-5xl">숨은여행</h1>
-      <p className="mt-3 text-base text-stone-500">나라만 고르면 일정·명소·경비·환율·날씨를 한 곳에서.</p>
-
-      <div className="mt-10 space-y-5">
-        <CountryPicker value={undefined} onChange={(c) => setCountry(c.code)} />
-        <DateRange value={dates} onChange={setDates} />
-      </div>
-
-      <div className="mt-8">
-        <p className="mb-3 text-xs font-medium uppercase tracking-wider text-stone-400">인기 여행지</p>
-        <div className="flex flex-wrap gap-2">
-          {popular.map((c) => (
-            <button
-              key={c.code}
-              type="button"
-              onClick={() => setCountry(c.code)}
-              className="flex items-center gap-2 rounded-full border border-stone-200 px-3.5 py-2 text-sm text-stone-700 transition hover:border-stone-400 active:bg-stone-100"
-            >
-              <Flag code={c.code} size="sm" />
-              {c.nameKo}
-            </button>
-          ))}
-        </div>
-      </div>
-      <Footer />
-    </div>
-  )
-}
-
-// ---------------- 여행 화면 ----------------
-
 type ShellProps = ReturnType<typeof useTripState> & { country: Country; place: Place }
 
 function Shell({ country, dates, place, setCountry, setDates, setPlace }: ShellProps) {
-  const [tab, setTab] = useState<TabId>(readTab)
-  // 한 번 연 탭은 숨겨 두기만 해서 입력값·불러온 결과를 유지한다
-  const [visited, setVisited] = useState<Set<TabId>>(() => new Set([readTab()]))
+  const initial = readHash()
+  const [tab, setTab] = useState<TabId>(initial.tab)
+  const [subs, setSubs] = useState<Record<string, SubId>>({ money: initial.tab === 'money' && initial.sub ? initial.sub : 'budget', info: initial.tab === 'info' && initial.sub ? initial.sub : 'weather' })
+  // 한 번 연 화면은 숨겨 두기만 해서 입력값·불러온 결과를 유지한다
+  const [visited, setVisited] = useState<Set<string>>(() => new Set([initial.tab, initial.sub ?? '']))
   const [editing, setEditing] = useState(false)
 
   useEffect(() => {
-    const onHash = () => setTab(readTab())
+    const onHash = () => {
+      const r = readHash()
+      setTab(r.tab)
+      if (r.sub) setSubs((s) => ({ ...s, [r.tab]: r.sub! }))
+    }
     window.addEventListener('hashchange', onHash)
     return () => window.removeEventListener('hashchange', onHash)
   }, [])
+  const activeSub = tab === 'money' || tab === 'info' ? subs[tab] : undefined
   useEffect(() => {
-    setVisited((v) => (v.has(tab) ? v : new Set(v).add(tab)))
-  }, [tab])
+    setVisited((v) => {
+      if (v.has(tab) && (!activeSub || v.has(activeSub))) return v
+      const n = new Set(v)
+      n.add(tab)
+      if (activeSub) n.add(activeSub)
+      return n
+    })
+  }, [tab, activeSub])
 
-  const go = (id: TabId) => {
-    if (id !== tab) history.pushState(null, '', `${location.pathname}${location.search}#${id}`)
+  const go = (id: TabId, sub?: SubId) => {
+    const hash = sub ?? id
+    if (`#${hash}` !== location.hash) history.pushState(null, '', `${location.pathname}${location.search}#${hash}`)
     setTab(id)
+    if (sub) setSubs((s) => ({ ...s, [id]: sub }))
     window.scrollTo({ top: 0 })
   }
   const current = TABS.find((t) => t.id === tab)!
-
   const setup = <TripSetup country={country} dates={dates} place={place} setCountry={setCountry} setDates={setDates} setPlace={setPlace} />
+  const days = Math.max(1, diffDays(dates.start, dates.end) + 1)
 
   return (
-    <div className="xl:grid xl:grid-cols-[360px_minmax(0,1fr)]">
+    <div className="xl:grid xl:grid-cols-[340px_minmax(0,1fr)]">
       {/* 컴퓨터: 왼쪽 고정 사이드바 */}
-      <aside className="hidden xl:flex xl:sticky xl:top-0 xl:h-dvh xl:flex-col xl:overflow-y-auto xl:border-r xl:border-stone-200 xl:px-6 xl:py-7">
-        <Brand />
+      <aside className="hidden xl:sticky xl:top-0 xl:flex xl:h-dvh xl:flex-col xl:overflow-y-auto xl:border-r xl:border-stone-200 xl:px-6 xl:py-7">
+        <Brand onClick={() => setCountry(null)} />
         <nav aria-label="기능" className="mt-8 space-y-0.5">
           {TABS.map((t) => (
             <button
@@ -130,12 +124,11 @@ function Shell({ country, dates, place, setCountry, setDates, setPlace }: ShellP
               type="button"
               onClick={() => go(t.id)}
               aria-current={tab === t.id ? 'page' : undefined}
-              className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition ${
-                tab === t.id ? 'bg-stone-100 font-semibold text-stone-900' : 'text-stone-500 hover:bg-stone-100/60 hover:text-stone-800'
-              }`}
+              className={`relative flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm ${tab === t.id ? 'font-semibold text-stone-900' : 'text-stone-500 hover:text-stone-800'}`}
             >
-              <Icon name={t.id} className={`size-5 ${tab === t.id ? 'text-teal-700' : ''}`} />
-              {t.title}
+              {tab === t.id && <motion.span layoutId="side-active" className="absolute inset-0 rounded-xl bg-stone-100" transition={{ type: 'spring', stiffness: 420, damping: 32 }} />}
+              <Icon name={t.id} className={`relative size-5 ${tab === t.id ? 'text-teal-700' : ''}`} />
+              <span className="relative">{t.title}</span>
             </button>
           ))}
         </nav>
@@ -159,15 +152,11 @@ function Shell({ country, dates, place, setCountry, setDates, setPlace }: ShellP
                   {country.nameKo} · {place.name}
                 </span>
                 <span className="block truncate text-xs text-stone-500">
-                  {formatKo(dates.start)} – {formatKo(dates.end)} · {Math.max(1, diffDays(dates.start, dates.end) + 1)}일
+                  {formatKo(dates.start)} – {formatKo(dates.end)} · {days}일
                 </span>
               </span>
             </button>
-            <button
-              type="button"
-              onClick={() => setEditing(true)}
-              className="flex items-center gap-1.5 rounded-full border border-stone-300 px-3 py-1.5 text-xs font-medium text-stone-700 active:bg-stone-100"
-            >
+            <button type="button" onClick={() => setEditing(true)} className="flex items-center gap-1.5 rounded-full border border-stone-300 px-3 py-1.5 text-xs font-medium text-stone-700">
               <Icon name="edit" className="size-3.5" />
               변경
             </button>
@@ -180,12 +169,11 @@ function Shell({ country, dates, place, setCountry, setDates, setPlace }: ShellP
                 type="button"
                 onClick={() => go(t.id)}
                 aria-current={tab === t.id ? 'page' : undefined}
-                className={`flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm transition ${
-                  tab === t.id ? 'bg-stone-900 font-semibold text-stone-50' : 'text-stone-500 hover:text-stone-800'
-                }`}
+                className={`relative flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm ${tab === t.id ? 'font-semibold text-stone-50' : 'text-stone-500 hover:text-stone-800'}`}
               >
-                <Icon name={t.id} className="size-4" />
-                {t.title}
+                {tab === t.id && <motion.span layoutId="top-active" className="absolute inset-0 rounded-full bg-stone-900" transition={{ type: 'spring', stiffness: 420, damping: 32 }} />}
+                <Icon name={t.id} className="relative size-4" />
+                <span className="relative">{t.title}</span>
               </button>
             ))}
           </nav>
@@ -196,35 +184,60 @@ function Shell({ country, dates, place, setCountry, setDates, setPlace }: ShellP
             <h1 className="text-2xl font-bold tracking-tight md:text-3xl">{current.title}</h1>
             <p className="mt-1 text-sm text-stone-500">{current.desc}</p>
           </div>
-          {TABS.map((t) =>
-            visited.has(t.id) ? (
-              <section key={t.id} hidden={tab !== t.id} aria-label={t.title}>
-                <SectionBoundary name={t.title}>
-                  <TabContent id={t.id} country={country} dates={dates} place={place} active={tab === t.id} />
-                </SectionBoundary>
-              </section>
-            ) : null,
+          {'subs' in current && (
+            <div className="no-scrollbar -mx-4 mb-6 flex gap-1 overflow-x-auto px-4" role="tablist">
+              {current.subs.map(([id, label]) => (
+                <button
+                  key={id}
+                  role="tab"
+                  aria-selected={activeSub === id}
+                  onClick={() => go(current.id, id as SubId)}
+                  className={`relative shrink-0 rounded-full px-4 py-2 text-sm ${activeSub === id ? 'font-semibold text-stone-50' : 'text-stone-500'}`}
+                >
+                  {activeSub === id && <motion.span layoutId={`sub-${current.id}`} className="absolute inset-0 rounded-full bg-stone-900" transition={{ type: 'spring', stiffness: 420, damping: 32 }} />}
+                  <span className="relative">{label}</span>
+                </button>
+              ))}
+            </div>
           )}
+          {VIEWS.map((v) => {
+            if (!visited.has(v.id)) return null
+            const active = v.parent ? tab === v.parent && activeSub === v.id : tab === v.id
+            return (
+              <motion.section
+                key={v.id}
+                hidden={!active}
+                aria-label={v.label}
+                initial={false}
+                animate={active ? { opacity: 1, y: 0 } : { opacity: 0, y: 14 }}
+                transition={active ? { type: 'spring', stiffness: 260, damping: 26 } : { duration: 0 }}
+              >
+                <SectionBoundary name={v.label}>
+                  <Suspense fallback={<Loading />}>
+                    <View id={v.id} country={country} dates={dates} place={place} active={active} onPickCountry={(c) => setCountry(c)} />
+                  </Suspense>
+                </SectionBoundary>
+              </motion.section>
+            )
+          })}
           <div className="mt-12 xl:hidden">
             <Footer />
           </div>
         </main>
       </div>
 
-      {/* 휴대폰: 아래쪽 탭 바 */}
-      <nav
-        aria-label="기능"
-        className="fixed inset-x-0 bottom-0 z-[700] border-t border-stone-200 bg-stone-50/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
-      >
-        <div className="grid grid-cols-7">
+      {/* 휴대폰: 아래쪽 탭 바 (활성 표시가 스프링으로 미끄러진다) */}
+      <nav aria-label="기능" className="fixed inset-x-0 bottom-0 z-[700] border-t border-stone-200 bg-stone-50/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden">
+        <div className="grid grid-cols-6">
           {TABS.map((t) => (
             <button
               key={t.id}
               type="button"
               onClick={() => go(t.id)}
               aria-current={tab === t.id ? 'page' : undefined}
-              className={`flex flex-col items-center gap-1 py-2.5 text-[11px] ${tab === t.id ? 'font-semibold text-stone-900' : 'text-stone-400'}`}
+              className={`relative flex flex-col items-center gap-1 py-2.5 text-[11px] ${tab === t.id ? 'font-semibold text-stone-900' : 'text-stone-400'}`}
             >
+              {tab === t.id && <motion.span layoutId="bottom-active" className="absolute inset-x-3 top-0 h-0.5 rounded-full bg-teal-700" transition={{ type: 'spring', stiffness: 500, damping: 30 }} />}
               <Icon name={t.id} className={`size-[22px] ${tab === t.id ? 'text-teal-700' : ''}`} />
               {t.short}
             </button>
@@ -232,31 +245,48 @@ function Shell({ country, dates, place, setCountry, setDates, setPlace }: ShellP
         </div>
       </nav>
 
-      {editing && (
-        <Sheet title="여행 설정" onClose={() => setEditing(false)}>
-          {setup}
-        </Sheet>
-      )}
+      <AnimatePresence>{editing && <Sheet title="여행 설정" onClose={() => setEditing(false)} onHome={() => setCountry(null)}>{setup}</Sheet>}</AnimatePresence>
     </div>
   )
 }
 
-function TabContent({ id, country, dates, place, active }: { id: TabId; country: Country; dates: TripDates; place: Place; active: boolean }) {
+const VIEWS: { id: string; label: string; parent?: TabId }[] = [
+  { id: 'home', label: '한눈에' },
+  { id: 'plan', label: '맞춤 일정' },
+  { id: 'spots', label: '명소·숙소·식당' },
+  { id: 'budget', label: '경비', parent: 'money' },
+  { id: 'exchange', label: '환율', parent: 'money' },
+  { id: 'settle', label: '더치페이', parent: 'money' },
+  { id: 'weather', label: '날씨', parent: 'info' },
+  { id: 'calendar', label: '캘린더', parent: 'info' },
+  { id: 'tips', label: '음식·팁', parent: 'info' },
+  { id: 'retro', label: '회고 카드' },
+]
+
+function View({ id, country, dates, place, active, onPickCountry }: { id: string; country: Country; dates: TripDates; place: Place; active: boolean; onPickCountry: (c: string) => void }) {
   switch (id) {
+    case 'home':
+      return <HomeSection country={country} place={place} dates={dates} onPickCountry={onPickCountry} />
     case 'plan':
       return <PlannerSection country={country} place={place} dates={dates} />
     case 'spots':
       return <SpotsSection country={country} place={place} active={active} />
-    case 'calendar':
-      return <CalendarSection country={country} dates={dates} />
     case 'budget':
       return <BudgetCalculator country={country} dates={dates} place={place} />
     case 'exchange':
       return <ExchangeCalculator country={country} />
+    case 'settle':
+      return <SettleSection country={country} dates={dates} />
     case 'weather':
       return <WeatherSection place={place} dates={dates} />
+    case 'calendar':
+      return <CalendarSection country={country} dates={dates} />
     case 'tips':
       return <TipsSection country={country} place={place} />
+    case 'retro':
+      return <RetroSection country={country} place={place} dates={dates} />
+    default:
+      return null
   }
 }
 
@@ -271,7 +301,7 @@ function TripSetup({
   country: Country
   dates: TripDates
   place: Place
-  setCountry: (c: string) => void
+  setCountry: (c: string | null) => void
   setDates: (d: TripDates) => void
   setPlace: (p: Place) => void
 }) {
@@ -287,8 +317,8 @@ function TripSetup({
   )
 }
 
-/** 휴대폰·태블릿용 아래에서 올라오는 설정 창 */
-function Sheet({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
+/** 휴대폰·태블릿용 아래에서 올라오는 설정 창: 스프링으로 튀어 오르고, 아래로 끌어 내리면 닫힌다 */
+function Sheet({ title, onClose, onHome, children }: { title: string; onClose: () => void; onHome: () => void; children: ReactNode }) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
     document.addEventListener('keydown', onKey)
@@ -301,30 +331,52 @@ function Sheet({ title, onClose, children }: { title: string; onClose: () => voi
   }, [onClose])
   return (
     <div className="fixed inset-0 z-[1500] flex items-end justify-center md:items-center" role="dialog" aria-modal="true" aria-label={title}>
-      <button type="button" aria-label="닫기" onClick={onClose} className="absolute inset-0 bg-black/0 backdrop-blur-sm" style={{ background: 'rgba(0,0,0,.6)' }} />
-      <div className="relative max-h-[90dvh] w-full overflow-y-auto rounded-t-3xl border border-stone-200 bg-white px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-3 md:max-w-lg md:rounded-3xl md:p-6">
-        <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-stone-300 md:hidden" />
+      <motion.button
+        type="button"
+        aria-label="닫기"
+        onClick={onClose}
+        className="absolute inset-0 backdrop-blur-sm"
+        style={{ background: 'rgba(0,0,0,.6)' }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      />
+      <motion.div
+        initial={{ y: '100%' }}
+        animate={{ y: 0 }}
+        exit={{ y: '100%' }}
+        transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+        drag="y"
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={{ top: 0.05, bottom: 0.8 }}
+        onDragEnd={(_, info) => (info.offset.y > 120 || info.velocity.y > 600) && onClose()}
+        className="relative max-h-[90dvh] w-full overflow-y-auto rounded-t-3xl border border-stone-200 bg-white px-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] pt-3 md:max-w-lg md:rounded-3xl md:p-6"
+      >
+        <div className="mx-auto mb-3 h-1 w-10 cursor-grab rounded-full bg-stone-300 md:hidden" />
         <div className="mb-5 flex items-center justify-between">
           <h2 className="text-lg font-bold">{title}</h2>
-          <button type="button" onClick={onClose} aria-label="닫기" className="rounded-full p-2 text-stone-500 active:bg-stone-100">
+          <button type="button" onClick={onClose} aria-label="닫기" className="rounded-full p-2 text-stone-500">
             <Icon name="close" />
           </button>
         </div>
         {children}
-        <button type="button" onClick={onClose} className="mt-6 h-12 w-full rounded-xl bg-stone-900 text-sm font-semibold text-stone-50 active:opacity-90">
+        <button type="button" onClick={onClose} className="mt-6 h-12 w-full rounded-xl bg-stone-900 text-sm font-semibold text-stone-50">
           완료
         </button>
-      </div>
+        <button type="button" onClick={onHome} className="mt-2 h-11 w-full text-sm text-stone-500">
+          지구본으로 돌아가 다른 나라 찾기
+        </button>
+      </motion.div>
     </div>
   )
 }
 
-function Brand() {
+function Brand({ onClick }: { onClick: () => void }) {
   return (
-    <div>
+    <button type="button" onClick={onClick} className="text-left" title="처음 화면(지구본)으로">
       <p className="text-[11px] font-medium tracking-[0.2em] text-teal-700">HIDDEN TRAVEL</p>
       <p className="mt-1 text-2xl font-bold tracking-tight">숨은여행</p>
-    </div>
+    </button>
   )
 }
 
@@ -347,7 +399,7 @@ function Footer({ compact }: { compact?: boolean }) {
         </button>
       </p>
       <p>
-        데이터: Wikidata · OpenStreetMap 기여자 · Nominatim · 위키백과 · Frankfurter · ExchangeRate-API · Nager.Date · Open-Meteo · 국기 flagcdn.com
+        데이터: Wikidata · OpenStreetMap 기여자 · Nominatim · 위키백과·위키미디어 공용 · Frankfurter · ExchangeRate-API · Nager.Date · Open-Meteo · MyMemory · 국기 flagcdn.com
       </p>
     </footer>
   )

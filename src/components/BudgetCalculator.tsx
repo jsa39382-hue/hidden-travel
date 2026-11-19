@@ -7,6 +7,7 @@ import { errorReasonKo } from '../lib/cache'
 import { COSTS_UPDATED, TIERS, calcBudget, getCostRow, headcount, regionOfCountry, type Party, type PartyType, type Tier } from '../lib/budget'
 import { DEFAULT_EXTRAS, KID_FLIGHT_RATE, SHOPPING, flightEstimate, insuranceEstimate, simEstimate, type ExtraLine, type ExtraPrefs } from '../lib/extras'
 import { ErrorBox, Loading } from './Status'
+import { Num, roundKrw } from './ui/Num'
 
 const PREFS_KEY = 'hidden-travel:budget'
 const PARTY_TYPES: { type: PartyType; label: string }[] = [
@@ -263,7 +264,7 @@ function ResultTable({
         <p className="text-xs text-stone-500">
           {placeName} · {result.people}명 · {result.nights}박 {result.days}일 · 방 {result.rooms}개
         </p>
-        <p className="mt-2 text-4xl font-bold tracking-tight">{totalMain}</p>
+        <p className="mt-2 text-4xl font-bold tracking-tight">{grandKrw != null ? <Num value={roundKrw(grandKrw)} suffix="원" /> : totalMain}</p>
         <p className="mt-1 text-sm text-stone-500">{extras.length ? '항공권 등 포함 총액' : sub(result.total)}</p>
         <div className="mt-4 grid grid-cols-3 gap-3 border-t border-stone-200 pt-4 text-sm">
           <p>
