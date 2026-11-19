@@ -391,6 +391,7 @@ function CityTransitBlock({ t, rides, setRides, krwPer }: { t: TransportCountry;
           </p>
           {fare && krwPer && <p className="text-xs text-stone-500">약 {roundKrw(((fare[0] + fare[1]) / 2) * krwPer).toLocaleString('ko-KR')}원 · 기본요금 + km당 요금 × 거리, ±20%</p>}
           {t.taxi?.nightHours && t.taxi.nightMultiplier && <p className="mt-1 text-xs text-stone-500">심야 {t.taxi.nightHours} ×{t.taxi.nightMultiplier}</p>}
+          {t.taxi?.note && <p className="mt-1 text-xs text-stone-500">{t.taxi.note}</p>}
           {t.rideApps.length > 0 && (
             <>
               <p className="mt-4 text-xs text-stone-500">차량 호출 앱</p>

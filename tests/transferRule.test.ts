@@ -82,3 +82,12 @@ test('택시가 비싸도 아이·짐 많으면 갈아타기 불이익으로 바
   assert.equal(light.recommended?.option.transfers, 0)
   assert.equal(heavy.recommended?.option.transfers, 0)
 })
+
+test('두 단계 택시 요금: 기본 거리 포함, 일정 금액 이후 km당 요금이 바뀜', () => {
+  // 홍콩 시내 택시 공식 요금표 형태: 처음 2km 29, 이후 km당 10.5, 102.5 넘으면 km당 7
+  const hk = { base: 29, includedKm: 2, perKm: 10.5, afterAmount: 102.5, perKmAfter: 7, nightMultiplier: null, nightHours: null }
+  const mid = (r: [number, number] | null) => (r ? (r[0] + r[1]) / 2 : NaN)
+  assert.equal(mid(taxiFare(hk, 1)), 29) // 기본 거리 안
+  assert.equal(mid(taxiFare(hk, 4)), 50) // 29 + 2×10.5
+  assert.equal(mid(taxiFare(hk, 19)), 102.5 + 7 * 10) // 102.5 도달 지점(9km) 이후 10km × 7
+})

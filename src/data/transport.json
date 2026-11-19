@@ -1,5 +1,5 @@
 {
- "_설명": "나라별 공항 이동·시내 교통·택시·도시 간 이동 데이터. costs.json처럼 나라 코드별로 넣는다. price는 [최소, 최대] 현지 통화(대중교통은 1인, 택시·차량 호출은 1대 기준). firstLast는 '05:30-23:40'(막차가 자정을 넘기면 '05:30-00:20'). 공식 사이트에서 확인한 값만 넣고, 확인하지 못한 값은 null로 둔다. transfers는 갈아타는 횟수(null이면 rail 1, 그 밖 0으로 본다). childRate는 아이 요금 비율(null이면 어른 요금으로 계산).",
+ "_설명": "나라별 공항 이동·시내 교통·택시·도시 간 이동 데이터. costs.json처럼 나라 코드별로 넣는다. price는 [최소, 최대] 현지 통화(대중교통은 1인, 택시·차량 호출은 1대 기준). firstLast는 '05:30-23:40'(막차가 자정을 넘기면 '05:30-00:20'). 공식 사이트에서 확인한 값만 넣고, 확인하지 못한 값은 null로 둔다. taxi는 base(기본요금)·includedKm(기본요금에 포함된 거리)·perKm·afterAmount/perKmAfter(일정 금액 이후 바뀌는 km당 요금)·note. transfers는 갈아타는 횟수(null이면 rail 1, 그 밖 0으로 본다). childRate는 아이 요금 비율(null이면 어른 요금으로 계산).",
  "updated": "2026-11",
  "countries": {
   "JP": {
@@ -28,12 +28,15 @@
       },
       {
        "mode": "rail",
-       "name": "도쿄 모노레일",
+       "name": "도쿄 모노레일 (하네다공항 → 하마마쓰초)",
        "minutes": null,
-       "price": null,
+       "price": [
+        490,
+        490
+       ],
        "firstLast": null,
        "where": "하네다공항 각 터미널역 (도쿄 모노레일)",
-       "note": "공식 안내: 하네다공항에서 신주쿠까지 약 38분",
+       "note": "공식: 하마마쓰초 ↔ 하네다공항 2터미널 어른 490엔(승차권), 평균 5분 간격 · 아이는 어른의 절반",
        "transfers": null
       },
       {
@@ -99,12 +102,15 @@
       },
       {
        "mode": "taxi",
-       "name": "택시",
+       "name": "정액 택시 (나리타 → 도쿄 주오·지요다·다이토구 등 C구역)",
        "minutes": null,
-       "price": null,
+       "price": [
+        29000,
+        31000
+       ],
        "firstLast": null,
-       "where": "각 터미널 택시 승강장",
-       "note": "거리로 계산해요",
+       "where": "1터미널 15번, 2터미널 28·31-A번, 3터미널 택시 승강장",
+       "note": "고속도로 통행료 별도, 22~5시 할증 · 신주쿠·시부야(D구역)는 31,500~32,500엔",
        "transfers": 0
       }
      ]
@@ -137,8 +143,8 @@
    "cityTransit": [
     {
      "city": "도쿄",
-     "card": "Suica · PASMO (IC 교통카드)",
-     "cardPrice": null,
+     "card": "Suica · PASMO (IC 교통카드, 보증금 500엔)",
+     "cardPrice": 500,
      "passes": [
       {
        "name": "Tokyo Subway Ticket 24시간",
@@ -162,9 +168,13 @@
    "taxi": {
     "city": "도쿄",
     "base": null,
+    "includedKm": null,
     "perKm": null,
+    "afterAmount": null,
+    "perKmAfter": null,
     "nightMultiplier": null,
-    "nightHours": null
+    "nightHours": null,
+    "note": null
    },
    "rideApps": [
     "GO",
@@ -189,11 +199,573 @@
    ],
    "sources": [
     "https://www.haneda-tokyo-access.com/en/ride/fares.html",
-    "https://www.tokyo-monorail.co.jp/english/",
     "https://www.keisei.co.jp/keisei/tetudou/skyliner/us/tickets/index.php",
-    "https://www.wikidata.org/wiki/Q36454",
+    "https://www.narita-airport.jp/en/access/taxi/",
+    "https://www.tokyo-monorail.co.jp/english/",
+    "https://www.tokyo-monorail.co.jp/english/tickets/suica/index.html",
+    "https://www.tokyo-monorail.co.jp/english/tickets/type.html",
+    "https://www.wikidata.org/wiki/Q193682",
     "https://www.wikidata.org/wiki/Q204853",
-    "https://www.wikidata.org/wiki/Q193682"
+    "https://www.wikidata.org/wiki/Q36454"
+   ]
+  },
+  "US": {
+   "currency": "USD",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "JFK",
+     "name": "존 F. 케네디 국제공항",
+     "lat": 40.64,
+     "lng": -73.78,
+     "cities": [
+      "뉴욕"
+     ],
+     "options": [
+      {
+       "mode": "taxi",
+       "name": "옐로캡 정액 (JFK ↔ 맨해튼)",
+       "minutes": null,
+       "price": [
+        74.75,
+        79.75
+       ],
+       "firstLast": null,
+       "where": "각 터미널 택시 승강장",
+       "note": "정액 70달러 + 주 할증 0.5 + 개선 1 + 혼잡 2.5 + 혼잡통행료 0.75 (평일 16~20시 +5) · 팁·통행료 별도",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": {
+    "city": "뉴욕",
+    "base": 3.0,
+    "includedKm": null,
+    "perKm": 2.175,
+    "afterAmount": null,
+    "perKmAfter": null,
+    "nightMultiplier": null,
+    "nightHours": null,
+    "note": "1/5마일당 0.70달러(=km당 약 2.18달러) · 20~6시 1달러, 평일 16~20시 2.5달러 추가 · 팁 별도"
+   },
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://www.nyc.gov/site/tlc/passengers/taxi-fare.page",
+    "https://www.wikidata.org/wiki/Q8685"
+   ]
+  },
+  "CA": {
+   "currency": "CAD",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "YVR",
+     "name": "밴쿠버 국제공항",
+     "lat": 49.1947,
+     "lng": -123.184,
+     "cities": [
+      "밴쿠버"
+     ],
+     "options": [
+      {
+       "mode": "rail",
+       "name": "캐나다 라인 스카이트레인 (YVR → 다운타운)",
+       "minutes": null,
+       "price": [
+        10.0,
+        11.6
+       ],
+       "firstLast": null,
+       "where": "YVR–Airport역",
+       "note": "1~2구간 요금 3.50~5.10달러 + 공항 출발 추가요금 6.50달러",
+       "transfers": null
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    },
+    {
+     "code": "YYZ",
+     "name": "토론토 피어슨 국제공항",
+     "lat": 43.6767,
+     "lng": -79.6306,
+     "cities": [
+      "토론토"
+     ],
+     "options": [
+      {
+       "mode": "rail",
+       "name": "UP Express (피어슨 → 유니언역)",
+       "minutes": null,
+       "price": [
+        12.35,
+        12.35
+       ],
+       "firstLast": null,
+       "where": "1터미널 UP Express역",
+       "note": "12세 이하 무료",
+       "transfers": null
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [
+    {
+     "city": "밴쿠버",
+     "card": "Compass 카드 (보증금 6달러) · 컨택리스",
+     "cardPrice": 6,
+     "passes": [
+      {
+       "name": "DayPass (전 구간)",
+       "price": 12.55,
+       "days": 1
+      }
+     ],
+     "single": [
+      2.85,
+      3.5
+     ]
+    }
+   ],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+    "https://www.translink.ca/transit-fares/where-to-buy",
+    "https://www.upexpress.com/en/fares",
+    "https://www.wikidata.org/wiki/Q321224",
+    "https://www.wikidata.org/wiki/Q242066"
+   ]
+  },
+  "AU": {
+   "currency": "AUD",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "SYD",
+     "name": "시드니 킹스퍼드 스미스 공항",
+     "lat": -33.9483,
+     "lng": 151.1761,
+     "cities": [
+      "시드니"
+     ],
+     "options": [
+      {
+       "mode": "taxi",
+       "name": "택시 (공항 → 시드니 CBD)",
+       "minutes": 20,
+       "price": [
+        45,
+        55
+       ],
+       "firstLast": null,
+       "where": "각 터미널 앞 택시 승강장",
+       "note": "공식 안내: 약 20분, 편도 45~55달러",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [
+    {
+     "city": "시드니",
+     "card": "Opal 카드 · 컨택리스",
+     "cardPrice": null,
+     "passes": [
+      {
+       "name": "Opal 하루 상한 (월~목)",
+       "price": 19.3,
+       "days": 1
+      },
+      {
+       "name": "Opal 주간 상한",
+       "price": 50,
+       "days": 7
+      }
+     ],
+     "single": null
+    }
+   ],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://transportnsw.info/tickets-fares/fares",
+    "https://www.sydneyairport.com.au/info-sheet/transport-options",
+    "https://www.wikidata.org/wiki/Q17581"
+   ]
+  },
+  "NZ": {
+   "currency": "NZD",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "AKL",
+     "name": "오클랜드 국제공항",
+     "lat": -37.0081,
+     "lng": 174.7917,
+     "cities": [
+      "오클랜드"
+     ],
+     "options": [
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [
+    {
+     "city": "오클랜드",
+     "card": "AT HOP 카드 (5달러) · 컨택리스",
+     "cardPrice": 5,
+     "passes": [
+      {
+       "name": "컨택리스 하루 상한",
+       "price": 20,
+       "days": 1
+      },
+      {
+       "name": "AT HOP 7일 상한",
+       "price": 50,
+       "days": 7
+      }
+     ],
+     "single": null
+    }
+   ],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://at.govt.nz/bus-train-ferry/at-hop-card/buy-at-hop-card",
+    "https://at.govt.nz/bus-train-ferry/at-hop-card/7-day-fare-cap-for-auckland-public-transport",
+    "https://www.wikidata.org/wiki/Q45938"
+   ]
+  },
+  "CZ": {
+   "currency": "CZK",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "PRG",
+     "name": "바츨라프 하벨 프라하 공항",
+     "lat": 50.1008,
+     "lng": 14.26,
+     "cities": [
+      "프라하"
+     ],
+     "options": [
+      {
+       "mode": "bus",
+       "name": "59번 트롤리버스 + 지하철 A선 (공항 → 시내)",
+       "minutes": null,
+       "price": [
+        46,
+        50
+       ],
+       "firstLast": null,
+       "where": "1·2터미널 버스 정류장",
+       "note": "트롤리버스 약 15분 후 벨레슬라빈역에서 지하철 A선 · 90분권(앱 46, 종이 50코루나)",
+       "transfers": 1
+      },
+      {
+       "mode": "bus",
+       "name": "100번 버스 + 지하철 B선 (공항 → 시내)",
+       "minutes": null,
+       "price": [
+        46,
+        50
+       ],
+       "firstLast": null,
+       "where": "1·2터미널 버스 정류장",
+       "note": "버스 약 18분 후 즐리친역에서 지하철 B선 · 90분권",
+       "transfers": 1
+      },
+      {
+       "mode": "bus",
+       "name": "Airport Express 버스 (공항 → 프라하 중앙역)",
+       "minutes": 40,
+       "price": null,
+       "firstLast": null,
+       "where": "1·2터미널",
+       "note": "공식: 교통 상황에 따라 약 40분 · 일반 대중교통권 사용 불가(별도 요금)",
+       "transfers": 0
+      },
+      {
+       "mode": "taxi",
+       "name": "공식 택시 (Uber Airport)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "1터미널 1층",
+       "note": "공항 공식 택시 · 거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [
+    {
+     "city": "프라하",
+     "card": "PID Lítačka 앱 · 종이 승차권",
+     "cardPrice": null,
+     "passes": [
+      {
+       "name": "24시간권",
+       "price": 140,
+       "days": 1
+      },
+      {
+       "name": "72시간권",
+       "price": 340,
+       "days": 3
+      }
+     ],
+     "single": [
+      36,
+      50
+     ]
+    }
+   ],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://pid.cz/en/tickets/",
+    "https://www.prg.aero/en/public-transport-buses",
+    "https://www.prg.aero/en/airport-express",
+    "https://www.prg.aero/en/taxi",
+    "https://www.wikidata.org/wiki/Q99172"
+   ]
+  },
+  "HK": {
+   "currency": "HKD",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "HKG",
+     "name": "홍콩 국제공항",
+     "lat": 22.3089,
+     "lng": 113.9144,
+     "cities": [
+      "홍콩"
+     ],
+     "options": [
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "시내 택시 요금표로 계산해요 · 짐 1개당 6홍콩달러 추가",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": {
+    "city": "홍콩 (시내 택시)",
+    "base": 29,
+    "includedKm": 2,
+    "perKm": 10.5,
+    "afterAmount": 102.5,
+    "perKmAfter": 7,
+    "nightMultiplier": null,
+    "nightHours": null,
+    "note": "처음 2km 29달러, 이후 200m마다 2.1달러 (102.5달러 넘으면 1.4달러) · 짐 1개 6달러, 터널 통행료 별도"
+   },
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://www.td.gov.hk/en/transport_in_hong_kong/public_transport/taxi/taxi_fare_of_hong_kong/index.html",
+    "https://www.wikidata.org/wiki/Q17704"
+   ]
+  },
+  "IT": {
+   "currency": "EUR",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "FCO",
+     "name": "로마 피우미치노 공항",
+     "lat": 41.7956,
+     "lng": 12.2499,
+     "cities": [
+      "로마"
+     ],
+     "options": [
+      {
+       "mode": "rail",
+       "name": "레오나르도 익스프레스 (피우미치노 → 로마 테르미니)",
+       "minutes": 32,
+       "price": [
+        14,
+        14
+       ],
+       "firstLast": null,
+       "where": "공항 안 기차역",
+       "note": "공식: 32분, 15분 간격",
+       "transfers": null
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://www.trenitalia.com/en/connections/leonardo-express.html",
+    "https://www.wikidata.org/wiki/Q19101"
+   ]
+  },
+  "ES": {
+   "currency": "EUR",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "BCN",
+     "name": "바르셀로나 엘프라트 공항",
+     "lat": 41.2969,
+     "lng": 2.0783,
+     "cities": [
+      "바르셀로나"
+     ],
+     "options": [
+      {
+       "mode": "rail",
+       "name": "지하철 L9 Sud (공항 → 시내)",
+       "minutes": null,
+       "price": [
+        5.9,
+        5.9
+       ],
+       "firstLast": null,
+       "where": "Aeroport T1 · T2역",
+       "note": "공항역은 전용 공항 승차권(5.90유로)이 필요해요",
+       "transfers": null
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [
+    {
+     "city": "바르셀로나",
+     "card": null,
+     "cardPrice": null,
+     "passes": [],
+     "single": [
+      2.9,
+      2.9
+     ]
+    }
+   ],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://www.tmb.cat/en/barcelona-fares-metro-bus",
+    "https://www.wikidata.org/wiki/Q56973"
+   ]
+  },
+  "TH": {
+   "currency": "THB",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "BKK",
+     "name": "수완나품 국제공항",
+     "lat": 13.6811,
+     "lng": 100.7472,
+     "cities": [
+      "방콕"
+     ],
+     "options": [
+      {
+       "mode": "bus",
+       "name": "BMTA S1 버스 (공항 → 사남루엉)",
+       "minutes": null,
+       "price": [
+        60,
+        60
+       ],
+       "firstLast": "06:00-17:00",
+       "where": "여객터미널",
+       "note": "공식: 전 구간 60바트",
+       "transfers": 0
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://suvarnabhumi.airportthai.co.th/",
+    "https://www.wikidata.org/wiki/Q194316"
    ]
   }
  }

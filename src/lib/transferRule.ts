@@ -144,10 +144,27 @@ export function recommendTransfer(input: TransferInput): TransferResult {
   return { recommended: pick, reason, others, excluded }
 }
 
-/** 택시 요금 = 기본요금 + km당 요금 × 거리 (심야면 할증), 화면에는 ±20% 범위로 */
-export function taxiFare(taxi: { base: number | null; perKm: number | null; nightMultiplier: number | null; nightHours: string | null }, km: number, hhmm?: string): Range | null {
-  if (taxi.base == null || taxi.perKm == null) return null
-  let v = taxi.base + taxi.perKm * km
+export interface TaxiTariff {
+  base: number | null
+  perKm: number | null
+  /** 기본요금에 포함된 거리 (km, 없으면 0) */
+  includedKm?: number | null
+  /** 요금이 이 금액을 넘으면 perKmAfter로 계산 (홍콩처럼 두 단계 요금) */
+  afterAmount?: number | null
+  perKmAfter?: number | null
+  nightMultiplier: number | null
+  nightHours: string | null
+}
+
+/** 택시 요금 = 기본요금 + km당 요금 × (거리 − 기본 거리) (두 단계 요금, 심야 할증 반영), 화면에는 ±20% 범위로 */
+export function taxiFare(taxi: TaxiTariff, km: number, hhmm?: string): Range | null {
+  if (taxi.base == null || taxi.perKm == null || taxi.perKm <= 0) return null
+  const over = Math.max(0, km - (taxi.includedKm ?? 0))
+  let v = taxi.base + taxi.perKm * over
+  if (taxi.afterAmount != null && taxi.perKmAfter != null && v > taxi.afterAmount) {
+    const kmToThreshold = Math.max(0, (taxi.afterAmount - taxi.base) / taxi.perKm)
+    v = taxi.afterAmount + taxi.perKmAfter * (over - kmToThreshold)
+  }
   if (hhmm && taxi.nightMultiplier && taxi.nightHours && inHours(hhmm, taxi.nightHours)) v *= taxi.nightMultiplier
   return [Math.round(v * 0.8), Math.round(v * 1.2)]
 }
@@ -171,7 +188,8 @@ export function cityTransitAdvice(
   const singlePerDay = single ? mid(single) * ridesPerDay : null
   const best = passes.filter((p): p is { name: string; price: number; days: number } => p.price != null && p.days > 0).sort((a, b) => a.price / a.days - b.price / b.days)[0]
   const passPerDay = best ? best.price / best.days : null
-  if (singlePerDay == null && passPerDay == null) return { pick: null, perDay: null, singlePerDay: null }
+  // 1회 요금을 모르면 비교할 근거가 없으니 고르지 않는다
+  if (singlePerDay == null) return { pick: null, perDay: null, singlePerDay: null }
   if (passPerDay != null && (singlePerDay == null || passPerDay < singlePerDay)) return { pick: 'pass', perDay: passPerDay, pass: best, singlePerDay }
   return { pick: 'single', perDay: singlePerDay, singlePerDay }
 }

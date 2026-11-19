@@ -1,7 +1,7 @@
 import raw from '../data/transport.json'
 import { DAY, HttpError, cachedJson, readCache } from './cache'
 import { distanceKm, makeQueue } from './osm'
-import { cityTransitAdvice, recommendTransfer, taxiFare, type Candidate, type Mode, type Range } from './transferRule'
+import { cityTransitAdvice, recommendTransfer, taxiFare, type Candidate, type Mode, type Range, type TaxiTariff } from './transferRule'
 
 // ---------------- 데이터 형식 ----------------
 
@@ -30,12 +30,10 @@ export interface CityTransit {
   passes: { name: string; price: number | null; days: number }[]
   single: Range | null
 }
-export interface Taxi {
+export interface Taxi extends TaxiTariff {
   city: string | null
-  base: number | null
-  perKm: number | null
-  nightMultiplier: number | null
-  nightHours: string | null
+  /** 할증·추가요금 등 보충 설명 */
+  note: string | null
 }
 export interface Intercity {
   route: string
@@ -101,7 +99,9 @@ export function parseCountry(v: unknown): TransportCountry | null {
     childRate: num(v.childRate),
     airports: arr(v.airports, parseAirport),
     cityTransit: arr(v.cityTransit, parseTransit),
-    taxi: t ? { city: str(t.city), base: num(t.base), perKm: num(t.perKm), nightMultiplier: num(t.nightMultiplier), nightHours: hhmmRange(t.nightHours) } : null,
+    taxi: t
+      ? { city: str(t.city), base: num(t.base), perKm: num(t.perKm), includedKm: num(t.includedKm), afterAmount: num(t.afterAmount), perKmAfter: num(t.perKmAfter), nightMultiplier: num(t.nightMultiplier), nightHours: hhmmRange(t.nightHours), note: str(t.note) }
+      : null,
     rideApps: arr(v.rideApps, str),
     intercity: arr(v.intercity, (x) =>
       isObj(x) && str(x.route) ? { route: str(x.route)!, mode: str(x.mode) ?? '', minutes: num(x.minutes), price: range(x.price), booking: str(x.booking) } : null,
