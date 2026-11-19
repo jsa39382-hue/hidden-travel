@@ -7,6 +7,7 @@ import { HOUR, HttpError, cachedJson, fetchJson } from './cache'
 // 먼 날짜는 값이 null일 수 있다.
 interface OpenMeteoRes {
   timezone: string
+  utc_offset_seconds?: number
   current?: { time: string; temperature_2m: number | null; weather_code: number | null; relative_humidity_2m: number | null; wind_speed_10m: number | null }
   daily: {
     time: string[]
@@ -29,6 +30,8 @@ export interface DayWeather {
 
 export interface Weather {
   timezone: string
+  /** 현지 시간과 UTC의 차이(초) */
+  utcOffsetSec?: number
   current?: { time: string; temp: number | null; code: number | null; humidity: number | null; wind: number | null }
   days: DayWeather[]
 }
@@ -51,6 +54,7 @@ async function load(lat: number, lng: number): Promise<Weather> {
   const d = r.daily
   return {
     timezone: r.timezone,
+    utcOffsetSec: r.utc_offset_seconds,
     current: r.current && {
       time: r.current.time,
       temp: r.current.temperature_2m,
@@ -71,7 +75,7 @@ async function load(lat: number, lng: number): Promise<Weather> {
 
 /** 지점의 16일 예보 (1시간 캐시) */
 export const getWeather = (lat: number, lng: number, force = false) =>
-  cachedJson(`weather:v1:${lat.toFixed(3)},${lng.toFixed(3)}`, HOUR, () => load(lat, lng), { force })
+  cachedJson(`weather:v2:${lat.toFixed(3)},${lng.toFixed(3)}`, HOUR, () => load(lat, lng), { force })
 
 /** WMO 날씨 코드 → [이모지, 한국어] */
 export function describeWeather(code: number | null): [string, string] {

@@ -3,6 +3,8 @@ import type { Country, Place } from '../types'
 import { useAsync } from '../lib/useAsync'
 import { errorReasonKo } from '../lib/cache'
 import { getSummary, splitSpots, useSpots, type Spot } from '../lib/spots'
+import { getSpotDetails } from '../lib/spotDetails'
+import { TranslateQuotaError, googleTranslateUrl, guessLang, papagoUrl, translateToKo } from '../lib/translate'
 import { getNearby, type Eatery, type Lodging } from '../lib/nearby'
 import { formatDistance, googleMapsUrl, osmUrl } from '../lib/osm'
 import { getCostRow, TIERS } from '../lib/budget'
@@ -191,7 +193,7 @@ export function SpotsSection({ country, place, active = true }: { country: Count
                     ) : (
                       <ul className="space-y-3">
                         {visible.map((s) => (
-                          <SpotCard key={s.id} spot={s} selected={s.id === selected} onMap={() => showOnMap(s)} onLodging={() => nearbyOf(s)} />
+                          <SpotCard key={s.id} spot={s} countryCode={country.code} selected={s.id === selected} onMap={() => showOnMap(s)} onLodging={() => nearbyOf(s)} />
                         ))}
                       </ul>
                     )}
@@ -309,29 +311,42 @@ function fameLabel(s: Spot) {
   }
 }
 
-function SpotCard({ spot, selected, onMap, onLodging }: { spot: Spot; selected: boolean; onMap: () => void; onLodging: () => void }) {
+function SpotCard({ spot, selected, onMap, onLodging, countryCode }: { spot: Spot; selected: boolean; onMap: () => void; onLodging: () => void; countryCode: string }) {
+  const [open, setOpen] = useState(false)
   const hasWiki = !!(spot.koTitle || spot.enTitle || (spot.wiki && ['ko', 'en'].includes(spot.wiki.lang)))
   const sum = useAsync(hasWiki ? () => getSummary(spot) : null, [spot.id])
+  const details = useAsync(open && spot.wikidata ? () => getSpotDetails(spot).then((r) => r.data) : null, [open, spot.id])
   const fame = fameLabel(spot)
+  const summary = sum.status === 'success' ? sum.data : null
+  const d = details.status === 'success' ? details.data : null
+  const facts = [
+    d?.location && `📍 ${d.location}`,
+    d?.inception && `${d.inception} 건립`,
+    d?.elevation && `해발 ${d.elevation.toLocaleString('ko-KR')}m`,
+    ...(d?.heritage ?? []),
+    spot.openingHours && `🕒 ${spot.openingHours}`,
+    spot.fee && (spot.fee === 'no' ? '입장 무료' : spot.fee === 'yes' ? '입장료 있음' : `요금 ${spot.fee}`),
+  ].filter(Boolean) as string[]
+  const website = spot.website ?? d?.website
+  const description = d?.description ?? (spot.description ? { text: spot.description, lang: guessLang(spot.description, countryCode) ?? 'ko' } : undefined)
+
   return (
-    <li data-id={spot.id} className={`overflow-hidden rounded-xl ring-1 transition ${selected ? 'ring-2 ring-teal-600' : 'ring-stone-200'}`}>
-      <div className="flex gap-3 p-3">
-        {sum.status === 'success' && sum.data?.thumbnail && (
-          <img src={sum.data.thumbnail} alt="" loading="lazy" className="size-20 shrink-0 rounded-lg object-cover" />
-        )}
+    <li data-id={spot.id} className={`overflow-hidden rounded-2xl border bg-white transition ${selected ? 'border-teal-700' : 'border-stone-200'}`}>
+      <div className="flex gap-3 p-4">
+        {summary?.thumbnail && <img src={summary.thumbnail} alt="" loading="lazy" className="size-20 shrink-0 rounded-xl object-cover" />}
         <div className="min-w-0 flex-1">
-          <p className="font-bold leading-snug">{spot.name}</p>
+          <p className="font-semibold leading-snug">{spot.name}</p>
           {spot.nameLocal && <p className="truncate text-xs text-stone-400">{spot.nameLocal}</p>}
           <p className="mt-0.5 text-xs text-stone-500">
             {spot.kind} · 중심에서 {formatDistance(spot.distKm)}
           </p>
-          <span className={`mt-1 inline-block rounded-full px-2 py-0.5 text-[11px] font-medium ${fame.cls}`}>
+          <span className={`mt-1.5 inline-block rounded-full px-2 py-0.5 text-[11px] font-medium ${fame.cls}`}>
             {fame.text} · 숨은 정도 {spot.hiddenScore}
           </span>
         </div>
       </div>
       {hasWiki && (
-        <div className="px-3 pb-2 text-sm text-stone-600">
+        <div className="px-4 pb-3 text-sm text-stone-600">
           {sum.status === 'loading' && <p className="text-xs text-stone-400">설명 불러오는 중…</p>}
           {sum.status === 'error' && (
             <p className="text-xs text-stone-400">
@@ -341,17 +356,55 @@ function SpotCard({ spot, selected, onMap, onLodging }: { spot: Spot; selected: 
               </button>
             </p>
           )}
-          {sum.status === 'success' && sum.data && (
-            <p className="line-clamp-3">
-              {sum.data.extract}{' '}
-              <a href={sum.data.url} target="_blank" rel="noreferrer" className="text-xs text-teal-700 underline">
-                {sum.data.lang === 'ko' ? '위키백과' : '위키백과(영어)'}
+          {summary && (
+            <p className={open ? '' : 'line-clamp-3'}>
+              {summary.extract}{' '}
+              <a href={summary.url} target="_blank" rel="noreferrer" className="text-xs text-teal-700 underline">
+                {summary.lang === 'ko' ? '위키백과' : '위키백과(영어)'}
               </a>
             </p>
           )}
         </div>
       )}
-      <div className="flex flex-wrap gap-1.5 border-t border-stone-100 px-3 py-2 text-xs">
+
+      {open && (
+        <div className="space-y-3 border-t border-stone-200 px-4 py-3 text-sm">
+          {details.status === 'loading' && <p className="text-xs text-stone-400">자세한 정보 불러오는 중…</p>}
+          {details.status === 'error' && (
+            <p className="text-xs text-stone-400">
+              자세한 정보를 불러오지 못했어요.{' '}
+              <button type="button" onClick={details.retry} className="underline">
+                다시 시도
+              </button>
+            </p>
+          )}
+          {d?.image && !summary?.thumbnail && <img src={d.image} alt={spot.name} loading="lazy" className="max-h-56 w-full rounded-xl object-cover" />}
+          {description && <p className="text-stone-700">{description.text}</p>}
+          {facts.length > 0 && (
+            <div className="flex flex-wrap gap-1.5">
+              {facts.map((f) => (
+                <span key={f} className="rounded-full border border-stone-200 px-2.5 py-1 text-xs text-stone-600">
+                  {f}
+                </span>
+              ))}
+            </div>
+          )}
+          {!description && !facts.length && details.status !== 'loading' && !summary && (
+            <p className="text-xs text-stone-500">공개 데이터에 등록된 설명이 없어요. 덜 알려진 곳일수록 정보가 적어요. 아래 지도 링크로 사진·후기를 확인해 보세요.</p>
+          )}
+          <Translator spot={spot} countryCode={countryCode} summary={summary?.lang !== 'ko' ? summary?.extract : undefined} description={description && description.lang !== 'ko' ? description : undefined} />
+          {website && (
+            <a href={website} target="_blank" rel="noreferrer" className="inline-block text-xs text-teal-700 underline underline-offset-2">
+              공식 홈페이지
+            </a>
+          )}
+        </div>
+      )}
+
+      <div className="flex flex-wrap items-center gap-1.5 border-t border-stone-200 px-4 py-2.5 text-xs">
+        <button type="button" onClick={() => setOpen((v) => !v)} aria-expanded={open} className="rounded-full bg-stone-900 px-3 py-1 font-semibold text-stone-50">
+          {open ? '접기' : '자세히 · 번역'}
+        </button>
         <Action onClick={onMap}>지도에서 보기</Action>
         <Action onClick={onLodging}>근처 숙소·식당</Action>
         <a href={googleMapsUrl(spot.lat, spot.lng)} target="_blank" rel="noreferrer" className="rounded-full px-3 py-1 font-medium text-stone-500 transition hover:text-stone-800">
@@ -368,6 +421,73 @@ function SpotCard({ spot, selected, onMap, onLodging }: { spot: Spot; selected: 
         )}
       </div>
     </li>
+  )
+}
+
+/** 이름·설명을 한국어로 번역 (MyMemory). 한도 초과면 파파고·구글 번역 링크 */
+function Translator({
+  spot,
+  countryCode,
+  summary,
+  description,
+}: {
+  spot: Spot
+  countryCode: string
+  summary?: string
+  description?: { text: string; lang: string }
+}) {
+  const nameLang = guessLang(spot.name, countryCode)
+  const items = [
+    nameLang && { key: 'name', label: '이름', text: spot.name, from: nameLang },
+    description && { key: 'desc', label: '설명', text: description.text, from: description.lang === 'ko' ? null : description.lang },
+    summary && { key: 'sum', label: '위키백과 요약', text: summary, from: guessLang(summary, countryCode, 'en') },
+  ].filter((x): x is { key: string; label: string; text: string; from: string | null } => !!x && !!x.from)
+  const [state, setState] = useState<'idle' | 'loading' | 'done' | 'quota' | 'error'>('idle')
+  const [result, setResult] = useState<Record<string, string>>({})
+
+  if (!items.length) return null
+  const all = items.map((i) => i.text).join('\n\n')
+  const run = async () => {
+    setState('loading')
+    try {
+      const out: Record<string, string> = {}
+      for (const it of items) out[it.key] = await translateToKo(it.text, it.from)
+      setResult(out)
+      setState('done')
+    } catch (e) {
+      setState(e instanceof TranslateQuotaError ? 'quota' : 'error')
+    }
+  }
+
+  return (
+    <div className="rounded-xl bg-stone-100 p-3">
+      {state === 'done' ? (
+        <div className="space-y-2">
+          {items.map((it) => (
+            <p key={it.key} className="text-sm text-stone-800">
+              <span className="mr-1.5 text-xs text-stone-500">{it.label}</span>
+              {result[it.key]}
+            </p>
+          ))}
+          <p className="text-[11px] text-stone-400">기계 번역(MyMemory)이라 어색할 수 있어요.</p>
+        </div>
+      ) : (
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <button type="button" onClick={run} disabled={state === 'loading'} className="rounded-full border border-stone-300 px-3 py-1.5 font-medium text-stone-800 disabled:opacity-50">
+            {state === 'loading' ? '번역 중…' : '한국어로 번역'}
+          </button>
+          {(state === 'quota' || state === 'error') && (
+            <span className="text-stone-500">{state === 'quota' ? '오늘 무료 번역 한도를 다 썼어요.' : '번역하지 못했어요.'} 번역 사이트에서 보기:</span>
+          )}
+          <a href={papagoUrl(all)} target="_blank" rel="noreferrer" className="text-stone-500 underline underline-offset-2">
+            파파고
+          </a>
+          <a href={googleTranslateUrl(all)} target="_blank" rel="noreferrer" className="text-stone-500 underline underline-offset-2">
+            구글 번역
+          </a>
+        </div>
+      )}
+    </div>
   )
 }
 

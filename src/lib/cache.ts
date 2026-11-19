@@ -188,7 +188,7 @@ export function errorReasonKo(e: unknown): string {
 }
 
 /** 예전 버전 키·오래된 항목을 지운다 (앱 시작 시 한 번) */
-const OBSOLETE = ['spots:v1:', 'lodging:v1:', 'spots:base:v2:', 'spots:fame:v2:', 'spots:base:v3:', 'spots:fame:v3:', 'nearby:v1:', 'nearby:v2:']
+const OBSOLETE = ['spots:v1:', 'lodging:v1:', 'spots:base:v2:', 'spots:fame:v2:', 'spots:base:v3:', 'spots:fame:v3:', 'nearby:v1:', 'nearby:v2:', 'weather:v1:']
 const MAX_AGE = 14 * DAY
 export function cleanupCache() {
   try {

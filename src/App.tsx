@@ -9,6 +9,7 @@ import { PlacePicker } from './components/PlacePicker'
 import { SpotsSection } from './components/SpotsSection'
 import { WeatherSection } from './components/WeatherSection'
 import { PlannerSection } from './components/PlannerSection'
+import { TipsSection } from './components/TipsSection'
 import { SectionBoundary } from './components/SectionBoundary'
 import { OfflineBanner } from './components/OfflineBanner'
 import { Diagnostics } from './components/Diagnostics'
@@ -26,6 +27,7 @@ const TABS = [
   { id: 'budget', title: '예상 경비', short: '경비', desc: '인원과 스타일에 맞춘 여행 경비 추정' },
   { id: 'exchange', title: '환율', short: '환율', desc: '원화 기준 환율과 계산기' },
   { id: 'weather', title: '날씨', short: '날씨', desc: '선택한 지역의 16일 예보' },
+  { id: 'tips', title: '여행 팁', short: '팁', desc: '콘센트·시차·팁 문화부터 기본 현지어 표현까지' },
 ] as const
 type TabId = (typeof TABS)[number]['id']
 
@@ -214,7 +216,7 @@ function Shell({ country, dates, place, setCountry, setDates, setPlace }: ShellP
         aria-label="기능"
         className="fixed inset-x-0 bottom-0 z-[700] border-t border-stone-200 bg-stone-50/90 pb-[env(safe-area-inset-bottom)] backdrop-blur-xl md:hidden"
       >
-        <div className="grid grid-cols-6">
+        <div className="grid grid-cols-7">
           {TABS.map((t) => (
             <button
               key={t.id}
@@ -253,6 +255,8 @@ function TabContent({ id, country, dates, place, active }: { id: TabId; country:
       return <ExchangeCalculator country={country} />
     case 'weather':
       return <WeatherSection place={place} dates={dates} />
+    case 'tips':
+      return <TipsSection country={country} place={place} />
   }
 }
 

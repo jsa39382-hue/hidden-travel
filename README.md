@@ -21,6 +21,7 @@ npm run dev
 | `npm run build` | 타입 검사 + 배포용 빌드 (`dist/`) |
 | `npm run build:countries` | Wikidata에서 국가 목록을 받아 `src/data/countries.json` 재생성 |
 | `npm run build:cities` | Wikidata에서 나라별 주요 도시를 받아 `src/data/cities.wikidata.json` 재생성 |
+| `npm run build:facts` | Wikidata에서 나라별 콘센트·전압·운전 방향·국가 번호·긴급 전화를 받아 `src/data/country-facts.json` 재생성 |
 | `npm run build:festivals` | Wikidata에서 나라별 축제를 받아 `src/data/wikidata-festivals.json` 재생성 (몇 분 걸림) |
 
 ## 직접 고칠 수 있는 데이터
@@ -30,6 +31,7 @@ npm run dev
 | `src/data/festivals.json` | 주요 축제 보충 (Wikidata에 없거나 부족한 나라) |
 | `src/data/costs.json` | 나라별 하루 경비 [알뜰, 보통, 고급] (31개국 + 지역 평균, USD) |
 | `src/data/cities.json` | 31개국 여행 도시 좌표와 물가 보정값(factor) |
+| `src/data/tips.json` | 31개국 여행 팁(팁 문화·수돗물·결제·교통·주의할 점)과 기본 현지어 표현 |
 | `src/data/regions.json` | 비용 지역 평균에 쓰는 나라별 지역 분류 |
 | `src/data/holidays.json` | Nager.Date가 지원하지 않는 나라(태국·대만·말레이시아·인도·UAE)의 고정 공휴일 |
 
@@ -55,7 +57,9 @@ npm run dev
   - `?diag=1`로 열면 서버별 연결 진단 화면, Wikipedia 요약, Wikimedia Pageviews
 - 지역 검색: Nominatim (OSM 서버 요청은 1초에 1번 이하로 줄 세움)
 - 지도: Leaflet + OpenStreetMap 타일
-- 날씨: Open-Meteo
+- 날씨·시차: Open-Meteo
+- 번역: MyMemory (하루 무료 한도가 있어 버튼을 누를 때만 번역, 30일 저장. 한도 초과 시 파파고·구글 번역 링크)
+- 명소 자세히: Wikidata (설명·사진·문화재 지정·세운 해·높이·홈페이지)
 
 ## 진행 상황
 

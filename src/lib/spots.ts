@@ -26,6 +26,10 @@ export interface Spot {
   /** 숨은 명소 목록 정렬용 흥미도 */
   interest: number
   website?: string
+  /** OpenStreetMap에서 온 추가 정보 */
+  openingHours?: string
+  fee?: string
+  description?: string
   wikidata?: string
   /** Wikidata에서 찾은 경우: 연결된 위키 문서(언어판) 수 */
   sitelinks?: number
@@ -136,6 +140,9 @@ function toSpot(e: OsmElement, center: [number, number]): Spot | null {
     hiddenScore: 0,
     interest: bonus + (tags['name:ko'] ? 3 : 0) + (tags.description || tags.website ? 2 : 0),
     website: tags.website ?? tags['contact:website'],
+    openingHours: tags.opening_hours,
+    fee: tags.fee,
+    description: tags['description:ko'] ?? tags['description:en'] ?? tags.description,
   }
 }
 
