@@ -1,36 +1,56 @@
 import { HttpError } from './cache'
 
 /**
- * OpenStreetMap 계열 서버(Overpass, Nominatim)는 사용 정책상 1초에 1번 이하로 요청해야 한다.
- * 서버별로 요청을 줄 세워 앞 요청이 끝난 뒤 최소 간격을 두고 보낸다.
+ * OpenStreetMap 계열 서버(Overpass, Nominatim)는 사용 정책상 요청을 몰아 보내면 안 된다.
+ * 요청 '시작' 사이에 최소 간격을 두고, 동시에 진행되는 요청 수도 제한한다.
  */
-function makeQueue(minGapMs: number) {
-  let last = 0
-  let chain: Promise<unknown> = Promise.resolve()
-  return <T>(fn: () => Promise<T>): Promise<T> => {
-    const run = chain.then(async () => {
-      const wait = last + minGapMs - Date.now()
-      if (wait > 0) await new Promise((r) => setTimeout(r, wait))
-      try {
-        return await fn()
-      } finally {
-        last = Date.now()
-      }
-    })
-    chain = run.catch(() => undefined)
-    return run
+function makeQueue(minGapMs: number, maxConcurrent: number) {
+  let lastStart = 0
+  let running = 0
+  const waiting: (() => void)[] = []
+  const next = () => {
+    if (running >= maxConcurrent || !waiting.length) return
+    const wait = lastStart + minGapMs - Date.now()
+    if (wait > 0) {
+      setTimeout(next, wait)
+      return
+    }
+    lastStart = Date.now()
+    running++
+    waiting.shift()!()
   }
+  return <T>(fn: () => Promise<T>): Promise<T> =>
+    new Promise<T>((resolve, reject) => {
+      waiting.push(() => {
+        fn()
+          .then(resolve, reject)
+          .finally(() => {
+            running--
+            next()
+          })
+      })
+      next()
+    })
 }
 
-const overpassQueue = makeQueue(1100)
-const nominatimQueue = makeQueue(1100)
+// Overpass 공개 서버는 IP당 동시 2건까지 허용 → 명소와 숙소·식당을 동시에 찾을 수 있다.
+// 대기열은 서버마다 따로 둔다. (한 서버가 멈춰도 다른 서버로 보내는 요청이 그 뒤에 갇히지 않게)
+const overpassQueues = new Map<string, ReturnType<typeof makeQueue>>()
+const overpassQueue = (server: string) => {
+  let q = overpassQueues.get(server)
+  if (!q) overpassQueues.set(server, (q = makeQueue(1100, 2)))
+  return q
+}
+const nominatimQueue = makeQueue(1100, 1)
 
-// 키가 필요 없는 공개 Overpass 서버. 첫 번째가 실패(과부하·시간 초과·연결 오류)하면 다음 서버로 넘어간다.
+// 키가 필요 없는 공개 Overpass 서버
 const OVERPASS_SERVERS = [
   'https://overpass-api.de/api/interpreter',
   'https://overpass.private.coffee/api/interpreter',
   'https://overpass.kumi.systems/api/interpreter',
 ]
+/** 첫 서버가 이 시간 안에 답하지 않으면 다음 서버에도 같이 요청해 먼저 온 응답을 쓴다 */
+const HEDGE_AFTER_MS = 6000
 
 export interface OsmElement {
   type: 'node' | 'way' | 'relation'
@@ -41,37 +61,66 @@ export interface OsmElement {
   tags?: Record<string, string>
 }
 
-// Overpass JSON 응답: {"version":0.6,"generator":"Overpass API ...","osm3s":{...},"elements":[{type,id,lat,lon,tags} | {type,id,center:{lat,lon},tags}]}
-export async function overpass(query: string, timeoutMs = 35000): Promise<OsmElement[]> {
-  let lastError: unknown
-  for (const server of OVERPASS_SERVERS) {
-    try {
-      return await overpassQueue(async () => {
-        const ctrl = new AbortController()
-        const timer = setTimeout(() => ctrl.abort(), timeoutMs)
-        try {
-          const res = await fetch(server, {
-            method: 'POST',
-            body: new URLSearchParams({ data: query }),
-            signal: ctrl.signal,
-          })
-          if (!res.ok) throw new HttpError(res.status, server)
-          const json = (await res.json()) as { elements?: OsmElement[]; remark?: string }
-          if (!Array.isArray(json.elements)) throw new Error('Overpass 응답 형식이 예상과 달라요')
-          // 서버 시간 초과 시 200과 함께 remark만 오는 경우가 있다
-          if (json.remark && /timed out|runtime error/i.test(json.remark) && json.elements.length === 0) throw new Error('Overpass 서버 시간 초과')
-          return json.elements
-        } finally {
-          clearTimeout(timer)
-        }
-      })
-    } catch (e) {
-      lastError = e
-      // 잘못된 쿼리(400)는 다른 서버에서도 실패하므로 바로 멈춘다
-      if (e instanceof HttpError && e.status === 400) break
-    }
+async function overpassOnce(server: string, query: string, timeoutMs: number, outer: AbortSignal): Promise<OsmElement[]> {
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs)
+  const onOuter = () => ctrl.abort()
+  outer.addEventListener('abort', onOuter)
+  try {
+    const res = await fetch(server, { method: 'POST', body: new URLSearchParams({ data: query }), signal: ctrl.signal })
+    if (!res.ok) throw new HttpError(res.status, server)
+    const json = (await res.json()) as { elements?: OsmElement[]; remark?: string }
+    if (!Array.isArray(json.elements)) throw new Error('Overpass 응답 형식이 예상과 달라요')
+    // 서버 시간 초과 시 200과 함께 remark만 오는 경우가 있다
+    if (json.remark && /timed out|runtime error|out of memory/i.test(json.remark) && json.elements.length === 0) throw new Error('Overpass 서버 시간 초과')
+    return json.elements
+  } finally {
+    clearTimeout(timer)
+    outer.removeEventListener('abort', onOuter)
   }
-  throw lastError
+}
+
+// Overpass JSON 응답: {"version":0.6,"generator":"Overpass API ...","elements":[{type,id,lat,lon,tags} | {type,id,center:{lat,lon},tags}]}
+export function overpass(query: string, timeoutMs = 30000): Promise<OsmElement[]> {
+  const outer = new AbortController()
+  return new Promise<OsmElement[]>((resolve, reject) => {
+    let started = 0
+    let failed = 0
+    let lastError: unknown
+    let done = false
+    let hedgeTimer: ReturnType<typeof setTimeout> | undefined
+
+    const startNext = () => {
+      if (done || started >= OVERPASS_SERVERS.length) return
+      const server = OVERPASS_SERVERS[started++]
+      clearTimeout(hedgeTimer)
+      // 늦으면 다음 서버도 같이 시작
+      hedgeTimer = setTimeout(startNext, HEDGE_AFTER_MS)
+      overpassQueue(server)(() => (done ? Promise.resolve([] as OsmElement[]) : overpassOnce(server, query, timeoutMs, outer.signal))).then(
+        (els) => {
+          if (done) return
+          done = true
+          clearTimeout(hedgeTimer)
+          outer.abort() // 나머지 서버 요청은 취소
+          resolve(els)
+        },
+        (e) => {
+          if (done) return
+          failed++
+          lastError = e
+          // 잘못된 쿼리(400)는 다른 서버에서도 실패하므로 바로 멈춘다
+          if ((e instanceof HttpError && e.status === 400) || failed >= OVERPASS_SERVERS.length) {
+            done = true
+            clearTimeout(hedgeTimer)
+            reject(lastError)
+            return
+          }
+          if (failed >= started) startNext() // 진행 중인 요청이 없으면 바로 다음 서버
+        },
+      )
+    }
+    startNext()
+  })
 }
 
 export const elementLatLng = (e: OsmElement): [number, number] | null =>

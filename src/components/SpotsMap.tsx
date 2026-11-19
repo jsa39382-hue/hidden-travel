@@ -2,7 +2,7 @@ import 'leaflet/dist/leaflet.css'
 import { useEffect } from 'react'
 import { CircleMarker, MapContainer, TileLayer, Tooltip, useMap } from 'react-leaflet'
 import type { Spot } from '../lib/spots'
-import type { Lodging } from '../lib/lodging'
+import type { Eatery, Lodging } from '../lib/nearby'
 
 export interface MapProps {
   center: [number, number]
@@ -10,6 +10,7 @@ export interface MapProps {
   spots: Spot[]
   spotColor: string
   lodgings: Lodging[]
+  eateries?: Eatery[]
   selectedId?: string
   focus?: [number, number] | null
   onSelectSpot: (id: string) => void
@@ -32,7 +33,7 @@ function Recenter({ center, radiusKm }: { center: [number, number]; radiusKm: nu
   return null
 }
 
-export default function SpotsMap({ center, radiusKm, spots, spotColor, lodgings, selectedId, focus, onSelectSpot, onSelectLodging }: MapProps) {
+export default function SpotsMap({ center, radiusKm, spots, spotColor, lodgings, eateries = [], selectedId, focus, onSelectSpot, onSelectLodging }: MapProps) {
   return (
     <MapContainer center={center} zoom={12} scrollWheelZoom={false} className="h-72 w-full rounded-xl sm:h-96" style={{ zIndex: 0 }}>
       <TileLayer
@@ -54,6 +55,19 @@ export default function SpotsMap({ center, radiusKm, spots, spotColor, lodgings,
           eventHandlers={{ click: () => onSelectLodging(l.id) }}
         >
           <Tooltip>🏨 {l.name}</Tooltip>
+        </CircleMarker>
+      ))}
+      {eateries.map((e) => (
+        <CircleMarker
+          key={e.id}
+          center={[e.lat, e.lng]}
+          radius={e.id === selectedId ? 8 : 5}
+          pathOptions={{ color: '#9f1239', fillColor: '#e11d48', fillOpacity: 0.85, weight: e.id === selectedId ? 3 : 1 }}
+          eventHandlers={{ click: () => onSelectLodging(e.id) }}
+        >
+          <Tooltip>
+            {e.kind === 'cafe' ? '☕' : '🍜'} {e.name}
+          </Tooltip>
         </CircleMarker>
       ))}
       {spots.map((s) => (

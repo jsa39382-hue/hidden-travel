@@ -131,3 +131,58 @@ export function errorReasonKo(e: unknown): string {
   if (e instanceof SyntaxError) return '서버 응답을 읽지 못했어요.'
   return e instanceof Error && /[가-힣]/.test(e.message) ? e.message : '알 수 없는 오류가 났어요.'
 }
+
+/** 예전 버전 키·오래된 항목을 지운다 (앱 시작 시 한 번) */
+const OBSOLETE = ['spots:v1:', 'lodging:v1:']
+const MAX_AGE = 14 * DAY
+export function cleanupCache() {
+  try {
+    const remove: string[] = []
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i)
+      if (!k?.startsWith(PREFIX)) continue
+      const rest = k.slice(PREFIX.length)
+      if (OBSOLETE.some((o) => rest.startsWith(o))) {
+        remove.push(k)
+        continue
+      }
+      try {
+        const e = JSON.parse(localStorage.getItem(k) ?? '{}') as Entry<unknown>
+        if (!e.savedAt || Date.now() - e.savedAt > MAX_AGE) remove.push(k)
+      } catch {
+        remove.push(k)
+      }
+    }
+    remove.forEach((k) => localStorage.removeItem(k))
+  } catch {
+    /* localStorage를 쓸 수 없는 환경 */
+  }
+}
+
+/** 저장된 응답 캐시 크기(KB) */
+export function cacheSizeKb() {
+  let n = 0
+  try {
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i)
+      if (k?.startsWith(PREFIX)) n += k.length + (localStorage.getItem(k)?.length ?? 0)
+    }
+  } catch {
+    return 0
+  }
+  return Math.round((n * 2) / 1024)
+}
+
+/** 응답 캐시 전부 지우기 (여행 설정은 남김) */
+export function clearCache() {
+  try {
+    const keys: string[] = []
+    for (let i = 0; i < localStorage.length; i++) {
+      const k = localStorage.key(i)
+      if (k?.startsWith(PREFIX)) keys.push(k)
+    }
+    keys.forEach((k) => localStorage.removeItem(k))
+  } catch {
+    /* 무시 */
+  }
+}

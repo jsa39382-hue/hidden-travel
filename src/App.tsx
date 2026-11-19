@@ -8,10 +8,16 @@ import { BudgetCalculator } from './components/BudgetCalculator'
 import { PlacePicker } from './components/PlacePicker'
 import { SpotsSection } from './components/SpotsSection'
 import { WeatherSection } from './components/WeatherSection'
+import { PlannerSection } from './components/PlannerSection'
+import { SectionBoundary } from './components/SectionBoundary'
+import { OfflineBanner } from './components/OfflineBanner'
+import { cacheSizeKb, clearCache } from './lib/cache'
+import { useState } from 'react'
 import { useTripState } from './lib/tripState'
 import { diffDays } from './lib/dates'
 
 const SECTIONS = [
+  { id: 'plan', icon: '✨', title: '맞춤 일정' },
   { id: 'calendar', icon: '📅', title: '공휴일·축제' },
   { id: 'exchange', icon: '💱', title: '환율' },
   { id: 'budget', icon: '🧾', title: '예상 경비' },
@@ -72,7 +78,10 @@ export default function App() {
 
             {SECTIONS.map((s) => (
               <Section key={s.id} id={s.id} icon={s.icon} title={s.title}>
-                {s.id === 'calendar' ? (
+                <SectionBoundary name={s.title}>
+                {s.id === 'plan' ? (
+                  <PlannerSection country={country} place={place!} dates={dates} />
+                ) : s.id === 'calendar' ? (
                   <CalendarSection country={country} dates={dates} />
                 ) : s.id === 'exchange' ? (
                   <ExchangeCalculator country={country} />
@@ -83,15 +92,39 @@ export default function App() {
                 ) : s.id === 'budget' ? (
                   <BudgetCalculator country={country} dates={dates} place={place!} />
                 ) : null}
+                </SectionBoundary>
               </Section>
             ))}
           </>
         )}
       </main>
 
-      <footer className="mx-auto mt-10 max-w-3xl px-4 text-center text-xs text-stone-400">
-        국가 정보: Wikidata · 국기: flagcdn.com · 환율: Frankfurter, ExchangeRate-API · 공휴일: Nager.Date · 축제: Wikidata · 지도·명소·숙소: © OpenStreetMap 기여자 · 설명: 위키백과 · 날씨: Open-Meteo
+      <OfflineBanner />
+      <footer className="mx-auto mt-10 max-w-3xl space-y-2 px-4 text-center text-xs text-stone-400">
+        <CacheButton />
+        <p>
+        국가 정보: Wikidata · 국기: flagcdn.com · 환율: Frankfurter, ExchangeRate-API · 공휴일: Nager.Date · 축제: Wikidata · 지도·명소·숙소: © OpenStreetMap 기여자 · 설명: 위키백과 · 날씨: Open-Meteo</p>
       </footer>
     </div>
+  )
+}
+
+function CacheButton() {
+  const [kb, setKb] = useState(cacheSizeKb)
+  return (
+    <p>
+      API 응답을 이 기기에 저장해 다시 쓰고 있어요 (약 {kb}KB · 공휴일 24시간, 환율·날씨 1시간, 명소·숙소 24시간).{' '}
+      <button
+        type="button"
+        onClick={() => {
+          clearCache()
+          setKb(cacheSizeKb())
+          location.reload()
+        }}
+        className="font-medium text-stone-600 underline underline-offset-2"
+      >
+        저장된 데이터 지우기
+      </button>
+    </p>
   )
 }

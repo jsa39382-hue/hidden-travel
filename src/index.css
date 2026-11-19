@@ -6,3 +6,9 @@
 
 html { -webkit-text-size-adjust: 100%; }
 body { @apply bg-stone-50 text-stone-900 antialiased; }
+
+/* 모바일: 밑줄 글자 버튼·링크의 터치 영역을 넓힌다 (보이는 모양은 그대로) */
+:where(button, a).underline {
+  display: inline-block;
+  padding-block: 0.375rem;
+}

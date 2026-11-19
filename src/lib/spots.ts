@@ -1,4 +1,5 @@
 import { DAY, cachedJson, readCache, writeCache, HttpError } from './cache'
+import { useAsync } from './useAsync'
 import { distanceKm, elementLatLng, overpass, type OsmElement } from './osm'
 
 export type SpotCategory = 'nature' | 'view' | 'museum' | 'history' | 'art' | 'attraction'
@@ -24,6 +25,9 @@ export interface Spot {
   /** 숨은 명소 목록 정렬용 흥미도 */
   interest: number
   website?: string
+  wikidata?: string
+  /** 인지도(조회수) 확인 전이면 true */
+  pending?: boolean
 }
 
 export interface SpotsResult {
@@ -96,7 +100,7 @@ function buildQuery(lat: number, lng: number, radiusM: number) {
   nwr${a}[natural~"^(waterfall|peak|beach|cave_entrance|hot_spring)$"][name];
   nwr${a}[historic][historic!~"^(${HISTORIC_NOISE})$"][name];
 );
-out tags center 700;`
+out tags center 400;`
 }
 
 function parseWikiTag(v?: string): Spot['wiki'] {
@@ -104,7 +108,7 @@ function parseWikiTag(v?: string): Spot['wiki'] {
   return m ? { lang: m[1], title: m[2].trim() } : undefined
 }
 
-function toSpot(e: OsmElement, center: [number, number]): (Spot & { wikidata?: string }) | null {
+function toSpot(e: OsmElement, center: [number, number]): Spot | null {
   const tags = e.tags ?? {}
   const ll = elementLatLng(e)
   const local = tags.name
@@ -218,24 +222,38 @@ export const scoreFromViews = (v: number) => Math.max(0, Math.min(100, Math.roun
 export const HIDDEN_THRESHOLD = 50
 const NO_WIKI_SCORE = 75
 const UNKNOWN_VIEWS_SCORE = 40
-const MAX_PAGEVIEW_LOOKUPS = 60
+const MAX_PAGEVIEW_LOOKUPS = 45
 
-async function loadSpots(lat: number, lng: number, radiusKm: number): Promise<SpotsResult> {
+const hasWikiOf = (s: Spot) => !!(s.enTitle || s.wiki || s.koTitle || s.wikidata)
+
+/** 1단계: Overpass 명소 목록만 (빠름). 위키 문서가 있는 곳은 인지도 확인 전 상태로 둔다. */
+async function loadBase(lat: number, lng: number, radiusKm: number): Promise<SpotsResult> {
   const center: [number, number] = [lat, lng]
   const elements = await overpass(buildQuery(lat, lng, Math.round(radiusKm * 1000)))
-
-  // 같은 이름이 가까이 여러 개(건물·경계 등) 있으면 하나만
   const raw = elements
     .map((e) => toSpot(e, center))
-    .filter((s): s is NonNullable<typeof s> => !!s)
-    .sort((a, b) => (b.wiki || b.wikidata ? 1 : 0) - (a.wiki || a.wikidata ? 1 : 0) || a.distKm - b.distKm)
-  const spots: (Spot & { wikidata?: string })[] = []
+    .filter((s): s is Spot => !!s)
+    .sort((a, b) => (hasWikiOf(b) ? 1 : 0) - (hasWikiOf(a) ? 1 : 0) || a.distKm - b.distKm)
+  // 같은 이름이 가까이 여러 개(건물·경계 등) 있으면 하나만
+  const spots: Spot[] = []
   for (const s of raw) {
     if (spots.some((t) => t.name === s.name && distanceKm([t.lat, t.lng], [s.lat, s.lng]) < 0.5)) continue
+    if (s.wiki?.lang === 'ko') s.koTitle = s.wiki.title
+    if (s.wiki?.lang === 'en') s.enTitle = s.wiki.title
+    const hasWiki = hasWikiOf(s)
+    s.hiddenScore = hasWiki ? UNKNOWN_VIEWS_SCORE : NO_WIKI_SCORE
+    s.pending = hasWiki || undefined
+    s.interest += s.hiddenScore + (hasWiki ? 15 : 0) - Math.min(10, s.distKm)
     spots.push(s)
+    if (spots.length >= 300) break
   }
+  return { spots, fetchedAt: Date.now(), viewsChecked: 0, viewsFailed: 0 }
+}
 
-  // 1) Wikidata로 한국어·영어 문서 제목 확인 (실패해도 계속)
+/** 2단계: Wikidata 문서 제목 + Wikimedia 조회수로 숨은 정도 계산 */
+async function loadFame(base: Spot[]): Promise<SpotsResult> {
+  const spots = base.map((s) => ({ ...s, interest: s.interest - s.hiddenScore - (hasWikiOf(s) ? 15 : 0) + Math.min(10, s.distKm) }))
+
   const qids = [...new Set(spots.map((s) => s.wikidata).filter((q): q is string => !!q))]
   if (qids.length) {
     try {
@@ -243,23 +261,19 @@ async function loadSpots(lat: number, lng: number, radiusKm: number): Promise<Sp
       for (const s of spots) {
         const t = s.wikidata ? titles.get(s.wikidata) : undefined
         if (t) {
-          s.koTitle = t.ko
-          s.enTitle = t.en
+          s.koTitle ??= t.ko
+          s.enTitle ??= t.en
         }
       }
     } catch {
       /* 제목 확인 실패 → 위키 태그만 사용 */
     }
   }
-  for (const s of spots) {
-    if (s.wiki?.lang === 'ko') s.koTitle ??= s.wiki.title
-    if (s.wiki?.lang === 'en') s.enTitle ??= s.wiki.title
-  }
 
-  // 2) 조회수: 영어 문서(나라 간 비교 가능) → 원래 위키 태그 문서 → 한국어 문서 순
+  // 조회수: 영어 문서(나라 간 비교 가능) → 원래 위키 태그 문서 → 한국어 문서 순
   const withWiki = spots.filter((s) => s.enTitle || s.wiki || s.koTitle).sort((a, b) => a.distKm - b.distKm)
   const lookup = withWiki.slice(0, MAX_PAGEVIEW_LOOKUPS)
-  const results = await mapLimit(lookup, 4, (s) => {
+  const results = await mapLimit(lookup, 6, (s) => {
     const [lang, title] = s.enTitle ? ['en', s.enTitle] : s.wiki ? [s.wiki.lang, s.wiki.title] : ['ko', s.koTitle!]
     return pageviews30(lang, title)
   })
@@ -273,33 +287,34 @@ async function loadSpots(lat: number, lng: number, radiusKm: number): Promise<Sp
   })
   for (const s of withWiki.slice(MAX_PAGEVIEW_LOOKUPS)) s.views = null
 
-  // 3) 점수
   for (const s of spots) {
     const hasWiki = !!(s.enTitle || s.wiki || s.koTitle)
     s.hiddenScore = !hasWiki ? NO_WIKI_SCORE : s.views == null ? UNKNOWN_VIEWS_SCORE : scoreFromViews(s.views)
     // 설명을 보여 줄 수 있는(문서가 있는) 숨은 곳을 더 앞에, 너무 먼 곳은 살짝 뒤로
     s.interest += s.hiddenScore + (hasWiki ? 15 : 0) - Math.min(10, s.distKm)
     if (!hasWiki) s.views = undefined
+    s.pending = undefined
   }
-
-  return {
-    spots: spots.slice(0, 400).map(({ wikidata: _w, ...s }) => s),
-    fetchedAt: Date.now(),
-    viewsChecked: lookup.length - viewsFailed,
-    viewsFailed,
-  }
+  return { spots, fetchedAt: Date.now(), viewsChecked: lookup.length - viewsFailed, viewsFailed }
 }
 
-/** 지역의 명소 (24시간 캐시) */
-export function getSpots(lat: number, lng: number, radiusKm: number, force = false) {
-  const key = `spots:v1:${lat.toFixed(3)},${lng.toFixed(3)}:${radiusKm}`
-  return cachedJson(key, DAY, () => loadSpots(lat, lng, radiusKm), { force })
+const spotsKey = (lat: number, lng: number, radiusKm: number) => `${lat.toFixed(3)},${lng.toFixed(3)}:${radiusKm}`
+
+/** 지역의 명소 목록 (24시간 캐시) */
+export function getSpotsBase(lat: number, lng: number, radiusKm: number, force = false) {
+  return cachedJson(`spots:base:v2:${spotsKey(lat, lng, radiusKm)}`, DAY, () => loadBase(lat, lng, radiusKm), { force })
+}
+
+/** 명소 목록 + 인지도 (24시간 캐시) */
+export function getSpotsFame(lat: number, lng: number, radiusKm: number, base: Spot[], force = false) {
+  return cachedJson(`spots:fame:v2:${spotsKey(lat, lng, radiusKm)}`, DAY, () => loadFame(base), { force })
 }
 
 export function splitSpots(spots: Spot[]) {
-  const hidden = spots.filter((s) => s.hiddenScore >= HIDDEN_THRESHOLD).sort((a, b) => b.interest - a.interest)
+  // 인지도 확인 전인 곳은 아직 어느 쪽인지 모르므로 숨은 명소 뒤쪽에 둔다
+  const hidden = spots.filter((s) => s.hiddenScore >= HIDDEN_THRESHOLD || s.pending).sort((a, b) => (a.pending ? 1 : 0) - (b.pending ? 1 : 0) || b.interest - a.interest)
   const famous = spots
-    .filter((s) => s.hiddenScore < HIDDEN_THRESHOLD)
+    .filter((s) => s.hiddenScore < HIDDEN_THRESHOLD && !s.pending)
     .sort((a, b) => (b.views ?? -1) - (a.views ?? -1) || a.distKm - b.distKm)
   return { hidden, famous }
 }
@@ -355,4 +370,24 @@ export async function getSummary(spot: Spot): Promise<WikiSummary | null> {
     if (r.data) return r.data
   }
   return null
+}
+
+/**
+ * 명소를 두 단계로 불러오는 훅: 목록이 오면 바로 보여 주고, 인지도(조회수)는 뒤이어 채운다.
+ * 같은 지역을 여러 곳(명소 섹션·여행 계획)에서 불러도 캐시·동시 요청 합치기 덕분에 한 번만 요청한다.
+ */
+export function useSpots(lat: number, lng: number, radiusKm: number) {
+  const base = useAsync((force) => getSpotsBase(lat, lng, radiusKm, force), [lat, lng, radiusKm])
+  const baseSpots = base.status === 'success' ? base.data.data.spots : null
+  const fame = useAsync(baseSpots ? (force) => getSpotsFame(lat, lng, radiusKm, baseSpots, force) : null, [baseSpots])
+  const spots = fame.status === 'success' ? fame.data.data.spots : baseSpots
+  return {
+    base,
+    fame,
+    spots,
+    famePending: !!baseSpots && fame.status === 'loading',
+    fameFailed: fame.status === 'error',
+    stale: (base.status === 'success' && base.data.stale) || (fame.status === 'success' && fame.data.stale),
+    retry: () => (base.status === 'error' ? base.retry() : fame.retry()),
+  }
 }
