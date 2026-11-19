@@ -18,7 +18,7 @@ export function ErrorBox({ message, onRetry, detail }: { message: string; onRetr
         <button
           type="button"
           onClick={onRetry}
-          className="mt-3 rounded-lg bg-rose-600 px-3 py-1.5 text-sm font-medium text-white active:bg-rose-700"
+          className="mt-3 rounded-lg border border-rose-300 px-3 py-1.5 text-sm font-medium text-rose-700 active:bg-rose-100"
         >
           다시 시도
         </button>

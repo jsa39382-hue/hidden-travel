@@ -14,7 +14,7 @@ export function PlacePicker({ country, place, onChange }: { country: Country; pl
 
   return (
     <div>
-      <p className="mb-1.5 text-sm font-medium text-stone-600">📍 어느 도시·지역을 둘러보세요?</p>
+      <p className="mb-1.5 text-sm font-medium text-stone-600">어느 도시·지역을 둘러보세요?</p>
       <div className="-mx-1 flex flex-wrap gap-1.5 px-1">
         {chips.map((p) => {
           const active = p.name === place.name
@@ -24,7 +24,7 @@ export function PlacePicker({ country, place, onChange }: { country: Country; pl
               type="button"
               aria-pressed={active}
               onClick={() => onChange(p)}
-              className={`rounded-full px-3 py-1.5 text-sm ring-1 ${active ? 'bg-teal-700 font-medium text-white ring-teal-700' : 'bg-white text-stone-700 ring-stone-300 active:bg-stone-50'}`}
+              className={`rounded-full px-3 py-1.5 text-sm ring-1 ${active ? 'bg-stone-900 font-semibold text-stone-50 ring-stone-900' : 'bg-white text-stone-700 ring-stone-300 active:bg-stone-50'}`}
             >
               {p.name}
             </button>
@@ -35,7 +35,7 @@ export function PlacePicker({ country, place, onChange }: { country: Country; pl
           onClick={() => setSearching((v) => !v)}
           className="rounded-full px-3 py-1.5 text-sm text-teal-700 ring-1 ring-teal-600/40 active:bg-teal-50"
         >
-          🔍 다른 지역 검색
+          다른 지역 검색
         </button>
       </div>
       {searching && <PlaceSearch country={country} onPick={(p) => (onChange(p), setSearching(false))} />}

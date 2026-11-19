@@ -21,7 +21,8 @@ export function CalendarSection({ country, dates }: { country: Country; dates: T
   const fest = useAsync(() => getFestivals(country.code), [country.code])
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-8 lg:grid lg:grid-cols-2 lg:items-start lg:gap-10 lg:space-y-0">
+      <div className="space-y-5">
       {hol.status === 'error' ? (
         <ErrorBox message="공휴일을 불러오지 못했어요." detail={errorReasonKo(hol.error)} onRetry={hol.retry} />
       ) : hol.status !== 'success' ? (
@@ -45,8 +46,9 @@ export function CalendarSection({ country, dates }: { country: Country; dates: T
         </>
       )}
 
+      </div>
       <div>
-        <h3 className="mb-2 font-bold">🎉 축제·행사</h3>
+        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-stone-500">축제·행사</h3>
         {fest.status === 'error' ? (
           <ErrorBox message="축제 정보를 불러오지 못했어요." detail={errorReasonKo(fest.error)} onRetry={fest.retry} />
         ) : fest.status !== 'success' ? (
@@ -204,6 +206,7 @@ function MonthCalendar({
 
 function FestivalList({ festivals, dates }: { festivals: Festival[]; dates: TripDates }) {
   const [showAll, setShowAll] = useState(false)
+  const [showRest, setShowRest] = useState(false)
   const [showAllDuring, setShowAllDuring] = useState(false)
   const withOverlap = festivals.map((f) => ({ f, o: overlapWithTrip(f, dates.start, dates.end) }))
   // 날짜가 확실히 겹치는 것 → 직접 정리한 것 → 위키 문서가 있는 것 순
@@ -240,7 +243,12 @@ function FestivalList({ festivals, dates }: { festivals: Festival[]; dates: Trip
         )}
       </div>
 
-      {rest.length > 0 && (
+      {rest.length > 0 && !showRest && (
+        <button type="button" onClick={() => setShowRest(true)} className="w-full rounded-xl border border-stone-200 py-3 text-sm text-stone-600 active:bg-stone-100">
+          다른 달의 축제 보기 ({rest.length})
+        </button>
+      )}
+      {rest.length > 0 && showRest && (
         <div>
           <p className="mb-2 text-sm font-medium text-stone-600">다른 달의 축제</p>
           <ul className="space-y-2">

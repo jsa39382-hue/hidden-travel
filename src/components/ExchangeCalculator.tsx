@@ -68,23 +68,26 @@ function Calculator({ rate, country, onRefresh }: { rate: KrwRate; country: Coun
   const presetsLocal = [1, 10, 100, 1000, 10000].map((n) => n * unit).slice(0, 4)
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 md:grid md:grid-cols-2 md:items-start md:gap-8 md:space-y-0">
       {/* 대표 환율 */}
-      <div className="rounded-xl bg-teal-50 p-4">
-        <p className="text-sm text-teal-800">
-          {formatNumber(unit)} {currency} ({name})
+      <div className="space-y-5">
+      <div className="rounded-2xl border border-stone-200 bg-white p-5">
+        <p className="text-xs text-stone-500">
+          {formatNumber(unit)} {currency} · {name}
         </p>
-        <p className="mt-0.5 text-3xl font-extrabold tracking-tight text-teal-900">{formatKrw(rate.krwPer * unit)}</p>
-        <p className="mt-1 text-sm text-teal-700">
+        <p className="mt-2 text-4xl font-bold tracking-tight">{formatKrw(rate.krwPer * unit)}</p>
+        <p className="mt-1 text-sm text-stone-500">
           1,000원 = {formatNumber(rate.perKrw * 1000, digits)} {currency}
         </p>
       </div>
+      </div>
 
       {/* 양방향 변환 */}
+      <div className="space-y-5">
       <div className="space-y-2">
         <AmountInput label={`${name} (${currency})`} code={currency} value={localText} onChange={(v) => set('local', v)} />
-        <div className="flex justify-center text-stone-400" aria-hidden>
-          ⇅
+        <div className="flex justify-center py-0.5 text-stone-400" aria-hidden>
+          <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round"><path d="M8 4v16M4 8l4-4 4 4M16 20V4M12 16l4 4 4-4" /></svg>
         </div>
         <AmountInput label="대한민국 원 (KRW)" code="KRW" value={krwText} onChange={(v) => set('krw', v)} />
       </div>
@@ -95,8 +98,8 @@ function Calculator({ rate, country, onRefresh }: { rate: KrwRate; country: Coun
       </div>
 
       {/* 기준 정보 */}
-      <div className="space-y-2 border-t border-stone-100 pt-3 text-xs text-stone-500">
-        {rate.stale && <Notice>⚠️ 지금은 환율 서버에 연결할 수 없어 전에 저장해 둔 환율을 보여 주고 있어요.</Notice>}
+      <div className="space-y-2 border-t border-stone-200 pt-4 text-xs text-stone-500">
+        {rate.stale && <Notice>지금은 환율 서버에 연결할 수 없어 전에 저장해 둔 환율을 보여 주고 있어요.</Notice>}
         <dl className="grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
           <dt className="font-medium text-stone-600">기준일</dt>
           <dd>{rate.basisLabel}</dd>
@@ -111,6 +114,7 @@ function Calculator({ rate, country, onRefresh }: { rate: KrwRate; country: Coun
           </dd>
         </dl>
         <p>무료 환율은 실시간이 아니라 하루 한 번 정도 갱신되는 기준 환율이에요. 실제 환전·카드 결제 때는 수수료가 붙어 몇 % 차이가 날 수 있어요.</p>
+      </div>
       </div>
     </div>
   )

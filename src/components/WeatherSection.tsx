@@ -32,18 +32,18 @@ export function WeatherSection({ place, dates }: { place: Place; dates: TripDate
   const [curIcon, curLabel] = describeWeather(weather.current?.code ?? null)
 
   return (
-    <div className="space-y-4">
+    <div className="max-w-2xl space-y-4">
       {weather.current && (
-        <div className="flex items-center gap-4 rounded-xl bg-sky-50 p-4">
+        <div className="flex items-center gap-5 rounded-2xl border border-stone-200 bg-white p-5">
           <span className="text-5xl" aria-hidden>
             {curIcon}
           </span>
           <div>
-            <p className="text-sm text-sky-800">{place.name} 지금</p>
-            <p className="text-3xl font-extrabold text-sky-950">
+            <p className="text-xs text-stone-500">{place.name} 지금</p>
+            <p className="text-4xl font-bold tracking-tight">
               {t(weather.current.temp)} <span className="text-base font-medium">{curLabel}</span>
             </p>
-            <p className="text-xs text-sky-700">
+            <p className="mt-1 text-xs text-stone-500">
               습도 {weather.current.humidity ?? '-'}% · 바람 {weather.current.wind != null ? `${(weather.current.wind / 3.6).toFixed(1)}m/s` : '-'} · 현지{' '}
               {weather.current.time.slice(11, 16)} 기준
             </p>
@@ -65,7 +65,7 @@ export function WeatherSection({ place, dates }: { place: Place; dates: TripDate
       )}
 
       {tips.length > 0 && (
-        <ul className="space-y-1 rounded-xl bg-stone-50 p-3 text-sm text-stone-700">
+        <ul className="space-y-1.5 border-l-2 border-teal-700 pl-4 text-sm text-stone-700">
           {tips.map((tip) => (
             <li key={tip}>{tip}</li>
           ))}
@@ -77,7 +77,7 @@ export function WeatherSection({ place, dates }: { place: Place; dates: TripDate
           <DayRow key={d.date} d={d} lo={lo} hi={hi} inTrip={isWithin(d.date, dates.start, dates.end)} />
         ))}
       </ul>
-      <button type="button" onClick={() => setShowAll((v) => !v)} className="w-full rounded-xl bg-stone-100 py-2.5 text-sm font-medium active:bg-stone-200">
+      <button type="button" onClick={() => setShowAll((v) => !v)} className="w-full rounded-xl border border-stone-200 py-3 text-sm text-stone-600 active:bg-stone-100">
         {showAll ? '접기' : `${FORECAST_DAYS}일 전체 예보 보기`}
       </button>
 

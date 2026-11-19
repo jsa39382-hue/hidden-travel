@@ -59,9 +59,9 @@ export function BudgetCalculator({ country, dates, place }: { country: Country; 
   )
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6 lg:grid lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start lg:gap-10 lg:space-y-0">
       {/* 입력 */}
-      <div className="space-y-4">
+      <div className="space-y-5">
         <Field label="누구와 가나요?">
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             {PARTY_TYPES.map((t) => (
@@ -112,6 +112,7 @@ export function BudgetCalculator({ country, dates, place }: { country: Country; 
       </div>
 
       {/* 결과 */}
+      <div className="space-y-4 lg:sticky lg:top-28 xl:top-8">
       {rates.status === 'error' ? (
         <>
           <ErrorBox message="환율을 불러오지 못해 원화로 바꾸지 못했어요." detail={errorReasonKo(rates.error)} onRetry={rates.retry} />
@@ -129,8 +130,8 @@ export function BudgetCalculator({ country, dates, place }: { country: Country; 
         />
       )}
 
-      <div className="space-y-1 rounded-xl bg-stone-50 p-3 text-xs text-stone-500">
-        <p className="font-medium text-stone-700">⚠️ 추정치입니다. 항공권·쇼핑·보험은 빠져 있어요.</p>
+      <div className="space-y-1 text-[11px] leading-relaxed text-stone-500">
+        <p className="font-medium text-stone-700">추정치예요. 항공권·쇼핑·보험은 빠져 있어요.</p>
         <p>
           {basis === 'country' && `${country.nameKo}의 하루 물가 자료(${COSTS_UPDATED} 기준, USD)로 계산했어요.`}
           {basis === 'region' && `${country.nameKo}의 자료가 없어 ${region} 지역 평균으로 계산했어요.`}
@@ -144,6 +145,7 @@ export function BudgetCalculator({ country, dates, place }: { country: Country; 
           숙소는 방 단위(2인 1실{party.type === 'family' ? ', 가족은 한 방에 최대 4명' : ''}), 식비·교통·관광은 1인 단위로 계산하고 아이는 어른의 70%로
           계산해요.
         </p>
+      </div>
       </div>
     </div>
   )
@@ -172,15 +174,22 @@ function ResultTable({
 
   return (
     <div>
-      <div className="rounded-xl bg-teal-700 p-4 text-white">
-        <p className="text-sm text-teal-100">
-          {placeName} · {result.people}명 · {result.nights}박 {result.days}일 · 방 {result.rooms}개 예상 총액
+      <div className="rounded-2xl border border-stone-200 bg-white p-5">
+        <p className="text-xs text-stone-500">
+          {placeName} · {result.people}명 · {result.nights}박 {result.days}일 · 방 {result.rooms}개
         </p>
-        <p className="mt-1 text-3xl font-extrabold tracking-tight">{main(result.total)}</p>
-        <p className="text-sm text-teal-100">{sub(result.total)}</p>
-        <p className="mt-2 text-sm">
-          1인당 약 <b>{main(result.perPerson)}</b> · 하루 약 <b>{main(result.total / result.days)}</b>
-        </p>
+        <p className="mt-2 text-4xl font-bold tracking-tight">{main(result.total)}</p>
+        <p className="mt-1 text-sm text-stone-500">{sub(result.total)}</p>
+        <div className="mt-4 grid grid-cols-2 gap-3 border-t border-stone-200 pt-4 text-sm">
+          <p>
+            <span className="block text-xs text-stone-500">1인당</span>
+            <span className="font-semibold">{main(result.perPerson)}</span>
+          </p>
+          <p>
+            <span className="block text-xs text-stone-500">하루</span>
+            <span className="font-semibold">{main(result.total / result.days)}</span>
+          </p>
+        </div>
       </div>
 
       <table className="mt-3 w-full text-sm">
@@ -237,7 +246,7 @@ function Toggle({ active, onClick, children }: { active: boolean; onClick: () =>
       aria-pressed={active}
       onClick={onClick}
       className={`h-11 rounded-xl px-2 text-sm font-medium ring-1 transition ${
-        active ? 'bg-teal-700 text-white ring-teal-700' : 'bg-white text-stone-700 ring-stone-300 active:bg-stone-50'
+        active ? 'bg-stone-900 text-stone-50 ring-stone-900' : 'bg-white text-stone-700 ring-stone-300 active:bg-stone-50'
       }`}
     >
       {children}

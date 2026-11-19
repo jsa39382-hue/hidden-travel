@@ -47,7 +47,8 @@ export function PlannerSection({ country, place, dates }: { country: Country; pl
   const toggle = (c: string) => setChips((cs) => (cs.includes(c) ? cs.filter((x) => x !== c) : [...cs, c]))
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6 lg:grid lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-start lg:gap-10 lg:space-y-0">
+      <div className="space-y-4 lg:sticky lg:top-28 xl:top-8">
       <div>
         <label htmlFor="style-text" className="mb-1 block text-sm font-medium text-stone-600">
           어떤 여행을 원하세요? 자유롭게 적어 주세요
@@ -60,18 +61,21 @@ export function PlannerSection({ country, place, dates }: { country: Country; pl
           placeholder={`예: ${EXAMPLES[0]}`}
           className="w-full rounded-xl border border-stone-300 p-3 text-base focus:border-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600/20"
         />
-        <div className="mt-1 flex flex-wrap gap-1.5">
+        <div className="mt-2 flex flex-wrap gap-1.5">
           {EXAMPLES.slice(1).map((ex) => (
-            <button key={ex} type="button" onClick={() => setText(ex)} className="rounded-full bg-stone-100 px-2.5 py-1 text-xs text-stone-600">
+            <button key={ex} type="button" onClick={() => setText(ex)} className="rounded-full border border-stone-200 px-2.5 py-1 text-xs text-stone-500 transition hover:text-stone-800">
               {ex}
             </button>
           ))}
         </div>
       </div>
 
-      <div>
-        <p className="mb-1.5 text-sm font-medium text-stone-600">또는 눌러서 고르기</p>
-        <div className="flex flex-wrap gap-1.5">
+      <details className="group rounded-xl border border-stone-200 px-4 py-3" open={chips.length > 0}>
+        <summary className="flex cursor-pointer list-none items-center justify-between text-sm text-stone-600">
+          키워드로 고르기{chips.length > 0 && ` · ${chips.length}개 선택`}
+          <span className="text-stone-400 transition group-open:rotate-90">›</span>
+        </summary>
+        <div className="mt-3 flex flex-wrap gap-1.5">
           {STYLE_CHIPS.map((c) => {
             const on = chips.includes(c.label)
             return (
@@ -80,19 +84,19 @@ export function PlannerSection({ country, place, dates }: { country: Country; pl
                 type="button"
                 aria-pressed={on}
                 onClick={() => toggle(c.label)}
-                className={`rounded-full px-3 py-1.5 text-sm ring-1 ${on ? 'bg-teal-700 text-white ring-teal-700' : 'bg-white text-stone-700 ring-stone-300'}`}
+                className={`rounded-full px-3 py-1.5 text-sm ring-1 transition ${on ? 'bg-stone-900 text-stone-50 ring-stone-900' : 'text-stone-600 ring-stone-300 hover:ring-stone-500'}`}
               >
                 {c.label}
               </button>
             )
           })}
         </div>
-      </div>
+      </details>
 
-      <div className="rounded-xl bg-teal-50 p-3 text-sm text-teal-900">
-        <p className="font-medium">이렇게 이해했어요</p>
-        <p className="mt-0.5">{style.understood.join(' · ')}</p>
-        <p className="mt-0.5 text-xs text-teal-700">
+      <div className="border-l-2 border-teal-700 pl-4 text-sm">
+        <p className="text-xs text-stone-500">이렇게 이해했어요</p>
+        <p className="mt-1 text-stone-800">{style.understood.join(' · ')}</p>
+        <p className="mt-1 text-xs text-stone-500">
           하루 {style.pace === 'relaxed' ? '2곳 정도 여유롭게' : style.pace === 'packed' ? '4~5곳 알차게' : '3곳 정도'} · {place.name} 중심 10km ·{' '}
           {formatKo(dates.start)} ~ {formatKo(dates.end)}
         </p>
@@ -101,12 +105,17 @@ export function PlannerSection({ country, place, dates }: { country: Country; pl
       <button
         type="button"
         onClick={() => setRequest({ text, chips, seed: (request?.seed ?? 0) + (request ? 1 : 0) })}
-        className="h-12 w-full rounded-xl bg-teal-700 text-base font-bold text-white active:bg-teal-800"
+        className="h-12 w-full rounded-xl bg-stone-900 text-base font-semibold text-stone-50 transition active:opacity-90"
       >
-        {request ? '🔄 다시 짜기' : '✨ 여행 계획 만들기'}
+        {request ? '다시 짜기' : '여행 계획 만들기'}
       </button>
 
-      {request && (
+      <p className="text-[11px] leading-relaxed text-stone-400">
+        키가 필요 없는 공개 데이터(명소·식당, 위키 조회수, 날씨, 공휴일, 축제)를 규칙에 따라 조합해 만든 추천이에요. AI가 쓴 글이 아니며, 영업시간·휴무일은 방문 전에 꼭 확인하세요.
+      </p>
+      </div>
+      <div className="min-w-0">
+      {request ? (
         <PlanResult
           country={country}
           place={place}
@@ -121,11 +130,12 @@ export function PlannerSection({ country, place, dates }: { country: Country; pl
             setTimeout(() => setCopied(false), 2000)
           }}
         />
+      ) : (
+        <div className="hidden h-full min-h-64 items-center justify-center rounded-2xl border border-dashed border-stone-200 p-8 text-center text-sm text-stone-400 lg:flex">
+          왼쪽에 원하는 여행을 적고 &lsquo;여행 계획 만들기&rsquo;를 누르면 여기에 일정표가 나와요.
+        </div>
       )}
-      <p className="text-xs text-stone-500">
-        키가 필요 없는 공개 데이터(OpenStreetMap 명소·식당, 위키 조회수, 날씨, 공휴일, 축제)를 규칙에 따라 조합해 만든 추천이에요. AI가 쓴 글이 아니며, 영업시간·휴무일은 방문
-        전에 꼭 확인하세요.
-      </p>
+      </div>
     </div>
   )
 }
@@ -205,7 +215,7 @@ function PlanResult({
       ))}
 
       <div>
-        <h3 className="mb-2 font-bold">📋 추천 여행 리스트</h3>
+        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-stone-500">추천 여행 리스트</h3>
         <ol className="space-y-1.5">
           {plan.recommended.map((r, i) => (
             <li key={r.spot.id} className="flex gap-2 text-sm">
@@ -221,9 +231,9 @@ function PlanResult({
 
       <div>
         <div className="mb-2 flex items-center justify-between">
-          <h3 className="font-bold">🗓️ 일정표</h3>
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-stone-500">일정표</h3>
           <button type="button" onClick={copy} className="rounded-full bg-stone-100 px-3 py-1.5 text-xs font-medium active:bg-stone-200">
-            {copied ? '✅ 복사했어요' : '📋 일정 복사·공유'}
+            {copied ? '복사했어요' : '일정 복사·공유'}
           </button>
         </div>
         <div className="space-y-3">
@@ -304,7 +314,7 @@ function DayCard({ day, onFindFood, hasOwnFood }: { day: PlanDay; onFindFood: (d
       {missingMeal && day.centroid && !hasOwnFood && (
         <div className="border-t border-stone-100 px-3 py-2">
           <button type="button" onClick={findFood} disabled={state === 'loading'} className="text-xs font-medium text-teal-700 underline underline-offset-2 disabled:opacity-50">
-            {state === 'loading' ? '이 날 동선 근처 식당 찾는 중…' : state === 'error' ? '식당 찾기 실패 — 다시 시도' : '🍜 이 날 동선 근처 식당 찾아 채우기'}
+            {state === 'loading' ? '이 날 동선 근처 식당 찾는 중…' : state === 'error' ? '식당 찾기 실패 — 다시 시도' : '이 날 동선 근처 식당 찾아 채우기'}
           </button>
         </div>
       )}

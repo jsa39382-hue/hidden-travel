@@ -14,7 +14,7 @@ const SpotsMap = lazy(() => import('./SpotsMap'))
 
 const RADII = [5, 10, 20] as const
 const PAGE = 15
-const COLORS = { hidden: '#0f766e', famous: '#7c3aed' }
+const COLORS = { hidden: '#5eead4', famous: '#c4b5fd' }
 
 interface LodgingCenter {
   name: string
@@ -22,15 +22,16 @@ interface LodgingCenter {
   lng: number
 }
 
-export function SpotsSection({ country, place }: { country: Country; place: Place }) {
+export function SpotsSection({ country, place, active = true }: { country: Country; place: Place; active?: boolean }) {
+  const [view, setView] = useState<'spots' | 'nearby'>('spots')
   const [radius, setRadius] = useState<(typeof RADII)[number]>(10)
   const [tab, setTab] = useState<'hidden' | 'famous'>('hidden')
   const [shown, setShown] = useState(PAGE)
   const [selected, setSelected] = useState<string | undefined>()
   const [focus, setFocus] = useState<[number, number] | null>(null)
   const [lodgingAt, setLodgingAt] = useState<LodgingCenter>({ name: place.name, lat: place.lat, lng: place.lng })
+  const [nearTab, setNearTab] = useState<'lodging' | 'food' | 'cafe'>('lodging')
   const listRef = useRef<HTMLDivElement>(null)
-  const lodgingRef = useRef<HTMLDivElement>(null)
 
   // 지역이 바뀌면 초기화
   useEffect(() => {
@@ -43,194 +44,246 @@ export function SpotsSection({ country, place }: { country: Country; place: Plac
   const sp = useSpots(place.lat, place.lng, radius)
   // 숙소·식당은 명소와 동시에 찾는다 (서로 기다리지 않음)
   const nearby = useAsync((force, signal) => getNearby(lodgingAt.lat, lodgingAt.lng, force, signal), [lodgingAt.lat, lodgingAt.lng])
-  const [nearTab, setNearTab] = useState<'lodging' | 'food' | 'cafe'>('lodging')
 
   const split = useMemo(() => (sp.spots ? splitSpots(sp.spots) : { hidden: [], famous: [] }), [sp.spots])
   const list = split[tab]
   const visible = list.slice(0, shown)
   const near = nearby.status === 'success' ? nearby.data.data : null
-  const lodgings = near && nearTab === 'lodging' ? near.lodgings.slice(0, 30) : []
-  const eateries = near && nearTab !== 'lodging' ? near.eateries.filter((e) => (nearTab === 'cafe' ? e.kind === 'cafe' : e.kind !== 'cafe')).slice(0, 40) : []
-  const center: [number, number] = useMemo(() => [place.lat, place.lng], [place.lat, place.lng])
+  const lodgings = near && view === 'nearby' && nearTab === 'lodging' ? near.lodgings.slice(0, 30) : []
+  const eateries =
+    near && view === 'nearby' && nearTab !== 'lodging' ? near.eateries.filter((e) => (nearTab === 'cafe' ? e.kind === 'cafe' : e.kind !== 'cafe')).slice(0, 40) : []
+  const mapCenter: [number, number] = useMemo(
+    () => (view === 'nearby' ? [lodgingAt.lat, lodgingAt.lng] : [place.lat, place.lng]),
+    [view, lodgingAt.lat, lodgingAt.lng, place.lat, place.lng],
+  )
 
+  const scrollToItem = (id: string) =>
+    requestAnimationFrame(() => listRef.current?.querySelector(`[data-id="${id}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }))
   const selectSpot = (id: string) => {
     setSelected(id)
     const i = list.findIndex((s) => s.id === id)
     if (i >= shown) setShown(i + 1)
-    requestAnimationFrame(() => listRef.current?.querySelector(`[data-id="${id}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }))
+    scrollToItem(id)
   }
   const showOnMap = (s: { id: string; lat: number; lng: number }) => {
     setSelected(s.id)
     setFocus([s.lat, s.lng])
+    // 휴대폰에서는 지도가 위에 있으므로 지도로 올라간다
+    if (window.innerWidth < 1024) document.getElementById('spots-map')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
   }
-  const lodgingNear = (s: Spot) => {
+  const nearbyOf = (s: Spot) => {
     setLodgingAt({ name: s.name, lat: s.lat, lng: s.lng })
-    requestAnimationFrame(() => lodgingRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+    setView('nearby')
+    setSelected(undefined)
+    setFocus(null)
+  }
+
+  const nearCount = {
+    lodging: near?.lodgings.length,
+    food: near?.eateries.filter((e) => e.kind !== 'cafe').length,
+    cafe: near?.eateries.filter((e) => e.kind === 'cafe').length,
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-stone-600">
-          <b>{place.name}</b> 중심 반경
-        </p>
-        <div className="flex gap-1" role="group" aria-label="검색 반경">
-          {RADII.map((r) => (
-            <button
-              key={r}
-              type="button"
-              aria-pressed={radius === r}
-              onClick={() => (setRadius(r), setShown(PAGE))}
-              className={`rounded-full px-3 py-1 text-sm ring-1 ${radius === r ? 'bg-stone-800 text-white ring-stone-800' : 'bg-white ring-stone-300'}`}
-            >
-              {r}km
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* 탭 */}
-      <div className="grid grid-cols-2 rounded-xl bg-stone-100 p-1" role="tablist">
-        {(['hidden', 'famous'] as const).map((t) => (
-          <button
-            key={t}
-            role="tab"
-            aria-selected={tab === t}
-            onClick={() => (setTab(t), setShown(PAGE), setSelected(undefined))}
-            className={`rounded-lg py-2 text-sm font-medium ${tab === t ? 'bg-white shadow-sm' : 'text-stone-500'}`}
-          >
-            {t === 'hidden' ? '🤫 숨은 명소' : '⭐ 유명 명소'}
-            {sp.spots && <span className="ml-1 text-xs text-stone-400">{split[t].length}</span>}
-          </button>
-        ))}
-      </div>
-
-      {/* 지도 */}
-      <Suspense fallback={<div className="flex h-72 items-center justify-center rounded-xl bg-stone-100 text-sm text-stone-500">지도 불러오는 중…</div>}>
-        <SpotsMap
-          center={center}
-          radiusKm={radius}
-          spots={visible}
-          spotColor={COLORS[tab]}
-          lodgings={lodgings}
-          eateries={eateries}
-          selectedId={selected}
-          focus={focus}
-          onSelectSpot={selectSpot}
-          onSelectLodging={(id) => {
-            setSelected(id)
-            requestAnimationFrame(() => lodgingRef.current?.querySelector(`[data-id="${id}"]`)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }))
-          }}
+    <div className="space-y-5">
+      {/* 보기 전환 */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <Segmented
+          value={view}
+          onChange={(v) => (setView(v), setSelected(undefined), setFocus(null))}
+          options={[
+            ['spots', '명소'],
+            ['nearby', '숙소·식당'],
+          ]}
         />
-      </Suspense>
-      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-stone-500">
-        <Legend color={COLORS[tab]} label={tab === 'hidden' ? '숨은 명소' : '유명 명소'} />
-        {nearTab === 'lodging' ? <Legend color="#f97316" label="숙소" /> : <Legend color="#e11d48" label={nearTab === 'cafe' ? '카페' : '식당'} />}
-        <Legend color="#fff" border label="검색 중심" />
-      </div>
-
-      {/* 목록 */}
-      <div ref={listRef}>
-        {sp.base.status === 'error' ? (
-          <ErrorBox
-            message="명소를 불러오지 못했어요."
-            detail={`${errorReasonKo(sp.base.error)} OpenStreetMap 서버가 붐빌 때 자주 생겨요. 잠시 뒤 다시 시도하거나 반경을 줄여 보세요.`}
-            onRetry={sp.retry}
-          />
-        ) : !sp.spots ? (
-          <Loading label="명소 찾는 중… (보통 5~15초)" />
-        ) : (
-          <>
-            {sp.stale && <Notice>⚠️ 서버에 연결할 수 없어 전에 저장해 둔 결과를 보여 주고 있어요.</Notice>}
-            {sp.base.status === 'success' && sp.base.data.data.source === 'fallback' && (
-              <p className="mb-2 rounded-lg bg-sky-50 px-3 py-2 text-xs text-sky-800">
-                OpenStreetMap 검색 서버가 응답하지 않아 Wikidata(위키 데이터)에 등록된 명소로 찾았어요. 작은 전망대·폭포 같은 곳은 빠질 수 있어요.
-              </p>
-            )}
-            {sp.famePending && (
-              <p className="mb-2 flex items-center gap-2 rounded-lg bg-stone-50 px-3 py-2 text-xs text-stone-600" role="status">
-                <span className="size-3 animate-spin rounded-full border-2 border-teal-600 border-t-transparent" />
-                위키 조회수로 얼마나 알려진 곳인지 확인하는 중이에요. 끝나면 숨은/유명 분류가 정리돼요.
-              </p>
-            )}
-            {sp.fameFailed && (
-              <p className="mb-2 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-800">
-                인지도 확인에 실패해 위키 문서 유무로만 나눴어요.{' '}
-                <button type="button" onClick={sp.fame.retry} className="font-medium underline">
-                  다시 확인
-                </button>
-              </p>
-            )}
-            {list.length === 0 ? (
-              <p className="py-4 text-sm text-stone-500">
-                이 반경에서 {tab === 'hidden' ? '숨은' : '유명'} 명소를 찾지 못했어요.{sp.famePending ? ' 인지도 확인이 끝나면 다시 보여 드려요.' : ' 반경을 넓혀 보세요.'}
-              </p>
-            ) : (
-              <ul className="space-y-3">
-                {visible.map((s) => (
-                  <SpotCard key={s.id} spot={s} selected={s.id === selected} onMap={() => showOnMap(s)} onLodging={() => lodgingNear(s)} />
-                ))}
-              </ul>
-            )}
-            {shown < list.length && (
-              <button type="button" onClick={() => setShown((n) => n + PAGE)} className="mt-3 w-full rounded-xl bg-stone-100 py-2.5 text-sm font-medium active:bg-stone-200">
-                {Math.min(PAGE, list.length - shown)}곳 더 보기 ({shown}/{list.length})
+        {view === 'spots' ? (
+          <div className="flex items-center gap-1 text-xs" role="group" aria-label="검색 반경">
+            <span className="mr-1 text-stone-500">반경</span>
+            {RADII.map((r) => (
+              <button
+                key={r}
+                type="button"
+                aria-pressed={radius === r}
+                onClick={() => (setRadius(r), setShown(PAGE))}
+                className={`rounded-full px-3 py-1.5 transition ${radius === r ? 'bg-stone-900 font-semibold text-stone-50' : 'text-stone-500 hover:text-stone-800'}`}
+              >
+                {r}km
               </button>
-            )}
-            <p className="mt-3 text-xs text-stone-500">
-              숨은 정도는 위키백과 문서 유무와 최근 30일 조회수로 매겨요. 문서가 없거나 조회수가 적을수록 덜 알려진 곳이에요.
-              {sp.fame.status === 'success' && sp.fame.data.data.viewsFailed > 0 && ` (조회수 확인 실패 ${sp.fame.data.data.viewsFailed}곳은 중간 점수로 계산)`} 명소
-              정보: {sp.base.status === 'success' && sp.base.data.data.source === 'fallback' ? 'Wikidata' : 'OpenStreetMap 기여자'}, 설명·사진: 위키백과
-            </p>
-          </>
+            ))}
+          </div>
+        ) : (
+          lodgingAt.name !== place.name && (
+            <button type="button" onClick={() => setLodgingAt({ name: place.name, lat: place.lat, lng: place.lng })} className="text-xs text-teal-700 underline underline-offset-2">
+              {place.name} 중심으로 돌아가기
+            </button>
+          )
         )}
       </div>
 
-      {/* 주변 숙소·식당 */}
-      <div ref={lodgingRef} className="scroll-mt-28 border-t border-stone-200 pt-4">
-        <div className="mb-2 flex items-center justify-between gap-2">
-          <h3 className="font-bold">📍 {lodgingAt.name} 주변</h3>
-          {lodgingAt.name !== place.name && (
-            <button type="button" onClick={() => setLodgingAt({ name: place.name, lat: place.lat, lng: place.lng })} className="shrink-0 text-xs text-teal-700 underline">
-              {place.name} 중심으로
-            </button>
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:items-start lg:gap-6">
+        {/* 지도: 휴대폰은 위, 넓은 화면은 오른쪽에 고정 */}
+        <div id="spots-map" className="mb-5 lg:sticky lg:top-28 lg:order-2 lg:mb-0 xl:top-8">
+          <Suspense fallback={<div className="flex h-64 items-center justify-center rounded-2xl bg-stone-100 text-sm text-stone-500 sm:h-80">지도 불러오는 중…</div>}>
+            <SpotsMap
+              center={mapCenter}
+              radiusKm={view === 'nearby' ? 1.5 : radius}
+              spots={view === 'spots' ? visible : []}
+              spotColor={COLORS[tab]}
+              lodgings={lodgings}
+              eateries={eateries}
+              selectedId={selected}
+              focus={focus}
+              visible={active}
+              onSelectSpot={selectSpot}
+              onSelectLodging={(id) => (setSelected(id), scrollToItem(id))}
+            />
+          </Suspense>
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-stone-500">
+            {view === 'spots' ? (
+              <Legend color={COLORS[tab]} label={tab === 'hidden' ? '숨은 명소' : '유명 명소'} />
+            ) : nearTab === 'lodging' ? (
+              <Legend color="#fb923c" label="숙소" />
+            ) : (
+              <Legend color="#fb7185" label={nearTab === 'cafe' ? '카페' : '식당'} />
+            )}
+            <Legend color="#fff" border label="검색 중심" />
+          </div>
+        </div>
+
+        {/* 목록 */}
+        <div ref={listRef} className="min-w-0 lg:order-1">
+          {view === 'spots' ? (
+            <>
+              <Underline
+                value={tab}
+                onChange={(t) => (setTab(t), setShown(PAGE), setSelected(undefined))}
+                options={[
+                  ['hidden', '숨은 명소', sp.spots ? split.hidden.length : undefined],
+                  ['famous', '유명 명소', sp.spots ? split.famous.length : undefined],
+                ]}
+              />
+              <div className="mt-4">
+                {sp.base.status === 'error' ? (
+                  <ErrorBox message="명소를 불러오지 못했어요." detail={`${errorReasonKo(sp.base.error)} 잠시 뒤 다시 시도하거나 반경을 줄여 보세요.`} onRetry={sp.retry} />
+                ) : !sp.spots ? (
+                  <Loading label="명소 찾는 중… (보통 5~15초)" />
+                ) : (
+                  <>
+                    {sp.stale && <Notice>서버에 연결할 수 없어 전에 저장해 둔 결과를 보여 주고 있어요.</Notice>}
+                    {sp.famePending && (
+                      <p className="mb-3 flex items-center gap-2 text-xs text-stone-500" role="status">
+                        <span className="size-3 animate-spin rounded-full border-2 border-teal-600 border-t-transparent" />
+                        위키 조회수로 인지도를 확인하는 중… 끝나면 분류가 정리돼요.
+                      </p>
+                    )}
+                    {sp.fameFailed && (
+                      <p className="mb-3 text-xs text-amber-800">
+                        인지도 확인에 실패해 위키 문서 유무로만 나눴어요.{' '}
+                        <button type="button" onClick={sp.fame.retry} className="font-medium underline">
+                          다시 확인
+                        </button>
+                      </p>
+                    )}
+                    {list.length === 0 ? (
+                      <p className="py-6 text-sm text-stone-500">
+                        이 반경에서 {tab === 'hidden' ? '숨은' : '유명'} 명소를 찾지 못했어요.{sp.famePending ? ' 인지도 확인이 끝나면 다시 보여 드려요.' : ' 반경을 넓혀 보세요.'}
+                      </p>
+                    ) : (
+                      <ul className="space-y-3">
+                        {visible.map((s) => (
+                          <SpotCard key={s.id} spot={s} selected={s.id === selected} onMap={() => showOnMap(s)} onLodging={() => nearbyOf(s)} />
+                        ))}
+                      </ul>
+                    )}
+                    {shown < list.length && (
+                      <button type="button" onClick={() => setShown((n) => n + PAGE)} className="mt-4 w-full rounded-xl border border-stone-200 py-3 text-sm font-medium text-stone-700 active:bg-stone-100">
+                        더 보기 ({shown}/{list.length})
+                      </button>
+                    )}
+                    <p className="mt-4 text-[11px] leading-relaxed text-stone-400">
+                      숨은 정도는 위키백과 문서 유무와 최근 30일 조회수로 매겨요.{' '}
+                      {sp.base.status === 'success' && sp.base.data.data.source === 'fallback'
+                        ? 'OpenStreetMap 서버가 응답하지 않아 Wikidata에 등록된 명소로 찾았어요.'
+                        : '명소 정보: OpenStreetMap 기여자.'}{' '}
+                      설명·사진: 위키백과
+                    </p>
+                  </>
+                )}
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="mb-3 text-sm text-stone-500">
+                <span className="font-semibold text-stone-800">{lodgingAt.name}</span> 주변
+              </p>
+              <Underline
+                value={nearTab}
+                onChange={setNearTab}
+                options={[
+                  ['lodging', '숙소', nearCount.lodging],
+                  ['food', '식당', nearCount.food],
+                  ['cafe', '카페', nearCount.cafe],
+                ]}
+              />
+              <div className="mt-4">
+                {nearby.status === 'error' ? (
+                  <ErrorBox message="주변 숙소·식당을 불러오지 못했어요." detail={errorReasonKo(nearby.error)} onRetry={nearby.retry} />
+                ) : !near ? (
+                  <Loading label="주변 숙소·식당 찾는 중…" />
+                ) : nearTab === 'lodging' ? (
+                  <LodgingList items={near.lodgings} radiusKm={near.radiusKm} country={country} place={place} selected={selected} onMap={showOnMap} />
+                ) : eateries.length === 0 ? (
+                  <p className="py-6 text-sm text-stone-500">이 근처에서 {nearTab === 'cafe' ? '카페' : '식당'}를 찾지 못했어요.</p>
+                ) : (
+                  <EateryList items={eateries} total={eateries.length} radiusKm={near.radiusKm * 0.7} country={country} place={place} selected={selected} onMap={showOnMap} cafe={nearTab === 'cafe'} />
+                )}
+                {near?.source === 'fallback' && (
+                  <p className="mt-4 text-[11px] text-stone-400">OpenStreetMap 서버가 응답하지 않아 Nominatim으로 찾았어요. 종류별로 가까운 40곳까지만 나와요.</p>
+                )}
+              </div>
+            </>
           )}
         </div>
-        <div className="mb-3 grid grid-cols-3 rounded-xl bg-stone-100 p-1" role="tablist">
-          {(
-            [
-              ['lodging', '🏨 숙소', near?.lodgings.length],
-              ['food', '🍜 식당', near?.eateries.filter((e) => e.kind !== 'cafe').length],
-              ['cafe', '☕ 카페', near?.eateries.filter((e) => e.kind === 'cafe').length],
-            ] as const
-          ).map(([k, label, n]) => (
-            <button
-              key={k}
-              role="tab"
-              aria-selected={nearTab === k}
-              onClick={() => setNearTab(k)}
-              className={`rounded-lg py-2 text-sm font-medium ${nearTab === k ? 'bg-white shadow-sm' : 'text-stone-500'}`}
-            >
-              {label}
-              {n != null && <span className="ml-1 text-xs text-stone-400">{n}</span>}
-            </button>
-          ))}
-        </div>
- {near?.source === 'fallback' && (
-          <p className="mb-2 rounded-lg bg-sky-50 px-3 py-2 text-xs text-sky-800">OpenStreetMap 검색 서버가 응답하지 않아 대체 검색(Nominatim)으로 찾았어요. 종류별로 가까운 40곳까지만 나와요.</p>
-        )}
-        {nearby.status === 'error' ? (
-          <ErrorBox message="주변 숙소·식당을 불러오지 못했어요." detail={errorReasonKo(nearby.error)} onRetry={nearby.retry} />
-        ) : !near ? (
-          <Loading label="주변 숙소·식당 찾는 중…" />
-        ) : near.source === 'fallback' && nearTab !== 'lodging' && eateries.length === 0 ? (
-          <p className="text-sm text-stone-500">대체 검색(Nominatim)에서 이 근처 {nearTab === 'cafe' ? '카페' : '식당'}를 찾지 못했어요.</p>
-        ) : nearTab === 'lodging' ? (
-          <LodgingList items={near.lodgings} radiusKm={near.radiusKm} country={country} place={place} selected={selected} onMap={showOnMap} />
-        ) : (
-          <EateryList items={eateries} total={eateries.length} radiusKm={near.radiusKm * 0.7} country={country} place={place} selected={selected} onMap={showOnMap} cafe={nearTab === 'cafe'} />
-        )}
       </div>
+    </div>
+  )
+}
+
+/** 둥근 세그먼트 전환 */
+function Segmented<T extends string>({ value, onChange, options }: { value: T; onChange: (v: T) => void; options: [T, string][] }) {
+  return (
+    <div className="inline-flex rounded-full border border-stone-200 p-1" role="tablist">
+      {options.map(([k, label]) => (
+        <button
+          key={k}
+          role="tab"
+          aria-selected={value === k}
+          onClick={() => onChange(k)}
+          className={`rounded-full px-4 py-1.5 text-sm transition ${value === k ? 'bg-stone-900 font-semibold text-stone-50' : 'text-stone-500 hover:text-stone-800'}`}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+/** 밑줄 탭 */
+function Underline<T extends string>({ value, onChange, options }: { value: T; onChange: (v: T) => void; options: [T, string, number | undefined][] }) {
+  return (
+    <div className="flex gap-6 border-b border-stone-200" role="tablist">
+      {options.map(([k, label, n]) => (
+        <button
+          key={k}
+          role="tab"
+          aria-selected={value === k}
+          onClick={() => onChange(k)}
+          className={`-mb-px border-b-2 pb-2.5 text-sm transition ${value === k ? 'border-teal-700 font-semibold text-stone-900' : 'border-transparent text-stone-500 hover:text-stone-800'}`}
+        >
+          {label}
+          {n != null && <span className="ml-1.5 text-xs text-stone-400">{n}</span>}
+        </button>
+      ))}
     </div>
   )
 }
@@ -299,17 +352,17 @@ function SpotCard({ spot, selected, onMap, onLodging }: { spot: Spot; selected: 
         </div>
       )}
       <div className="flex flex-wrap gap-1.5 border-t border-stone-100 px-3 py-2 text-xs">
-        <Action onClick={onMap}>🗺️ 지도에서 보기</Action>
-        <Action onClick={onLodging}>🏨 근처 숙소·식당</Action>
-        <a href={googleMapsUrl(spot.lat, spot.lng)} target="_blank" rel="noreferrer" className="rounded-full bg-stone-100 px-2.5 py-1 font-medium text-stone-700">
+        <Action onClick={onMap}>지도에서 보기</Action>
+        <Action onClick={onLodging}>근처 숙소·식당</Action>
+        <a href={googleMapsUrl(spot.lat, spot.lng)} target="_blank" rel="noreferrer" className="rounded-full px-3 py-1 font-medium text-stone-500 transition hover:text-stone-800">
           구글 지도
         </a>
         {spot.id.startsWith('wd/') ? (
-          <a href={`https://www.wikidata.org/wiki/${spot.wikidata}`} target="_blank" rel="noreferrer" className="rounded-full bg-stone-100 px-2.5 py-1 font-medium text-stone-700">
+          <a href={`https://www.wikidata.org/wiki/${spot.wikidata}`} target="_blank" rel="noreferrer" className="rounded-full px-3 py-1 font-medium text-stone-500 transition hover:text-stone-800">
             Wikidata
           </a>
         ) : (
-          <a href={osmUrl({ type: spot.id.split('/')[0], id: Number(spot.id.split('/')[1]) })} target="_blank" rel="noreferrer" className="rounded-full bg-stone-100 px-2.5 py-1 font-medium text-stone-700">
+          <a href={osmUrl({ type: spot.id.split('/')[0], id: Number(spot.id.split('/')[1]) })} target="_blank" rel="noreferrer" className="rounded-full px-3 py-1 font-medium text-stone-500 transition hover:text-stone-800">
             OSM
           </a>
         )}
@@ -320,7 +373,7 @@ function SpotCard({ spot, selected, onMap, onLodging }: { spot: Spot; selected: 
 
 function Action({ onClick, children }: { onClick: () => void; children: React.ReactNode }) {
   return (
-    <button type="button" onClick={onClick} className="rounded-full bg-teal-50 px-2.5 py-1 font-medium text-teal-800 active:bg-teal-100">
+    <button type="button" onClick={onClick} className="rounded-full border border-stone-300 px-3 py-1 font-medium text-stone-800 transition hover:border-stone-500">
       {children}
     </button>
   )
@@ -376,12 +429,12 @@ function LodgingList({
               </div>
             </div>
             <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
-              <Action onClick={() => onMap(l)}>🗺️ 지도</Action>
-              <a href={googleMapsUrl(l.lat, l.lng)} target="_blank" rel="noreferrer" className="rounded-full bg-stone-100 px-2.5 py-1 font-medium text-stone-700">
+              <Action onClick={() => onMap(l)}>지도</Action>
+              <a href={googleMapsUrl(l.lat, l.lng)} target="_blank" rel="noreferrer" className="rounded-full px-3 py-1 font-medium text-stone-500 transition hover:text-stone-800">
                 구글 지도·가격 보기
               </a>
               {l.website && (
-                <a href={l.website} target="_blank" rel="noreferrer" className="rounded-full bg-stone-100 px-2.5 py-1 font-medium text-stone-700">
+                <a href={l.website} target="_blank" rel="noreferrer" className="rounded-full px-3 py-1 font-medium text-stone-500 transition hover:text-stone-800">
                   홈페이지
                 </a>
               )}
@@ -456,12 +509,12 @@ function EateryList({
               </div>
             </div>
             <div className="mt-2 flex flex-wrap gap-1.5 text-xs">
-              <Action onClick={() => onMap(e)}>🗺️ 지도</Action>
-              <a href={googleMapsUrl(e.lat, e.lng)} target="_blank" rel="noreferrer" className="rounded-full bg-stone-100 px-2.5 py-1 font-medium text-stone-700">
+              <Action onClick={() => onMap(e)}>지도</Action>
+              <a href={googleMapsUrl(e.lat, e.lng)} target="_blank" rel="noreferrer" className="rounded-full px-3 py-1 font-medium text-stone-500 transition hover:text-stone-800">
                 구글 지도·리뷰
               </a>
               {e.website && (
-                <a href={e.website} target="_blank" rel="noreferrer" className="rounded-full bg-stone-100 px-2.5 py-1 font-medium text-stone-700">
+                <a href={e.website} target="_blank" rel="noreferrer" className="rounded-full px-3 py-1 font-medium text-stone-500 transition hover:text-stone-800">
                   홈페이지
                 </a>
               )}

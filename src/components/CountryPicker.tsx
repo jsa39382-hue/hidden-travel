@@ -2,6 +2,7 @@ import { useEffect, useId, useMemo, useRef, useState } from 'react'
 import { COUNTRIES, POPULAR_CODES, getCountry, searchCountries } from '../lib/countries'
 import type { Country } from '../types'
 import { Flag } from './Flag'
+import { Icon } from './Icon'
 
 const MAX_RESULTS = 60
 
@@ -65,7 +66,7 @@ export function CountryPicker({ value, onChange }: { value: Country | undefined;
         어느 나라로 떠나세요?
       </label>
       <div className="flex items-center gap-2 rounded-xl border border-stone-300 bg-white px-3 focus-within:border-teal-600 focus-within:ring-2 focus-within:ring-teal-600/20">
-        {value && !open ? <Flag code={value.code} /> : <span aria-hidden className="text-stone-400">🔍</span>}
+        {value && !open ? <Flag code={value.code} /> : <Icon name="search" className="size-5 shrink-0 text-stone-400" />}
         <input
           id={listId + '-input'}
           ref={inputRef}
