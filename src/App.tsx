@@ -23,6 +23,7 @@ const BudgetCalculator = lazy(() => import('./components/BudgetCalculator').then
 const SpotsSection = lazy(() => import('./components/SpotsSection').then((m) => ({ default: m.SpotsSection })))
 const WeatherSection = lazy(() => import('./components/WeatherSection').then((m) => ({ default: m.WeatherSection })))
 const PlannerSection = lazy(() => import('./components/PlannerSection').then((m) => ({ default: m.PlannerSection })))
+const TransportSection = lazy(() => import('./components/TransportSection').then((m) => ({ default: m.TransportSection })))
 const TipsSection = lazy(() => import('./components/TipsSection').then((m) => ({ default: m.TipsSection })))
 const SettleSection = lazy(() => import('./components/SettleSection').then((m) => ({ default: m.SettleSection })))
 const RetroSection = lazy(() => import('./components/RetroSection').then((m) => ({ default: m.RetroSection })))
@@ -33,11 +34,11 @@ const TABS = [
   { id: 'plan', title: '맞춤 일정', short: '일정', desc: '카드를 넘기며 고르고, 원하는 스타일로 일정표 만들기' },
   { id: 'spots', title: '명소·숙소·식당', short: '명소', desc: '덜 알려진 명소와 주변 숙소·식당을 지도와 함께' },
   { id: 'money', title: '돈', short: '돈', desc: '예상 경비, 환율 계산, 더치페이 정산', subs: [['budget', '경비'], ['exchange', '환율'], ['settle', '더치페이']] },
-  { id: 'info', title: '정보', short: '정보', desc: '날씨·골든아워, 공휴일·축제, 음식·여행 팁', subs: [['weather', '날씨'], ['calendar', '캘린더'], ['tips', '음식·팁']] },
+  { id: 'info', title: '정보', short: '정보', desc: '날씨·골든아워, 공휴일·축제, 교통, 음식·여행 팁', subs: [['weather', '날씨'], ['calendar', '캘린더'], ['transport', '교통'], ['tips', '음식·팁']] },
   { id: 'retro', title: '회고 카드', short: '추억', desc: '다녀온 여행을 스토리 크기 이미지로' },
 ] as const
 type TabId = (typeof TABS)[number]['id']
-type SubId = 'budget' | 'exchange' | 'settle' | 'weather' | 'calendar' | 'tips'
+type SubId = 'budget' | 'exchange' | 'settle' | 'weather' | 'calendar' | 'transport' | 'tips'
 
 /** 주소 #탭 또는 #하위탭 (예전 주소 #budget, #weather도 그대로 열린다) */
 function readHash(): { tab: TabId; sub?: SubId } {
@@ -259,6 +260,7 @@ const VIEWS: { id: string; label: string; parent?: TabId }[] = [
   { id: 'settle', label: '더치페이', parent: 'money' },
   { id: 'weather', label: '날씨', parent: 'info' },
   { id: 'calendar', label: '캘린더', parent: 'info' },
+  { id: 'transport', label: '교통', parent: 'info' },
   { id: 'tips', label: '음식·팁', parent: 'info' },
   { id: 'retro', label: '회고 카드' },
 ]
@@ -281,6 +283,8 @@ function View({ id, country, dates, place, active, onPickCountry }: { id: string
       return <WeatherSection place={place} dates={dates} />
     case 'calendar':
       return <CalendarSection country={country} dates={dates} />
+    case 'transport':
+      return <TransportSection country={country} place={place} />
     case 'tips':
       return <TipsSection country={country} place={place} />
     case 'retro':

@@ -7,6 +7,7 @@ import { errorReasonKo } from '../lib/cache'
 import { COSTS_UPDATED, TIERS, calcBudget, getCostRow, headcount, regionOfCountry, type Party, type PartyType, type Tier } from '../lib/budget'
 import { DEFAULT_EXTRAS, KID_FLIGHT_RATE, SHOPPING, flightEstimate, insuranceEstimate, simEstimate, type ExtraLine, type ExtraPrefs } from '../lib/extras'
 import { ErrorBox, Loading } from './Status'
+import { transportBudget } from '../lib/transport'
 import { Num, roundKrw } from './ui/Num'
 
 const PREFS_KEY = 'hidden-travel:budget'
@@ -51,7 +52,7 @@ export function BudgetCalculator({ country, dates, place }: { country: Country; 
   const setParty = (p: Partial<Party>) => setPrefs((s) => ({ ...s, party: { ...s.party, ...p } }))
   const setExtras = (e: Partial<ExtraPrefs>) => setPrefs((s) => ({ ...s, extras: { ...DEFAULT_EXTRAS, ...s.extras, ...e } }))
   const { row, basis, region } = getCostRow(country.code)
-  const result = calcBudget(row, tier, party, days, place.factor)
+  const base = calcBudget(row, tier, party, days, place.factor)
 
   // 현지 경비 밖의 비용 (원화)
   const { adults, kids } = headcount(party)
@@ -94,6 +95,22 @@ export function BudgetCalculator({ country, dates, place }: { country: Country; 
     },
     [row.currency, country.currency],
   )
+
+  // 교통 데이터(transport.json)가 있는 나라는 '현지 교통'을 공항 왕복 + 시내 교통으로 다시 계산
+  const tb = transportBudget(country.code, place, tier, headcount(party), days)
+  const result = (() => {
+    if (!tb) return base
+    const costKrw = rates.status === 'success' ? rates.data.cost.krwPer : null
+    const localKrw = rates.status === 'success' ? rates.data.local?.krwPer : null
+    const lines = base.lines.map((l) => {
+      if (l.key !== 'transport') return l
+      // 교통 금액은 현지 통화 → 경비 표 통화(USD)로 바꿔서 넣는다
+      if (tb.amount != null && costKrw && localKrw) return { ...l, amount: (tb.amount * localKrw) / costKrw, unit: NaN, formula: tb.formula }
+      return { ...l, formula: tb.amount == null ? `${l.formula} · ${tb.formula}` : l.formula }
+    })
+    const total = lines.reduce((a, l) => a + l.amount, 0)
+    return { ...base, lines, total, perPerson: total / base.people }
+  })()
 
   return (
     <div className="space-y-6 lg:grid lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start lg:gap-10 lg:space-y-0">
@@ -295,7 +312,8 @@ function ResultTable({
               <td className="py-2.5">
                 <p className="font-medium">{l.label}</p>
                 <p className="text-xs text-stone-500">
-                  {fmtSrc(l.unit)} {l.formula}
+                  {Number.isFinite(l.unit) ? `${fmtSrc(l.unit)} ` : ''}
+                  {l.formula}
                 </p>
               </td>
               <td className="py-2.5 text-right tabular-nums">

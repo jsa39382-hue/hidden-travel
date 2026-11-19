@@ -2,95 +2,108 @@ import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 import type { Country, Place, TripDates } from '../types'
 import { placeKeyOf, useWishlist } from '../lib/wishlist'
-import { useStored } from '../lib/stored'
+import { useMemories, type TripMemory } from '../lib/memories'
+import { MemoryCarousel } from './MemoryCarousel'
 import { commonsDirectThumb } from '../lib/md5'
 import { diffDays, formatKo } from '../lib/dates'
 import { balances, type Expense, type Member } from '../lib/settle'
 import { shareOrDownload } from './HomeSection'
 import { Num } from './ui/Num'
 
-interface TripLog {
-  code: string
-  name: string
-  start: string
-  end: string
-}
-
-/** 여행 회고 카드: 인스타 스토리 크기(1080×1920) 이미지로 만들어 저장·공유 */
+/** 여행 회고: 위쪽은 추억 앨범(캐러셀), 아래쪽은 지금 여행의 카드 만들기 */
 export function RetroSection({ country, place, dates }: { country: Country; place: Place; dates: TripDates }) {
   const { wish } = useWishlist(placeKeyOf(place))
-  const [trips, setTrips] = useStored<TripLog[]>('hidden-travel:trips', [], Array.isArray)
+  const memories = useMemories()
   const spent = readSpent(country.code, dates.start)
   const days = Math.max(1, diffDays(dates.start, dates.end) + 1)
   const [url, setUrl] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [blob, setBlob] = useState<Blob | null>(null)
+  // 만든 직후 앨범에서 그 여행 카드로 넘어가게 (나라:시작일)
+  const [focusKey, setFocusKey] = useState<string | null>(null)
 
-  const thisTrip: TripLog = { code: country.code, name: country.nameKo, start: dates.start, end: dates.end }
-  const allTrips = trips.some((t) => t.code === thisTrip.code && t.start === thisTrip.start) ? trips : [...trips, thisTrip]
-  const countries = new Set(allTrips.map((t) => t.code)).size
+  const existing = memories.list.find((m) => m.code === country.code && m.start === dates.start)
+  const countries = countVisited(memories.list, existing ? null : country.code)
 
   useEffect(() => () => void (url && URL.revokeObjectURL(url)), [url])
 
   const make = async () => {
     setBusy(true)
     try {
-      const b = await drawRetro({ country, place, dates, days, spots: wish.liked, spent, countries })
+      // 명소: 관심 목록(하트) 기능이 생기면 그 목록을, 지금은 카드 넘기기의 '가고 싶다' 목록을 쓴다
+      const spots = wish.liked.slice(0, 4).map((s) => ({ id: s.id, name: s.name, ...(s.image ? { image: s.image } : {}) }))
+      const data = { code: country.code, name: country.nameKo, place: { name: place.name, lat: place.lat, lng: place.lng }, start: dates.start, end: dates.end, spots, spent: spent || null }
+      memories.upsert(data)
+      const memory: TripMemory = { id: existing?.id ?? 'new', memo: existing?.memo ?? '', photoIds: existing?.photoIds ?? [], updatedAt: Date.now(), ...data }
+      const b = await drawRetro(memory, { countries })
       setBlob(b)
       setUrl((old) => {
         if (old) URL.revokeObjectURL(old)
         return URL.createObjectURL(b)
       })
-      setTrips(allTrips)
+      setFocusKey(`${country.code}:${dates.start}:${Date.now()}`)
     } finally {
       setBusy(false)
     }
   }
 
   return (
-    <div className="space-y-6 lg:grid lg:grid-cols-2 lg:items-start lg:gap-10 lg:space-y-0">
-      <div className="space-y-5">
-        <div className="grid grid-cols-3 gap-3">
-          <Stat label="다녀온 나라" value={countries} suffix="개국" />
-          <Stat label="이번 여행" value={days} suffix="일" />
-          <Stat label="가고 싶다로 고른 곳" value={wish.liked.length} suffix="곳" />
-        </div>
-        <div className="rounded-2xl border border-stone-200 p-4 text-sm text-stone-600">
-          <p>
-            카드에 들어가는 것: 나라·도시·날짜, <b className="text-stone-800">일정 탭에서 '가고 싶다'로 고른 명소</b>(사진 포함 최대 4곳),{' '}
-            <b className="text-stone-800">돈 탭 더치페이에 기록한 총액</b>
-            {spent ? ` (${Math.round(spent).toLocaleString('ko-KR')}원)` : ' (기록이 없으면 빠져요)'}.
-          </p>
-        </div>
-        <button type="button" onClick={make} disabled={busy} className="h-12 w-full rounded-xl bg-stone-900 text-base font-semibold text-stone-50 disabled:opacity-50">
-          {busy ? '사진을 모아 그리는 중…' : url ? '다시 만들기' : '회고 카드 만들기'}
-        </button>
-        {blob && (
-          <button type="button" onClick={() => shareOrDownload(blob, `숨은여행-${country.nameKo}-회고.png`)} className="h-12 w-full rounded-xl border border-stone-300 text-base font-semibold text-stone-800">
-            저장·공유하기
-          </button>
-        )}
-        <p className="text-[11px] text-stone-400">이미지는 이 기기에서만 만들어져요. 휴대폰에서는 공유 창으로 인스타그램 스토리에 바로 올릴 수 있어요.</p>
-      </div>
-      <div className="flex justify-center">
-        {url ? (
-          <motion.img
-            key={url}
-            src={url}
-            alt="여행 회고 카드 미리보기"
-            initial={{ scale: 0.8, rotate: -4, opacity: 0 }}
-            animate={{ scale: 1, rotate: 0, opacity: 1 }}
-            transition={{ type: 'spring', stiffness: 260, damping: 14 }}
-            className="w-64 rounded-3xl border border-stone-200 shadow-2xl"
-          />
-        ) : (
-          <div className="flex aspect-[9/16] w-64 items-center justify-center rounded-3xl border border-dashed border-stone-300 p-6 text-center text-sm text-stone-400">
-            여기에 스토리 크기(9:16) 카드가 나와요
+    <div className="space-y-12">
+      <MemoryCarousel memories={memories} focusKey={focusKey} onMake={make} />
+
+      <div className="space-y-6 lg:grid lg:grid-cols-2 lg:items-start lg:gap-10 lg:space-y-0">
+        <div className="space-y-5">
+          <h3 className="text-sm font-semibold uppercase tracking-wider text-stone-500">이번 여행 카드 만들기</h3>
+          <div className="grid grid-cols-3 gap-3">
+            <Stat label="다녀온 나라" value={countries} suffix="개국" />
+            <Stat label="이번 여행" value={days} suffix="일" />
+            <Stat label="가고 싶다로 고른 곳" value={wish.liked.length} suffix="곳" />
           </div>
-        )}
+          <div className="rounded-2xl border border-stone-200 p-4 text-sm text-stone-600">
+            <p>
+              카드에 들어가는 것: 나라·도시·날짜, <b className="text-stone-800">일정 탭에서 '가고 싶다'로 고른 명소</b>(최대 4곳),{' '}
+              <b className="text-stone-800">돈 탭 더치페이에 기록한 총액</b>
+              {spent ? ` (${Math.round(spent).toLocaleString('ko-KR')}원)` : ' (기록이 없으면 빠져요)'}. 만들면 위 앨범에도 쌓여요.
+            </p>
+          </div>
+          <button type="button" onClick={make} disabled={busy} className="h-12 w-full rounded-xl bg-stone-900 text-base font-semibold text-stone-50 disabled:opacity-50">
+            {busy ? '사진을 모아 그리는 중…' : existing ? '이번 여행 카드 다시 만들기' : '회고 카드 만들기'}
+          </button>
+          {blob && (
+            <button type="button" onClick={() => shareOrDownload(blob, `숨은여행-${country.nameKo}-회고.png`)} className="h-12 w-full rounded-xl border border-stone-300 text-base font-semibold text-stone-800">
+              저장·공유하기
+            </button>
+          )}
+          <p className="text-[11px] text-stone-400">이미지는 이 기기에서만 만들어져요. 휴대폰에서는 공유 창으로 인스타그램 스토리에 바로 올릴 수 있어요.</p>
+        </div>
+        <div className="flex justify-center">
+          {url ? (
+            <motion.img
+              key={url}
+              src={url}
+              alt="여행 회고 카드 미리보기"
+              initial={{ scale: 0.8, rotate: -4, opacity: 0 }}
+              animate={{ scale: 1, rotate: 0, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 14 }}
+              className="w-64 rounded-3xl border border-stone-200 shadow-2xl"
+            />
+          ) : (
+            <div className="flex aspect-[9/16] w-64 items-center justify-center rounded-3xl border border-dashed border-stone-300 p-6 text-center text-sm text-stone-400">
+              여기에 스토리 크기(9:16) 카드가 나와요
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
+}
+
+/** 다녀온 나라 수 (시작일이 오늘 이후인 '예정' 여행은 빼고, extra는 지금 만들 나라) */
+export function countVisited(list: TripMemory[], extra: string | null) {
+  const today = new Date().toISOString().slice(0, 10)
+  const codes = new Set(list.filter((m) => m.start <= today).map((m) => m.code))
+  if (extra) codes.add(extra)
+  return codes.size
 }
 
 function Stat({ label, value, suffix }: { label: string; value: number; suffix: string }) {
@@ -105,7 +118,7 @@ function Stat({ label, value, suffix }: { label: string; value: number; suffix: 
   )
 }
 
-function readSpent(code: string, start: string) {
+export function readSpent(code: string, start: string) {
   try {
     const book = JSON.parse(localStorage.getItem(`hidden-travel:settle:${code}:${start}`) ?? 'null') as { members: Member[]; expenses: Expense[] } | null
     if (!book?.expenses?.length) return 0
@@ -136,17 +149,11 @@ function loadImage(src: string) {
   })
 }
 
-async function drawRetro(o: {
-  country: Country
-  place: Place
-  dates: TripDates
-  days: number
-  spots: { name: string; kind: string; image?: string }[]
-  spent: number
-  countries: number
-}) {
+/** 1080×1920 회고 카드 이미지. 내 사진이 있으면 크게, 없으면 명소 사진 격자 */
+export async function drawRetro(m: TripMemory, opts: { countries: number; photo?: Blob | null; planned?: boolean; expected?: number | null }) {
   const W = 1080
   const H = 1920
+  const days = Math.max(1, diffDays(m.start, m.end) + 1)
   const c = document.createElement('canvas')
   c.width = W
   c.height = H
@@ -159,53 +166,78 @@ async function drawRetro(o: {
 
   x.fillStyle = '#5eead4'
   x.font = '600 36px system-ui, sans-serif'
-  x.fillText('HIDDEN TRAVEL · 여행 회고', 90, 150)
+  x.fillText(`HIDDEN TRAVEL · ${opts.planned ? '여행 예정' : '여행 회고'}`, 90, 150)
   x.fillStyle = '#fafafa'
   x.font = '800 132px system-ui, sans-serif'
-  x.fillText(o.country.nameKo, 90, 310)
+  x.fillText(clip(x, m.name, W - 180), 90, 310)
   x.fillStyle = '#c9c9c9'
   x.font = '500 48px system-ui, sans-serif'
-  x.fillText(`${o.place.name} · ${o.days}일`, 90, 390)
+  x.fillText(clip(x, `${m.place.name} · ${days}일`, W - 180), 90, 390)
   x.fillStyle = '#8f8f8f'
   x.font = '400 38px system-ui, sans-serif'
-  x.fillText(`${formatKo(o.dates.start)} – ${formatKo(o.dates.end)}`, 90, 450)
+  x.fillText(`${formatKo(m.start)} – ${formatKo(m.end)}`, 90, 450)
 
-  // 사진 격자 (가고 싶다로 고른 곳 중 사진 있는 4곳)
-  const withPhoto = o.spots.filter((s) => s.image && !/^https?:/.test(s.image)).slice(0, 4)
-  const imgs = await Promise.all(withPhoto.map((s) => loadImage(commonsDirectThumb(s.image!, 500))))
   const gx = 90
   const gy = 540
-  const cell = (W - gx * 2 - 24) / 2
-  withPhoto.forEach((s, i) => {
-    const px = gx + (i % 2) * (cell + 24)
-    const py = gy + Math.floor(i / 2) * (cell + 90)
+  if (opts.photo) {
+    // 내 사진을 크게
+    const img = await loadImage(URL.createObjectURL(opts.photo))
+    const w = W - gx * 2
+    const h = 760
     x.save()
-    roundRect(x, px, py, cell, cell, 36)
+    roundRect(x, gx, gy, w, h, 40)
     x.clip()
     x.fillStyle = '#1a1a1a'
-    x.fillRect(px, py, cell, cell)
-    const img = imgs[i]
+    x.fillRect(gx, gy, w, h)
     if (img) {
-      const r = Math.max(cell / img.width, cell / img.height)
-      x.drawImage(img, px + (cell - img.width * r) / 2, py + (cell - img.height * r) / 2, img.width * r, img.height * r)
+      const r = Math.max(w / img.width, h / img.height)
+      x.drawImage(img, gx + (w - img.width * r) / 2, gy + (h - img.height * r) / 2, img.width * r, img.height * r)
     }
     x.restore()
     x.fillStyle = '#fafafa'
-    x.font = '600 34px system-ui, sans-serif'
-    x.fillText(clip(x, s.name, cell), px, py + cell + 50)
-  })
-  if (!withPhoto.length) {
-    x.fillStyle = '#6b6b6b'
-    x.font = '400 38px system-ui, sans-serif'
-    x.fillText('일정 탭에서 가고 싶은 곳을 골라 보세요', 90, 700)
+    x.font = '500 34px system-ui, sans-serif'
+    x.fillText(clip(x, m.spots.map((s) => s.name).join(' · '), w), gx, gy + h + 60)
+  } else {
+    // 명소 사진 격자 (사진 있는 4곳)
+    const withPhoto = m.spots.filter((s) => s.image && !/^https?:/.test(s.image)).slice(0, 4)
+    const imgs = await Promise.all(withPhoto.map((s) => loadImage(commonsDirectThumb(s.image!, 500))))
+    const cell = (W - gx * 2 - 24) / 2
+    withPhoto.forEach((s, i) => {
+      const px = gx + (i % 2) * (cell + 24)
+      const py = gy + Math.floor(i / 2) * (cell + 90)
+      x.save()
+      roundRect(x, px, py, cell, cell, 36)
+      x.clip()
+      x.fillStyle = '#1a1a1a'
+      x.fillRect(px, py, cell, cell)
+      const img = imgs[i]
+      if (img) {
+        const r = Math.max(cell / img.width, cell / img.height)
+        x.drawImage(img, px + (cell - img.width * r) / 2, py + (cell - img.height * r) / 2, img.width * r, img.height * r)
+      }
+      x.restore()
+      x.fillStyle = '#fafafa'
+      x.font = '600 34px system-ui, sans-serif'
+      x.fillText(clip(x, s.name, cell), px, py + cell + 50)
+    })
+    if (!withPhoto.length) {
+      x.fillStyle = '#6b6b6b'
+      x.font = '400 38px system-ui, sans-serif'
+      x.fillText(m.spots.length ? clip(x, m.spots.map((s) => s.name).join(' · '), W - 180) : '일정 탭에서 가고 싶은 곳을 골라 보세요', 90, 700)
+    }
+  }
+  if (m.memo) {
+    x.fillStyle = '#e4e4e4'
+    x.font = 'italic 400 40px system-ui, sans-serif'
+    x.fillText(clip(x, `“${m.memo}”`, W - 180), 90, 1460)
   }
 
-  // 숫자
-  const by = 1560
+  const by = 1580
+  const money = opts.planned ? (opts.expected ? `${Math.round(opts.expected / 10000).toLocaleString('ko-KR')}만 원` : '–') : m.spent ? `${Math.round(m.spent / 10000).toLocaleString('ko-KR')}만 원` : '–'
   const stats: [string, string][] = [
-    ['고른 숨은 명소', `${o.spots.length}곳`],
-    ['쓴 돈', o.spent ? `${Math.round(o.spent / 10000).toLocaleString('ko-KR')}만 원` : '–'],
-    ['다녀온 나라', `${o.countries}개국`],
+    ['고른 숨은 명소', `${m.spots.length}곳`],
+    [opts.planned ? '예상 경비' : '쓴 돈', money],
+    ['다녀온 나라', `${opts.countries}개국`],
   ]
   stats.forEach(([k, v], i) => {
     const px = 90 + i * 310

@@ -4,7 +4,7 @@ import { HttpError } from './cache'
  * OpenStreetMap 계열 서버(Overpass, Nominatim)는 사용 정책상 요청을 몰아 보내면 안 된다.
  * 요청 '시작' 사이에 최소 간격을 두고, 동시에 진행되는 요청 수도 제한한다.
  */
-function makeQueue(minGapMs: number, maxConcurrent: number) {
+export function makeQueue(minGapMs: number, maxConcurrent: number) {
   let lastStart = 0
   let running = 0
   const waiting: (() => void)[] = []

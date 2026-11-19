@@ -1,0 +1,200 @@
+{
+ "_설명": "나라별 공항 이동·시내 교통·택시·도시 간 이동 데이터. costs.json처럼 나라 코드별로 넣는다. price는 [최소, 최대] 현지 통화(대중교통은 1인, 택시·차량 호출은 1대 기준). firstLast는 '05:30-23:40'(막차가 자정을 넘기면 '05:30-00:20'). 공식 사이트에서 확인한 값만 넣고, 확인하지 못한 값은 null로 둔다. transfers는 갈아타는 횟수(null이면 rail 1, 그 밖 0으로 본다). childRate는 아이 요금 비율(null이면 어른 요금으로 계산).",
+ "updated": "2026-11",
+ "countries": {
+  "JP": {
+   "currency": "JPY",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "HND",
+     "name": "하네다공항 (도쿄국제공항)",
+     "lat": 35.5533,
+     "lng": 139.7811,
+     "cities": [
+      "도쿄",
+      "요코하마"
+     ],
+     "options": [
+      {
+       "mode": "rail",
+       "name": "게이큐선 (하네다공항 3터미널역 → 도쿄역)",
+       "minutes": 20,
+       "price": null,
+       "firstLast": null,
+       "where": "하네다공항 3터미널역 (게이큐)",
+       "note": "공식 소요 시간: 시나가와 11분, 시부야 23분, 신주쿠 30분 (3터미널 기준)",
+       "transfers": null
+      },
+      {
+       "mode": "rail",
+       "name": "도쿄 모노레일",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "하네다공항 각 터미널역 (도쿄 모노레일)",
+       "note": "공식 안내: 하네다공항에서 신주쿠까지 약 38분",
+       "transfers": null
+      },
+      {
+       "mode": "bus",
+       "name": "공항 리무진버스",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": null,
+       "transfers": 0
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "각 터미널 택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    },
+    {
+     "code": "NRT",
+     "name": "나리타국제공항",
+     "lat": 35.7649,
+     "lng": 140.3885,
+     "cities": [
+      "도쿄"
+     ],
+     "options": [
+      {
+       "mode": "rail",
+       "name": "게이세이 스카이라이너 (나리타공항 → 닛포리)",
+       "minutes": 36,
+       "price": null,
+       "firstLast": null,
+       "where": "나리타공항 2·3터미널역 / 나리타공항역",
+       "note": "공식: 나리타공항 2·3터미널역 → 닛포리역 최단 36분",
+       "transfers": null
+      },
+      {
+       "mode": "rail",
+       "name": "JR 나리타 익스프레스",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": null,
+       "transfers": null
+      },
+      {
+       "mode": "bus",
+       "name": "공항 리무진버스",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": null,
+       "transfers": 0
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "각 터미널 택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    },
+    {
+     "code": "KIX",
+     "name": "간사이국제공항",
+     "lat": 34.4306,
+     "lng": 135.2303,
+     "cities": [
+      "오사카",
+      "교토",
+      "고베",
+      "나라"
+     ],
+     "options": [
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [
+    {
+     "city": "도쿄",
+     "card": "Suica · PASMO (IC 교통카드)",
+     "cardPrice": null,
+     "passes": [
+      {
+       "name": "Tokyo Subway Ticket 24시간",
+       "price": null,
+       "days": 1
+      },
+      {
+       "name": "Tokyo Subway Ticket 48시간",
+       "price": null,
+       "days": 2
+      },
+      {
+       "name": "Tokyo Subway Ticket 72시간",
+       "price": null,
+       "days": 3
+      }
+     ],
+     "single": null
+    }
+   ],
+   "taxi": {
+    "city": "도쿄",
+    "base": null,
+    "perKm": null,
+    "nightMultiplier": null,
+    "nightHours": null
+   },
+   "rideApps": [
+    "GO",
+    "Uber",
+    "DiDi"
+   ],
+   "intercity": [
+    {
+     "route": "도쿄 → 신오사카",
+     "mode": "도카이도 신칸센 (노조미)",
+     "minutes": null,
+     "price": null,
+     "booking": null
+    },
+    {
+     "route": "도쿄 → 교토",
+     "mode": "도카이도 신칸센 (노조미)",
+     "minutes": null,
+     "price": null,
+     "booking": null
+    }
+   ],
+   "sources": [
+    "https://www.haneda-tokyo-access.com/en/ride/fares.html",
+    "https://www.tokyo-monorail.co.jp/english/",
+    "https://www.keisei.co.jp/keisei/tetudou/skyliner/us/tickets/index.php",
+    "https://www.wikidata.org/wiki/Q36454",
+    "https://www.wikidata.org/wiki/Q204853",
+    "https://www.wikidata.org/wiki/Q193682"
+   ]
+  }
+ }
+}
