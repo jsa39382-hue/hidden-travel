@@ -80,39 +80,94 @@ export async function fetchJson<T>(url: string, init: RequestInit & { timeoutMs?
   }
 }
 
-const inflight = new Map<string, Promise<unknown>>()
+interface Inflight {
+  promise: Promise<unknown>
+  ctrl: AbortController
+  refs: number
+}
+const inflight = new Map<string, Inflight>()
 
-/** 같은 키로 동시에 들어온 요청은 하나의 네트워크 호출로 합친다. */
-function dedupe<T>(key: string, fn: () => Promise<T>): Promise<T> {
-  const running = inflight.get(key) as Promise<T> | undefined
-  if (running) return running
-  const p = fn().finally(() => inflight.delete(key))
-  inflight.set(key, p)
-  return p
+const abortError = () => new DOMException('요청을 취소했어요', 'AbortError')
+
+/**
+ * 같은 키로 동시에 들어온 요청은 하나의 네트워크 호출로 합친다.
+ * 기다리는 쪽이 모두 취소했을 때만 실제 요청을 취소한다.
+ */
+function dedupe<T>(key: string, fn: (signal: AbortSignal) => Promise<T>, signal?: AbortSignal): Promise<T> {
+  let entry = inflight.get(key)
+  if (!entry || entry.ctrl.signal.aborted) {
+    const ctrl = new AbortController()
+    const created: Inflight = { promise: Promise.resolve(), ctrl, refs: 0 }
+    created.promise = fn(ctrl.signal).finally(() => {
+      if (inflight.get(key) === created) inflight.delete(key)
+    })
+    created.promise.catch(() => undefined)
+    inflight.set(key, created)
+    entry = created
+  }
+  const e = entry
+  if (!signal) {
+    // 취소 신호 없이 기다리는 쪽이 있으면 실제 요청은 끝까지 유지
+    e.refs += 1_000_000
+    return e.promise as Promise<T>
+  }
+  if (signal.aborted) return Promise.reject(abortError())
+  e.refs++
+  return new Promise<T>((resolve, reject) => {
+    let settled = false
+    const onAbort = () => {
+      if (settled) return
+      settled = true
+      e.refs--
+      reject(abortError())
+      // 같은 순간에 다시 구독하는 경우(React 개발 모드의 이중 실행 등)를 위해 한 틱 뒤에 판단
+      setTimeout(() => {
+        if (e.refs <= 0) e.ctrl.abort()
+      }, 0)
+    }
+    signal.addEventListener('abort', onAbort, { once: true })
+    const done = () => {
+      signal.removeEventListener('abort', onAbort)
+      if (settled) return false
+      settled = true
+      e.refs--
+      return true
+    }
+    ;(e.promise as Promise<T>).then(
+      (v) => done() && resolve(v),
+      (err) => done() && reject(err),
+    )
+  })
 }
 
 /**
  * 캐시 우선 조회. 캐시가 유효하면 네트워크를 쓰지 않는다.
  * 네트워크가 실패하면 만료된 캐시라도 돌려주고 stale=true로 표시한다.
+ * signal로 취소하면 AbortError로 끝난다 (만료 캐시로 대신하지 않음).
  */
 export async function cachedJson<T>(
   key: string,
   ttlMs: number,
-  loader: () => Promise<T>,
-  { force = false } = {},
+  loader: (signal: AbortSignal) => Promise<T>,
+  { force = false, signal }: { force?: boolean; signal?: AbortSignal } = {},
 ): Promise<{ data: T; savedAt: number; stale: boolean }> {
   if (!force) {
     const hit = readCache<T>(key, ttlMs)
     if (hit) return { ...hit, stale: false }
   }
   try {
-    const data = await dedupe(key, async () => {
-      const d = await loader()
-      writeCache(key, d)
-      return d
-    })
+    const data = await dedupe(
+      key,
+      async (sig) => {
+        const d = await loader(sig)
+        writeCache(key, d)
+        return d
+      },
+      signal,
+    )
     return { data, savedAt: Date.now(), stale: false }
   } catch (err) {
+    if (signal?.aborted) throw err
     const old = readStale<T>(key)
     if (old) return { ...old, stale: true }
     throw err
@@ -133,7 +188,7 @@ export function errorReasonKo(e: unknown): string {
 }
 
 /** 예전 버전 키·오래된 항목을 지운다 (앱 시작 시 한 번) */
-const OBSOLETE = ['spots:v1:', 'lodging:v1:']
+const OBSOLETE = ['spots:v1:', 'lodging:v1:', 'spots:base:v2:', 'spots:fame:v2:', 'nearby:v1:']
 const MAX_AGE = 14 * DAY
 export function cleanupCache() {
   try {

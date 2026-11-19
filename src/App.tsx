@@ -11,6 +11,8 @@ import { WeatherSection } from './components/WeatherSection'
 import { PlannerSection } from './components/PlannerSection'
 import { SectionBoundary } from './components/SectionBoundary'
 import { OfflineBanner } from './components/OfflineBanner'
+import { WhenVisible } from './components/WhenVisible'
+import { Diagnostics } from './components/Diagnostics'
 import { cacheSizeKb, clearCache } from './lib/cache'
 import { useState } from 'react'
 import { useTripState } from './lib/tripState'
@@ -39,6 +41,7 @@ export default function App() {
       </header>
 
       <main className="mx-auto -mt-12 max-w-3xl space-y-4 px-4">
+        {new URLSearchParams(location.search).has('diag') && <Diagnostics />}
         <div className="space-y-4 rounded-2xl bg-white p-4 shadow-md ring-1 ring-stone-200 sm:grid sm:grid-cols-2 sm:gap-4 sm:space-y-0 sm:p-6">
           <CountryPicker value={country} onChange={(c) => setCountry(c.code)} />
           <DateRange value={dates} onChange={setDates} />
@@ -86,7 +89,9 @@ export default function App() {
                 ) : s.id === 'exchange' ? (
                   <ExchangeCalculator country={country} />
                 ) : s.id === 'spots' ? (
-                  <SpotsSection country={country} place={place!} />
+                  <WhenVisible placeholder={<p className="py-6 text-sm text-stone-400">아래로 내려오면 명소를 찾기 시작해요…</p>}>
+                    <SpotsSection country={country} place={place!} />
+                  </WhenVisible>
                 ) : s.id === 'weather' ? (
                   <WeatherSection place={place!} dates={dates} />
                 ) : s.id === 'budget' ? (

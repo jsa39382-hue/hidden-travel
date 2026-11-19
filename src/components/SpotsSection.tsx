@@ -42,7 +42,7 @@ export function SpotsSection({ country, place }: { country: Country; place: Plac
 
   const sp = useSpots(place.lat, place.lng, radius)
   // 숙소·식당은 명소와 동시에 찾는다 (서로 기다리지 않음)
-  const nearby = useAsync((force) => getNearby(lodgingAt.lat, lodgingAt.lng, force), [lodgingAt.lat, lodgingAt.lng])
+  const nearby = useAsync((force, signal) => getNearby(lodgingAt.lat, lodgingAt.lng, force, signal), [lodgingAt.lat, lodgingAt.lng])
   const [nearTab, setNearTab] = useState<'lodging' | 'food' | 'cafe'>('lodging')
 
   const split = useMemo(() => (sp.spots ? splitSpots(sp.spots) : { hidden: [], famous: [] }), [sp.spots])

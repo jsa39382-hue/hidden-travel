@@ -1,6 +1,6 @@
 import { DAY, cachedJson, readCache, writeCache, HttpError } from './cache'
 import { useAsync } from './useAsync'
-import { distanceKm, elementLatLng, overpass, type OsmElement } from './osm'
+import { bboxOf, distanceKm, elementLatLng, overpass, type OsmElement } from './osm'
 
 export type SpotCategory = 'nature' | 'view' | 'museum' | 'history' | 'art' | 'attraction'
 
@@ -92,15 +92,15 @@ function classify(tags: Record<string, string>): { kind: string; category: SpotC
 // historic=* 중 작은 표지판·기념비처럼 여행지로 보기 어려운 것은 뺀다
 const HISTORIC_NOISE = 'memorial|wayside_cross|wayside_shrine|boundary_stone|milestone|yes|district|heritage|railway|marker|stone|optical_telegraph|pillory|cannon|vehicle|tree_shrine|creamery|mine_shaft|mine'
 
-function buildQuery(lat: number, lng: number, radiusM: number) {
-  const a = `(around:${radiusM},${lat},${lng})`
-  return `[out:json][timeout:30];
+function buildQuery(lat: number, lng: number, radiusKm: number) {
+  const b = bboxOf(lat, lng, radiusKm)
+  return `[out:json][timeout:25];
 (
-  nwr${a}[tourism~"^(attraction|viewpoint|museum|gallery|artwork)$"][name];
-  nwr${a}[natural~"^(waterfall|peak|beach|cave_entrance|hot_spring)$"][name];
-  nwr${a}[historic][historic!~"^(${HISTORIC_NOISE})$"][name];
+  nwr[tourism~"^(attraction|viewpoint|museum|gallery|artwork)$"][name]${b};
+  nwr[natural~"^(waterfall|peak|beach|cave_entrance|hot_spring)$"][name]${b};
+  nwr[historic][historic!~"^(${HISTORIC_NOISE})$"][name]${b};
 );
-out tags center 400;`
+out tags center 500;`
 }
 
 function parseWikiTag(v?: string): Spot['wiki'] {
@@ -227,12 +227,12 @@ const MAX_PAGEVIEW_LOOKUPS = 45
 const hasWikiOf = (s: Spot) => !!(s.enTitle || s.wiki || s.koTitle || s.wikidata)
 
 /** 1단계: Overpass 명소 목록만 (빠름). 위키 문서가 있는 곳은 인지도 확인 전 상태로 둔다. */
-async function loadBase(lat: number, lng: number, radiusKm: number): Promise<SpotsResult> {
+async function loadBase(lat: number, lng: number, radiusKm: number, signal?: AbortSignal): Promise<SpotsResult> {
   const center: [number, number] = [lat, lng]
-  const elements = await overpass(buildQuery(lat, lng, Math.round(radiusKm * 1000)))
+  const elements = await overpass(buildQuery(lat, lng, radiusKm), 35000, signal)
   const raw = elements
     .map((e) => toSpot(e, center))
-    .filter((s): s is Spot => !!s)
+    .filter((s): s is Spot => !!s && s.distKm <= radiusKm)
     .sort((a, b) => (hasWikiOf(b) ? 1 : 0) - (hasWikiOf(a) ? 1 : 0) || a.distKm - b.distKm)
   // 같은 이름이 가까이 여러 개(건물·경계 등) 있으면 하나만
   const spots: Spot[] = []
@@ -301,13 +301,13 @@ async function loadFame(base: Spot[]): Promise<SpotsResult> {
 const spotsKey = (lat: number, lng: number, radiusKm: number) => `${lat.toFixed(3)},${lng.toFixed(3)}:${radiusKm}`
 
 /** 지역의 명소 목록 (24시간 캐시) */
-export function getSpotsBase(lat: number, lng: number, radiusKm: number, force = false) {
-  return cachedJson(`spots:base:v2:${spotsKey(lat, lng, radiusKm)}`, DAY, () => loadBase(lat, lng, radiusKm), { force })
+export function getSpotsBase(lat: number, lng: number, radiusKm: number, force = false, signal?: AbortSignal) {
+  return cachedJson(`spots:base:v3:${spotsKey(lat, lng, radiusKm)}`, DAY, (sig) => loadBase(lat, lng, radiusKm, sig), { force, signal })
 }
 
 /** 명소 목록 + 인지도 (24시간 캐시) */
-export function getSpotsFame(lat: number, lng: number, radiusKm: number, base: Spot[], force = false) {
-  return cachedJson(`spots:fame:v2:${spotsKey(lat, lng, radiusKm)}`, DAY, () => loadFame(base), { force })
+export function getSpotsFame(lat: number, lng: number, radiusKm: number, base: Spot[], force = false, signal?: AbortSignal) {
+  return cachedJson(`spots:fame:v3:${spotsKey(lat, lng, radiusKm)}`, DAY, () => loadFame(base), { force, signal })
 }
 
 export function splitSpots(spots: Spot[]) {
@@ -377,9 +377,9 @@ export async function getSummary(spot: Spot): Promise<WikiSummary | null> {
  * 같은 지역을 여러 곳(명소 섹션·여행 계획)에서 불러도 캐시·동시 요청 합치기 덕분에 한 번만 요청한다.
  */
 export function useSpots(lat: number, lng: number, radiusKm: number) {
-  const base = useAsync((force) => getSpotsBase(lat, lng, radiusKm, force), [lat, lng, radiusKm])
+  const base = useAsync((force, signal) => getSpotsBase(lat, lng, radiusKm, force, signal), [lat, lng, radiusKm])
   const baseSpots = base.status === 'success' ? base.data.data.spots : null
-  const fame = useAsync(baseSpots ? (force) => getSpotsFame(lat, lng, radiusKm, baseSpots, force) : null, [baseSpots])
+  const fame = useAsync(baseSpots ? (force, signal) => getSpotsFame(lat, lng, radiusKm, baseSpots, force, signal) : null, [baseSpots])
   const spots = fame.status === 'success' ? fame.data.data.spots : baseSpots
   return {
     base,

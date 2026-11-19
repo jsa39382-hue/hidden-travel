@@ -80,15 +80,48 @@ async function overpassOnce(server: string, query: string, timeoutMs: number, ou
   }
 }
 
+export class OverpassError extends Error {
+  cause: unknown
+  constructor(message: string, cause: unknown) {
+    super(message)
+    this.cause = cause
+  }
+}
+
+/** 실패 원인을 짧은 한국어로 (진단용) */
+export function describeFailure(e: unknown): string {
+  if (e instanceof HttpError) return e.status === 429 ? '요청 많음(429)' : e.status === 504 ? '서버 과부하(504)' : `HTTP ${e.status}`
+  if (e instanceof DOMException && e.name === 'AbortError') return '시간 초과'
+  if (e instanceof TypeError) return '접속 불가(차단·CORS·네트워크)'
+  if (e instanceof Error) return /[가-힣]/.test(e.message) ? e.message : '알 수 없는 오류'
+  return '알 수 없는 오류'
+}
+
 // Overpass JSON 응답: {"version":0.6,"generator":"Overpass API ...","elements":[{type,id,lat,lon,tags} | {type,id,center:{lat,lon},tags}]}
-export function overpass(query: string, timeoutMs = 30000): Promise<OsmElement[]> {
+export function overpass(query: string, timeoutMs = 30000, signal?: AbortSignal): Promise<OsmElement[]> {
   const outer = new AbortController()
   return new Promise<OsmElement[]>((resolve, reject) => {
     let started = 0
     let failed = 0
     let lastError: unknown
+    const reasons: string[] = []
     let done = false
     let hedgeTimer: ReturnType<typeof setTimeout> | undefined
+    // 호출한 쪽이 취소하면 진행 중·대기 중인 서버 요청을 모두 멈춘다
+    if (signal) {
+      if (signal.aborted) return reject(new DOMException('요청을 취소했어요', 'AbortError'))
+      signal.addEventListener(
+        'abort',
+        () => {
+          if (done) return
+          done = true
+          clearTimeout(hedgeTimer)
+          outer.abort()
+          reject(new DOMException('요청을 취소했어요', 'AbortError'))
+        },
+        { once: true },
+      )
+    }
 
     const startNext = () => {
       if (done || started >= OVERPASS_SERVERS.length) return
@@ -96,7 +129,7 @@ export function overpass(query: string, timeoutMs = 30000): Promise<OsmElement[]
       clearTimeout(hedgeTimer)
       // 늦으면 다음 서버도 같이 시작
       hedgeTimer = setTimeout(startNext, HEDGE_AFTER_MS)
-      overpassQueue(server)(() => (done ? Promise.resolve([] as OsmElement[]) : overpassOnce(server, query, timeoutMs, outer.signal))).then(
+      overpassQueue(server)(() => (done || outer.signal.aborted ? Promise.resolve([] as OsmElement[]) : overpassOnce(server, query, timeoutMs, outer.signal))).then(
         (els) => {
           if (done) return
           done = true
@@ -108,11 +141,13 @@ export function overpass(query: string, timeoutMs = 30000): Promise<OsmElement[]
           if (done) return
           failed++
           lastError = e
+          reasons.push(`${new URL(server).host}: ${describeFailure(e)}`)
           // 잘못된 쿼리(400)는 다른 서버에서도 실패하므로 바로 멈춘다
           if ((e instanceof HttpError && e.status === 400) || failed >= OVERPASS_SERVERS.length) {
             done = true
             clearTimeout(hedgeTimer)
-            reject(lastError)
+            const all = new OverpassError(`OpenStreetMap 서버 ${failed}곳 모두 실패 — ${reasons.join(' / ')}`, lastError)
+            reject(all)
             return
           }
           if (failed >= started) startNext() // 진행 중인 요청이 없으면 바로 다음 서버
@@ -156,6 +191,18 @@ export function nominatimSearch(q: string, countryCode: string): Promise<Nominat
       clearTimeout(timer)
     }
   })
+}
+
+/**
+ * 중심·반경 → Overpass 네모 영역 "(남,서,북,동)".
+ * around(반경) 검색은 길·건물의 모양을 하나하나 거리 계산해야 해서 무겁다.
+ * 네모 영역으로 찾고 원 밖의 것은 브라우저에서 거리로 걸러 내는 편이 훨씬 빠르다.
+ */
+export function bboxOf(lat: number, lng: number, radiusKm: number) {
+  const dLat = radiusKm / 111.32
+  const dLng = radiusKm / (111.32 * Math.max(0.2, Math.cos((lat * Math.PI) / 180)))
+  const f = (n: number) => n.toFixed(5)
+  return `(${f(lat - dLat)},${f(lng - dLng)},${f(lat + dLat)},${f(lng + dLng)})`
 }
 
 /** 두 좌표 사이 거리(km) */

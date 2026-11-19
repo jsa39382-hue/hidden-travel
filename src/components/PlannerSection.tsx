@@ -152,7 +152,7 @@ function PlanResult({
   onCopied: () => void
 }) {
   const sp = useSpots(place.lat, place.lng, 10)
-  const nearby = useAsync((force) => getNearby(place.lat, place.lng, force), [place.lat, place.lng])
+  const nearby = useAsync((force, signal) => getNearby(place.lat, place.lng, force, signal), [place.lat, place.lng])
   const years = [...new Set([Number(dates.start.slice(0, 4)), Number(dates.end.slice(0, 4))])]
   const extra = useAsync(
     async () => {

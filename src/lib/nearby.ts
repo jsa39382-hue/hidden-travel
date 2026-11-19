@@ -1,5 +1,5 @@
 import { DAY, cachedJson } from './cache'
-import { distanceKm, elementLatLng, overpass, type OsmElement } from './osm'
+import { bboxOf, distanceKm, elementLatLng, overpass, type OsmElement } from './osm'
 import type { Tier } from './budget'
 
 export interface Lodging {
@@ -126,13 +126,15 @@ function toEatery(e: OsmElement, center: [number, number]): Eatery | null {
 }
 
 /** 숙소와 식당·카페를 한 번의 요청으로 가져온다 (출력 문 두 개로 종류별 개수를 따로 제한) */
-async function load(lat: number, lng: number, radiusM: number): Promise<Nearby> {
-  const eatR = Math.round(radiusM * 0.7)
+async function load(lat: number, lng: number, radiusM: number, signal?: AbortSignal): Promise<Nearby> {
+  const rKm = radiusM / 1000
+  const eatKm = rKm * 0.7
   const els = await overpass(
     `[out:json][timeout:20];
-nwr(around:${radiusM},${lat},${lng})[tourism~"^(hotel|hostel|guest_house|motel|apartment|chalet|alpine_hut)$"][name];out tags center 100;
-nwr(around:${eatR},${lat},${lng})[amenity~"^(restaurant|cafe|fast_food|food_court|bar|pub)$"][name];out tags center 250;`,
+nwr[tourism~"^(hotel|hostel|guest_house|motel|apartment|chalet|alpine_hut)$"][name]${bboxOf(lat, lng, rKm)};out tags center 120;
+nwr[amenity~"^(restaurant|cafe|fast_food|food_court|bar|pub)$"][name]${bboxOf(lat, lng, eatKm)};out tags center 300;`,
     25000,
+    signal,
   )
   const center: [number, number] = [lat, lng]
   const lodgings: Lodging[] = []
@@ -140,10 +142,10 @@ nwr(around:${eatR},${lat},${lng})[amenity~"^(restaurant|cafe|fast_food|food_cour
   for (const e of els) {
     if (e.tags?.tourism) {
       const l = toLodging(e, center)
-      if (l) lodgings.push(l)
+      if (l && l.distKm <= rKm) lodgings.push(l)
     } else {
       const f = toEatery(e, center)
-      if (f) eateries.push(f)
+      if (f && f.distKm <= eatKm) eateries.push(f)
     }
   }
   return {
@@ -154,9 +156,9 @@ nwr(around:${eatR},${lat},${lng})[amenity~"^(restaurant|cafe|fast_food|food_cour
 }
 
 /** 지점 주변 숙소·식당 (24시간 캐시). 숙소가 너무 적으면 반경을 넓혀 한 번 더 찾는다. */
-export async function getNearby(lat: number, lng: number, force = false) {
-  const key = (r: number) => `nearby:v1:${lat.toFixed(3)},${lng.toFixed(3)}:${r}`
-  const near = await cachedJson(key(1500), DAY, () => load(lat, lng, 1500), { force })
+export async function getNearby(lat: number, lng: number, force = false, signal?: AbortSignal) {
+  const key = (r: number) => `nearby:v2:${lat.toFixed(3)},${lng.toFixed(3)}:${r}`
+  const near = await cachedJson(key(1500), DAY, (sig) => load(lat, lng, 1500, sig), { force, signal })
   if (near.data.lodgings.length >= 5) return near
-  return cachedJson(key(5000), DAY, () => load(lat, lng, 5000), { force })
+  return cachedJson(key(5000), DAY, (sig) => load(lat, lng, 5000, sig), { force, signal })
 }
