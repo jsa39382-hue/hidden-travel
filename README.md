@@ -51,6 +51,6 @@ npm run dev
 - [x] 3. 공휴일 캘린더, 축제
 - [x] 4. 경비 계산기
 - [x] 5. 숨은 명소 + 지도 (+ 도시 선택·도시별 물가 보정·주변 숙소)
-- [ ] 6. 날씨
+- [x] 6. 날씨
 - [ ] 7. 캐시·에러 처리·모바일 점검
 - [x] 8. GitHub Pages 배포 (https://jsa39382-hue.github.io/hidden-travel/)

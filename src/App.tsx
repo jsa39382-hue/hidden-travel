@@ -7,6 +7,7 @@ import { CalendarSection } from './components/CalendarSection'
 import { BudgetCalculator } from './components/BudgetCalculator'
 import { PlacePicker } from './components/PlacePicker'
 import { SpotsSection } from './components/SpotsSection'
+import { WeatherSection } from './components/WeatherSection'
 import { useTripState } from './lib/tripState'
 import { diffDays } from './lib/dates'
 
@@ -77,11 +78,11 @@ export default function App() {
                   <ExchangeCalculator country={country} />
                 ) : s.id === 'spots' ? (
                   <SpotsSection country={country} place={place!} />
+                ) : s.id === 'weather' ? (
+                  <WeatherSection place={place!} dates={dates} />
                 ) : s.id === 'budget' ? (
                   <BudgetCalculator country={country} dates={dates} place={place!} />
-                ) : (
-                  <p className="text-sm text-stone-400">준비 중인 기능이에요.</p>
-                )}
+                ) : null}
               </Section>
             ))}
           </>
@@ -89,7 +90,7 @@ export default function App() {
       </main>
 
       <footer className="mx-auto mt-10 max-w-3xl px-4 text-center text-xs text-stone-400">
-        국가 정보: Wikidata · 국기: flagcdn.com · 환율: Frankfurter, ExchangeRate-API · 공휴일: Nager.Date · 축제: Wikidata · 지도·명소·숙소: © OpenStreetMap 기여자 · 설명: 위키백과
+        국가 정보: Wikidata · 국기: flagcdn.com · 환율: Frankfurter, ExchangeRate-API · 공휴일: Nager.Date · 축제: Wikidata · 지도·명소·숙소: © OpenStreetMap 기여자 · 설명: 위키백과 · 날씨: Open-Meteo
       </footer>
     </div>
   )
