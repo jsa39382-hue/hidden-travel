@@ -8,6 +8,7 @@
     "build:festivals": "node scripts/build-festivals.mjs",
     "build:cities": "node scripts/build-cities.mjs",
     "build:facts": "node scripts/build-country-facts.mjs",
+    "build:foods": "node scripts/build-foods.mjs",
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",

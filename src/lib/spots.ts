@@ -26,6 +26,8 @@ export interface Spot {
   /** 숨은 명소 목록 정렬용 흥미도 */
   interest: number
   website?: string
+  /** 사진 (Wikimedia Commons 파일 이름 또는 이미지 주소) */
+  image?: string
   /** OpenStreetMap에서 온 추가 정보 */
   openingHours?: string
   fee?: string
@@ -142,6 +144,7 @@ function toSpot(e: OsmElement, center: [number, number]): Spot | null {
     website: tags.website ?? tags['contact:website'],
     openingHours: tags.opening_hours,
     fee: tags.fee,
+    image: tags.wikimedia_commons?.startsWith('File:') ? tags.wikimedia_commons.slice(5) : /^https:\/\/.+\.(jpe?g|png|webp)$/i.test(tags.image ?? '') ? tags.image : undefined,
     description: tags['description:ko'] ?? tags['description:en'] ?? tags.description,
   }
 }
@@ -333,12 +336,12 @@ const spotsKey = (lat: number, lng: number, radiusKm: number) => `${lat.toFixed(
 
 /** 지역의 명소 목록 (24시간 캐시) */
 export function getSpotsBase(lat: number, lng: number, radiusKm: number, force = false, signal?: AbortSignal) {
-  return cachedJson(`spots:base:v4:${spotsKey(lat, lng, radiusKm)}`, DAY, (sig) => loadBase(lat, lng, radiusKm, sig), { force, signal })
+  return cachedJson(`spots:base:v5:${spotsKey(lat, lng, radiusKm)}`, DAY, (sig) => loadBase(lat, lng, radiusKm, sig), { force, signal })
 }
 
 /** 명소 목록 + 인지도 (24시간 캐시) */
 export function getSpotsFame(lat: number, lng: number, radiusKm: number, base: Spot[], force = false, signal?: AbortSignal) {
-  return cachedJson(`spots:fame:v4:${spotsKey(lat, lng, radiusKm)}`, DAY, () => loadFame(base), { force, signal })
+  return cachedJson(`spots:fame:v5:${spotsKey(lat, lng, radiusKm)}`, DAY, () => loadFame(base), { force, signal })
 }
 
 export function splitSpots(spots: Spot[]) {
@@ -468,10 +471,11 @@ interface WdRow {
   koLabel?: { value: string }
   ko?: { value: string }
   en?: { value: string }
+  img?: { value: string }
 }
 
 async function loadBaseWikidata(lat: number, lng: number, radiusKm: number, signal?: AbortSignal): Promise<SpotsResult> {
-  const query = `SELECT ?item ?type ?coord ?dist ?sl ?label ?koLabel ?ko ?en WHERE {
+  const query = `SELECT ?item ?type ?coord ?dist ?sl ?label ?koLabel ?ko ?en ?img WHERE {
   SERVICE wikibase:around {
     ?item wdt:P625 ?coord .
     bd:serviceParam wikibase:center "Point(${lng.toFixed(5)} ${lat.toFixed(5)})"^^geo:wktLiteral .
@@ -481,6 +485,7 @@ async function loadBaseWikidata(lat: number, lng: number, radiusKm: number, sign
   ?item wdt:P31 ?type .
   VALUES ?type { ${Object.keys(WD_TYPES).map((q) => 'wd:' + q).join(' ')} }
   ?item wikibase:sitelinks ?sl .
+  OPTIONAL { ?item wdt:P18 ?img }
   OPTIONAL { ?item rdfs:label ?koLabel FILTER(LANG(?koLabel) = "ko") }
   OPTIONAL { ?k schema:about ?item ; schema:isPartOf <https://ko.wikipedia.org/> ; schema:name ?ko }
   OPTIONAL { ?e schema:about ?item ; schema:isPartOf <https://en.wikipedia.org/> ; schema:name ?en }
@@ -532,8 +537,9 @@ async function loadBaseWikidata(lat: number, lng: number, radiusKm: number, sign
       wikidata: q,
       sitelinks,
       hiddenScore: hasKoEn ? UNKNOWN_VIEWS_SCORE : sitelinks ? scoreFromSitelinks(sitelinks) : NO_WIKI_SCORE,
-      interest: t[2] + (r.koLabel ? 3 : 0),
+      interest: t[2] + (r.koLabel ? 3 : 0) + (r.img ? 4 : 0),
       pending: hasKoEn || undefined,
+      image: r.img ? decodeURIComponent(r.img.value.slice(r.img.value.lastIndexOf('/') + 1)) : undefined,
     })
   }
   const spots = [...byItem.values()]
@@ -542,3 +548,7 @@ async function loadBaseWikidata(lat: number, lng: number, radiusKm: number, sign
   spots.sort((a, b) => a.distKm - b.distKm)
   return { spots: spots.slice(0, 450), fetchedAt: Date.now(), viewsChecked: 0, viewsFailed: 0 }
 }
+
+/** Commons 파일 이름 → 작은 사진 주소 (이미 주소면 그대로) */
+export const photoUrl = (image: string, width = 640) =>
+  /^https?:\/\//.test(image) ? image : `https://commons.wikimedia.org/wiki/Special:FilePath/${encodeURIComponent(image)}?width=${width}`

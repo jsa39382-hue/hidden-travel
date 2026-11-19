@@ -34,6 +34,9 @@ for (const [region, codes] of Object.entries(regionsRaw)) {
 
 export const COSTS_UPDATED = costs.updated
 
+/** 나라가 속한 비용 지역 (regions.json) */
+export const regionOfCountry = (code: string) => regionOf.get(code)
+
 export function getCostRow(code: string): { row: CostRow; basis: 'country' | 'region' | 'global'; region?: string } {
   const own = costs.countries[code]
   if (own) return { row: own, basis: 'country' }

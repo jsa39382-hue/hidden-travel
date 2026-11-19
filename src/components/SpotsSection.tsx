@@ -2,7 +2,7 @@ import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react'
 import type { Country, Place } from '../types'
 import { useAsync } from '../lib/useAsync'
 import { errorReasonKo } from '../lib/cache'
-import { getSummary, splitSpots, useSpots, type Spot } from '../lib/spots'
+import { getSummary, photoUrl, splitSpots, useSpots, type Spot } from '../lib/spots'
 import { getSpotDetails } from '../lib/spotDetails'
 import { TranslateQuotaError, googleTranslateUrl, guessLang, papagoUrl, translateToKo } from '../lib/translate'
 import { getNearby, type Eatery, type Lodging } from '../lib/nearby'
@@ -319,6 +319,8 @@ function SpotCard({ spot, selected, onMap, onLodging, countryCode }: { spot: Spo
   const fame = fameLabel(spot)
   const summary = sum.status === 'success' ? sum.data : null
   const d = details.status === 'success' ? details.data : null
+  // 사진은 펼치지 않아도 바로 보여 준다: 명소 자체 사진 → 위키백과 대표 사진 → (펼쳤을 때) Wikidata 사진
+  const photo = spot.image ? photoUrl(spot.image) : (summary?.thumbnail ?? d?.image)
   const facts = [
     d?.location && `📍 ${d.location}`,
     d?.inception && `${d.inception} 건립`,
@@ -332,8 +334,8 @@ function SpotCard({ spot, selected, onMap, onLodging, countryCode }: { spot: Spo
 
   return (
     <li data-id={spot.id} className={`overflow-hidden rounded-2xl border bg-white transition ${selected ? 'border-teal-700' : 'border-stone-200'}`}>
+      {photo && <Photo src={photo} alt={spot.name} />}
       <div className="flex gap-3 p-4">
-        {summary?.thumbnail && <img src={summary.thumbnail} alt="" loading="lazy" className="size-20 shrink-0 rounded-xl object-cover" />}
         <div className="min-w-0 flex-1">
           <p className="font-semibold leading-snug">{spot.name}</p>
           {spot.nameLocal && <p className="truncate text-xs text-stone-400">{spot.nameLocal}</p>}
@@ -378,7 +380,6 @@ function SpotCard({ spot, selected, onMap, onLodging, countryCode }: { spot: Spo
               </button>
             </p>
           )}
-          {d?.image && !summary?.thumbnail && <img src={d.image} alt={spot.name} loading="lazy" className="max-h-56 w-full rounded-xl object-cover" />}
           {description && <p className="text-stone-700">{description.text}</p>}
           {facts.length > 0 && (
             <div className="flex flex-wrap gap-1.5">
@@ -650,6 +651,17 @@ function EateryList({
       <p className="mt-2 text-xs text-stone-500">
         목록은 OpenStreetMap에 등록된 곳이고 맛·평점 정보는 없어요. 가격은 {place.name} 물가로 계산한 추정치예요. 리뷰는 구글 지도에서 확인하세요.
       </p>
+    </div>
+  )
+}
+
+/** 사진 (불러오지 못하면 자리를 감춘다) */
+function Photo({ src, alt }: { src: string; alt: string }) {
+  const [failed, setFailed] = useState(false)
+  if (failed) return null
+  return (
+    <div className="aspect-[16/9] w-full overflow-hidden bg-stone-100">
+      <img src={src} alt={alt} loading="lazy" onError={() => setFailed(true)} className="size-full object-cover" />
     </div>
   )
 }

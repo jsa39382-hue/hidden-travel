@@ -1,11 +1,14 @@
-// Wikidata에서 나라별 여행 기본 정보(콘센트·전압·운전 방향·국가 번호·긴급 전화·공용어)를 받아
+// Wikidata에서 나라별 여행 기본 정보(콘센트·전압·운전 방향·국가 번호·긴급 전화·공용어)와
+// REST Countries가 주던 개요(인구·면적·대륙·국가 도메인)를 받아
 // src/data/country-facts.json으로 저장한다. 실행: npm run build:facts
 import { readFile, writeFile } from 'node:fs/promises'
 
 const QUERY = `
 SELECT ?iso (GROUP_CONCAT(DISTINCT ?plugL; separator="|") AS ?plugs) (MIN(?volt) AS ?voltage)
        (SAMPLE(?drive) AS ?driving) (SAMPLE(?code) AS ?calling)
-       (GROUP_CONCAT(DISTINCT ?emL; separator="|") AS ?emergency) (GROUP_CONCAT(DISTINCT ?langL; separator="|") AS ?langs) WHERE {
+       (GROUP_CONCAT(DISTINCT ?emL; separator="|") AS ?emergency) (GROUP_CONCAT(DISTINCT ?langL; separator="|") AS ?langs)
+       (MAX(?pop) AS ?population) (MAX(?area) AS ?areaKm2) (GROUP_CONCAT(DISTINCT ?contL; separator="|") AS ?continents)
+       (SAMPLE(?tldL) AS ?tld) WHERE {
   ?c wdt:P297 ?iso .
   FILTER NOT EXISTS { ?c wdt:P576 [] }
   OPTIONAL { ?c wdt:P2853 ?plug . ?plug rdfs:label ?plugL FILTER(LANG(?plugL)="en") }
@@ -14,6 +17,10 @@ SELECT ?iso (GROUP_CONCAT(DISTINCT ?plugL; separator="|") AS ?plugs) (MIN(?volt)
   OPTIONAL { ?c wdt:P474 ?code }
   OPTIONAL { ?c wdt:P2852 ?em . ?em rdfs:label ?emL FILTER(LANG(?emL)="en") }
   OPTIONAL { ?c wdt:P37 ?lang . ?lang rdfs:label ?langL FILTER(LANG(?langL)="ko") }
+  OPTIONAL { ?c wdt:P1082 ?pop }
+  OPTIONAL { ?c p:P2046/psn:P2046/wikibase:quantityAmount ?area }
+  OPTIONAL { ?c wdt:P30 ?cont . ?cont rdfs:label ?contL FILTER(LANG(?contL)="ko") }
+  OPTIONAL { ?c wdt:P78 ?tldI . ?tldI rdfs:label ?tldL FILTER(LANG(?tldL)="en") }
 } GROUP BY ?iso`
 
 // 플러그 이름 → 국제 표준 문자(A~O)
@@ -48,6 +55,11 @@ for (const r of rows) {
     ...(r.calling ? { calling: r.calling.value.replace(/\s/g, '') } : {}),
     ...(emergency.length ? { emergency: emergency.slice(0, 5) } : {}),
     ...(split('langs').length ? { languages: split('langs').slice(0, 4) } : {}),
+    ...(r.population ? { population: Math.round(Number(r.population.value)) } : {}),
+    // 면적은 표준 단위(제곱미터)로 받아 km²로 바꾼다
+    ...(r.areaKm2 ? { areaKm2: Math.round(Number(r.areaKm2.value) / 1e6) } : {}),
+    ...(split('continents').length ? { continents: split('continents') } : {}),
+    ...(r.tld?.value?.startsWith('.') ? { tld: r.tld.value } : {}),
   }
 }
 await writeFile(new URL('../src/data/country-facts.json', import.meta.url), JSON.stringify(out))

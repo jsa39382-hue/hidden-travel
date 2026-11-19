@@ -22,6 +22,7 @@ npm run dev
 | `npm run build:countries` | Wikidata에서 국가 목록을 받아 `src/data/countries.json` 재생성 |
 | `npm run build:cities` | Wikidata에서 나라별 주요 도시를 받아 `src/data/cities.wikidata.json` 재생성 |
 | `npm run build:facts` | Wikidata에서 나라별 콘센트·전압·운전 방향·국가 번호·긴급 전화를 받아 `src/data/country-facts.json` 재생성 |
+| `npm run build:foods` | Wikidata에서 나라별 대표 음식(사진 포함)을 받아 `src/data/foods.json` 재생성 |
 | `npm run build:festivals` | Wikidata에서 나라별 축제를 받아 `src/data/wikidata-festivals.json` 재생성 (몇 분 걸림) |
 
 ## 직접 고칠 수 있는 데이터
@@ -35,6 +36,12 @@ npm run dev
 | `src/data/regions.json` | 비용 지역 평균에 쓰는 나라별 지역 분류 |
 | `src/data/holidays.json` | Nager.Date가 지원하지 않는 나라(태국·대만·말레이시아·인도·UAE)의 고정 공휴일 |
 
+## 경비 계산에 들어가는 것
+
+- 현지 경비: 숙소·식비·교통·관광 (costs.json × 도시 물가 보정)
+- 그 밖의 비용(켜고 끌 수 있음): 항공권 왕복(인천에서의 거리·성수기·예산 스타일로 추정, 직접 입력 가능), 여행자 보험, eSIM·유심, 쇼핑
+- 항공권 가격을 주는 키 없는 무료 API가 없어 대표 노선 운임에 맞춘 거리 비례식으로 추정한다 (`src/lib/extras.ts`)
+
 ## 맞춤 일정은 어떻게 만들어지나
 
 키 없이 쓸 수 있는 AI(LLM) API가 없어서 규칙 기반으로 만든다 (`src/lib/planner.ts`).
@@ -46,7 +53,8 @@ npm run dev
 
 ## 데이터 출처 (모두 키 불필요)
 
-- 국가 정보: Wikidata (REST Countries v3.1은 폐기, v5는 API 키 필요 → 정적 파일로 생성)
+- 국가 정보: Wikidata (REST Countries v3.1은 폐기, v5는 API 키 필요 → REST Countries가 주던 수도·통화·인구·면적·대륙·도메인을 Wikidata로 대신 생성)
+- 대표 음식·명소 사진: Wikidata·위키미디어 공용(Commons)
 - 국기: flagcdn.com
 - 공휴일: Nager.Date
 - 환율: Frankfurter, 백업 open.er-api.com

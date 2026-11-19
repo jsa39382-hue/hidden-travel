@@ -27,7 +27,7 @@ const TABS = [
   { id: 'budget', title: '예상 경비', short: '경비', desc: '인원과 스타일에 맞춘 여행 경비 추정' },
   { id: 'exchange', title: '환율', short: '환율', desc: '원화 기준 환율과 계산기' },
   { id: 'weather', title: '날씨', short: '날씨', desc: '선택한 지역의 16일 예보' },
-  { id: 'tips', title: '여행 팁', short: '팁', desc: '콘센트·시차·팁 문화부터 기본 현지어 표현까지' },
+  { id: 'tips', title: '음식·여행 팁', short: '팁', desc: '대표 음식, 나라 개요, 콘센트·시차·팁 문화, 기본 현지어 표현' },
 ] as const
 type TabId = (typeof TABS)[number]['id']
 
