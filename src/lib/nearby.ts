@@ -1,5 +1,6 @@
 import { DAY, cachedJson } from './cache'
-import { bboxOf, distanceKm, elementLatLng, overpass, type OsmElement } from './osm'
+import { bboxOf, distanceKm, elementLatLng, nominatimPois, overpass, type OsmElement } from './osm'
+import { raceWithFallback } from './fallback'
 import type { Tier } from './budget'
 
 export interface Lodging {
@@ -36,6 +37,8 @@ export interface Nearby {
   lodgings: Lodging[]
   eateries: Eatery[]
   radiusKm: number
+  /** 출처: OpenStreetMap(Overpass) 또는 대체 경로(Nominatim) */
+  source?: 'osm' | 'fallback'
 }
 
 const LODGING_KIND: Record<string, [string, Tier]> = {
@@ -125,8 +128,51 @@ function toEatery(e: OsmElement, center: [number, number]): Eatery | null {
   }
 }
 
-/** 숙소와 식당·카페를 한 번의 요청으로 가져온다 (출력 문 두 개로 종류별 개수를 따로 제한) */
 async function load(lat: number, lng: number, radiusM: number, signal?: AbortSignal): Promise<Nearby> {
+  const { data, source } = await raceWithFallback(
+    (sig) => loadOsm(lat, lng, radiusM, sig),
+    (sig) => loadNominatim(lat, lng, radiusM, sig),
+    { signal },
+  )
+  return { ...data, source }
+}
+
+/** 대체 경로: Nominatim에 종류별로 물어본다 (1초 간격이라 4번에 약 5초) */
+async function loadNominatim(lat: number, lng: number, radiusM: number, signal?: AbortSignal): Promise<Nearby> {
+  const rKm = radiusM / 1000
+  const eatKm = rKm * 0.7
+  const phrases: [string, number][] = [
+    ['hotel', rKm],
+    ['hostel', rKm],
+    ['restaurant', eatKm],
+    ['cafe', eatKm],
+  ]
+  const els: OsmElement[] = []
+  let ok = 0
+  let lastErr: unknown
+  for (const [q, r] of phrases) {
+    try {
+      els.push(...(await nominatimPois(q, lat, lng, r, signal)))
+      ok++
+    } catch (e) {
+      if (signal?.aborted) throw e
+      lastErr = e
+    }
+  }
+  if (!ok) throw lastErr
+  // 같은 곳이 두 번 나오면 하나만
+  const seen = new Set<string>()
+  return toNearby(
+    els.filter((e) => (seen.has(`${e.type}/${e.id}`) ? false : seen.add(`${e.type}/${e.id}`))),
+    lat,
+    lng,
+    rKm,
+    eatKm,
+  )
+}
+
+/** 숙소와 식당·카페를 한 번의 요청으로 가져온다 (출력 문 두 개로 종류별 개수를 따로 제한) */
+async function loadOsm(lat: number, lng: number, radiusM: number, signal?: AbortSignal): Promise<Nearby> {
   const rKm = radiusM / 1000
   const eatKm = rKm * 0.7
   const els = await overpass(
@@ -136,6 +182,10 @@ nwr[amenity~"^(restaurant|cafe|fast_food|food_court|bar|pub)$"][name]${bboxOf(la
     25000,
     signal,
   )
+  return toNearby(els, lat, lng, rKm, eatKm)
+}
+
+function toNearby(els: OsmElement[], lat: number, lng: number, rKm: number, eatKm: number): Nearby {
   const center: [number, number] = [lat, lng]
   const lodgings: Lodging[] = []
   const eateries: Eatery[] = []
@@ -151,13 +201,13 @@ nwr[amenity~"^(restaurant|cafe|fast_food|food_court|bar|pub)$"][name]${bboxOf(la
   return {
     lodgings: lodgings.sort((a, b) => a.distKm - b.distKm),
     eateries: eateries.sort((a, b) => a.distKm - b.distKm),
-    radiusKm: radiusM / 1000,
+    radiusKm: rKm,
   }
 }
 
 /** 지점 주변 숙소·식당 (24시간 캐시). 숙소가 너무 적으면 반경을 넓혀 한 번 더 찾는다. */
 export async function getNearby(lat: number, lng: number, force = false, signal?: AbortSignal) {
-  const key = (r: number) => `nearby:v2:${lat.toFixed(3)},${lng.toFixed(3)}:${r}`
+  const key = (r: number) => `nearby:v3:${lat.toFixed(3)},${lng.toFixed(3)}:${r}`
   const near = await cachedJson(key(1500), DAY, (sig) => load(lat, lng, 1500, sig), { force, signal })
   if (near.data.lodgings.length >= 5) return near
   return cachedJson(key(5000), DAY, (sig) => load(lat, lng, 5000, sig), { force, signal })

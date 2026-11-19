@@ -1,6 +1,7 @@
 import { DAY, cachedJson, readCache, writeCache, HttpError } from './cache'
 import { useAsync } from './useAsync'
 import { bboxOf, distanceKm, elementLatLng, overpass, type OsmElement } from './osm'
+import { raceWithFallback } from './fallback'
 
 export type SpotCategory = 'nature' | 'view' | 'museum' | 'history' | 'art' | 'attraction'
 
@@ -26,6 +27,8 @@ export interface Spot {
   interest: number
   website?: string
   wikidata?: string
+  /** Wikidata에서 찾은 경우: 연결된 위키 문서(언어판) 수 */
+  sitelinks?: number
   /** 인지도(조회수) 확인 전이면 true */
   pending?: boolean
 }
@@ -35,6 +38,8 @@ export interface SpotsResult {
   fetchedAt: number
   viewsChecked: number
   viewsFailed: number
+  /** 명소 목록 출처: OpenStreetMap(Overpass) 또는 대체 경로(Wikidata) */
+  source?: 'osm' | 'fallback'
 }
 
 // ---------- 태그 → 종류 ----------
@@ -220,14 +225,25 @@ async function mapLimit<T, R>(items: T[], n: number, fn: (x: T) => Promise<R>): 
 /** 조회수 → 숨은 정도(0~100). 0회=100, 30회≈67, 300회≈45, 3천 회≈24, 3만 회≈1 */
 export const scoreFromViews = (v: number) => Math.max(0, Math.min(100, Math.round(100 - 22 * Math.log10(v + 1))))
 export const HIDDEN_THRESHOLD = 50
+/** 한국어·영어 문서는 없고 다른 언어 문서만 있을 때: 연결된 언어판이 적을수록 덜 알려진 곳 */
+const scoreFromSitelinks = (n: number) => (n <= 1 ? 68 : n <= 3 ? 58 : n <= 6 ? 45 : 30)
 const NO_WIKI_SCORE = 75
 const UNKNOWN_VIEWS_SCORE = 40
 const MAX_PAGEVIEW_LOOKUPS = 45
 
 const hasWikiOf = (s: Spot) => !!(s.enTitle || s.wiki || s.koTitle || s.wikidata)
 
-/** 1단계: Overpass 명소 목록만 (빠름). 위키 문서가 있는 곳은 인지도 확인 전 상태로 둔다. */
+/** 1단계: 명소 목록만 (빠름). 위키 문서가 있는 곳은 인지도 확인 전 상태로 둔다. */
 async function loadBase(lat: number, lng: number, radiusKm: number, signal?: AbortSignal): Promise<SpotsResult> {
+  const { data, source } = await raceWithFallback(
+    (sig) => loadBaseOsm(lat, lng, radiusKm, sig),
+    (sig) => loadBaseWikidata(lat, lng, radiusKm, sig),
+    { signal },
+  )
+  return { ...data, source }
+}
+
+async function loadBaseOsm(lat: number, lng: number, radiusKm: number, signal?: AbortSignal): Promise<SpotsResult> {
   const center: [number, number] = [lat, lng]
   const elements = await overpass(buildQuery(lat, lng, radiusKm), 35000, signal)
   const raw = elements
@@ -254,7 +270,8 @@ async function loadBase(lat: number, lng: number, radiusKm: number, signal?: Abo
 async function loadFame(base: Spot[]): Promise<SpotsResult> {
   const spots = base.map((s) => ({ ...s, interest: s.interest - s.hiddenScore - (hasWikiOf(s) ? 15 : 0) + Math.min(10, s.distKm) }))
 
-  const qids = [...new Set(spots.map((s) => s.wikidata).filter((q): q is string => !!q))]
+  // Wikidata에서 찾은 명소는 문서 제목을 이미 알고 있으므로 다시 묻지 않는다
+  const qids = [...new Set(spots.filter((s) => !s.id.startsWith('wd/')).map((s) => s.wikidata).filter((q): q is string => !!q))]
   if (qids.length) {
     try {
       const titles = await resolveTitles(qids)
@@ -289,7 +306,14 @@ async function loadFame(base: Spot[]): Promise<SpotsResult> {
 
   for (const s of spots) {
     const hasWiki = !!(s.enTitle || s.wiki || s.koTitle)
-    s.hiddenScore = !hasWiki ? NO_WIKI_SCORE : s.views == null ? UNKNOWN_VIEWS_SCORE : scoreFromViews(s.views)
+    s.hiddenScore =
+      s.views != null
+        ? scoreFromViews(s.views)
+        : s.sitelinks // 조회수를 모르면 위키 언어판 수로 추정 (Wikidata에서 찾은 곳)
+          ? scoreFromSitelinks(s.sitelinks)
+          : !hasWiki
+            ? NO_WIKI_SCORE
+            : UNKNOWN_VIEWS_SCORE
     // 설명을 보여 줄 수 있는(문서가 있는) 숨은 곳을 더 앞에, 너무 먼 곳은 살짝 뒤로
     s.interest += s.hiddenScore + (hasWiki ? 15 : 0) - Math.min(10, s.distKm)
     if (!hasWiki) s.views = undefined
@@ -302,12 +326,12 @@ const spotsKey = (lat: number, lng: number, radiusKm: number) => `${lat.toFixed(
 
 /** 지역의 명소 목록 (24시간 캐시) */
 export function getSpotsBase(lat: number, lng: number, radiusKm: number, force = false, signal?: AbortSignal) {
-  return cachedJson(`spots:base:v3:${spotsKey(lat, lng, radiusKm)}`, DAY, (sig) => loadBase(lat, lng, radiusKm, sig), { force, signal })
+  return cachedJson(`spots:base:v4:${spotsKey(lat, lng, radiusKm)}`, DAY, (sig) => loadBase(lat, lng, radiusKm, sig), { force, signal })
 }
 
 /** 명소 목록 + 인지도 (24시간 캐시) */
 export function getSpotsFame(lat: number, lng: number, radiusKm: number, base: Spot[], force = false, signal?: AbortSignal) {
-  return cachedJson(`spots:fame:v3:${spotsKey(lat, lng, radiusKm)}`, DAY, () => loadFame(base), { force, signal })
+  return cachedJson(`spots:fame:v4:${spotsKey(lat, lng, radiusKm)}`, DAY, () => loadFame(base), { force, signal })
 }
 
 export function splitSpots(spots: Spot[]) {
@@ -390,4 +414,124 @@ export function useSpots(lat: number, lng: number, radiusKm: number) {
     stale: (base.status === 'success' && base.data.stale) || (fame.status === 'success' && fame.data.stale),
     retry: () => (base.status === 'error' ? base.retry() : fame.retry()),
   }
+}
+
+// ---------- 대체 경로: Wikidata 위치 검색 ----------
+
+/** Wikidata 분류 → [종류, 분류, 흥미 가산점] (QID는 2026-11 Wikidata에서 이름 확인) */
+const WD_TYPES: Record<string, [string, SpotCategory, number]> = {
+  Q8502: ['산', 'nature', 8],
+  Q54050: ['언덕', 'nature', 6],
+  Q23397: ['호수', 'nature', 12],
+  Q34038: ['폭포', 'nature', 20],
+  Q40080: ['해변', 'nature', 10],
+  Q35509: ['동굴', 'nature', 15],
+  Q177380: ['온천', 'nature', 15],
+  Q46169: ['국립공원', 'nature', 12],
+  Q1286517: ['자연 경관', 'nature', 12],
+  Q22698: ['공원', 'nature', 4],
+  Q1107656: ['정원', 'nature', 8],
+  Q6017969: ['전망 포인트', 'view', 15],
+  Q174782: ['광장', 'attraction', 2],
+  Q570116: ['관광 명소', 'attraction', 10],
+  Q33506: ['박물관', 'museum', 8],
+  Q207694: ['미술관', 'museum', 6],
+  Q2087181: ['역사 가옥', 'museum', 8],
+  Q23413: ['성', 'history', 12],
+  Q16560: ['궁전', 'history', 12],
+  Q57821: ['요새', 'history', 12],
+  Q109607: ['유적', 'history', 12],
+  Q839954: ['고고학 유적', 'history', 12],
+  Q4989906: ['기념물', 'history', -5],
+  Q5393308: ['절', 'history', 8],
+  Q845945: ['신사', 'history', 6],
+  Q44539: ['사원', 'history', 8],
+  Q16970: ['교회', 'history', 4],
+  Q160742: ['수도원', 'history', 12],
+  Q12280: ['다리', 'history', 3],
+}
+
+interface WdRow {
+  item: { value: string }
+  type: { value: string }
+  coord: { value: string }
+  dist: { value: string }
+  sl: { value: string }
+  label?: { value: string }
+  koLabel?: { value: string }
+  ko?: { value: string }
+  en?: { value: string }
+}
+
+async function loadBaseWikidata(lat: number, lng: number, radiusKm: number, signal?: AbortSignal): Promise<SpotsResult> {
+  const query = `SELECT ?item ?type ?coord ?dist ?sl ?label ?koLabel ?ko ?en WHERE {
+  SERVICE wikibase:around {
+    ?item wdt:P625 ?coord .
+    bd:serviceParam wikibase:center "Point(${lng.toFixed(5)} ${lat.toFixed(5)})"^^geo:wktLiteral .
+    bd:serviceParam wikibase:radius "${radiusKm}" .
+    bd:serviceParam wikibase:distance ?dist .
+  }
+  ?item wdt:P31 ?type .
+  VALUES ?type { ${Object.keys(WD_TYPES).map((q) => 'wd:' + q).join(' ')} }
+  ?item wikibase:sitelinks ?sl .
+  OPTIONAL { ?item rdfs:label ?koLabel FILTER(LANG(?koLabel) = "ko") }
+  OPTIONAL { ?k schema:about ?item ; schema:isPartOf <https://ko.wikipedia.org/> ; schema:name ?ko }
+  OPTIONAL { ?e schema:about ?item ; schema:isPartOf <https://en.wikipedia.org/> ; schema:name ?en }
+  SERVICE wikibase:label { bd:serviceParam wikibase:language "ko,en,mul,ja,zh,fr,de,es,it,pt,ru,th,vi,id,tr". ?item rdfs:label ?label }
+} LIMIT 1500`
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), 30000)
+  const onAbort = () => ctrl.abort()
+  signal?.addEventListener('abort', onAbort)
+  let rows: WdRow[]
+  try {
+    const res = await fetch('https://query.wikidata.org/sparql', {
+      method: 'POST',
+      headers: { Accept: 'application/sparql-results+json', 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({ query }),
+      signal: ctrl.signal,
+    })
+    if (!res.ok) throw new HttpError(res.status, res.url)
+    rows = ((await res.json()) as { results: { bindings: WdRow[] } }).results.bindings
+  } finally {
+    clearTimeout(timer)
+    signal?.removeEventListener('abort', onAbort)
+  }
+
+  const byItem = new Map<string, Spot>()
+  for (const r of rows) {
+    const q = r.item.value.slice(r.item.value.lastIndexOf('/') + 1)
+    const t = WD_TYPES[r.type.value.slice(r.type.value.lastIndexOf('/') + 1)]
+    const name = r.label?.value
+    const m = /Point\(([-\d.eE]+) ([-\d.eE]+)\)/.exec(r.coord.value)
+    if (!t || !m || !name || /^Q\d+$/.test(name)) continue
+    const prev = byItem.get(q)
+    // 분류가 여러 개면 흥미 가산점이 큰 쪽
+    if (prev && prev.interest >= t[2]) continue
+    const sitelinks = Number(r.sl.value)
+    const koTitle = r.ko?.value
+    const enTitle = r.en?.value
+    const hasKoEn = !!(koTitle || enTitle)
+    byItem.set(q, {
+      id: `wd/${q}`,
+      name,
+      kind: t[0],
+      category: t[1],
+      lat: Number(m[2]),
+      lng: Number(m[1]),
+      distKm: Number(r.dist.value),
+      koTitle,
+      enTitle,
+      wikidata: q,
+      sitelinks,
+      hiddenScore: hasKoEn ? UNKNOWN_VIEWS_SCORE : sitelinks ? scoreFromSitelinks(sitelinks) : NO_WIKI_SCORE,
+      interest: t[2] + (r.koLabel ? 3 : 0),
+      pending: hasKoEn || undefined,
+    })
+  }
+  const spots = [...byItem.values()]
+  for (const s of spots) s.interest += s.hiddenScore + (hasWikiOf(s) ? 15 : 0) - Math.min(10, s.distKm)
+  // 인지도 확인 전이라 흥미도로 자르면 유명한 곳이 잘려 나간다 → 가까운 순으로 자른다
+  spots.sort((a, b) => a.distKm - b.distKm)
+  return { spots: spots.slice(0, 450), fetchedAt: Date.now(), viewsChecked: 0, viewsFailed: 0 }
 }

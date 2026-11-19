@@ -42,12 +42,53 @@ async function probe(server: string, q: string): Promise<string> {
   }
 }
 
+async function probeUrl(url: string, init?: RequestInit): Promise<string> {
+  const t0 = performance.now()
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), 30000)
+  try {
+    const res = await fetch(url, { ...init, signal: ctrl.signal })
+    if (!res.ok) throw new HttpError(res.status, url)
+    await res.text()
+    return `✅ ${Math.round(performance.now() - t0)}ms`
+  } catch (e) {
+    return `❌ ${Math.round(performance.now() - t0)}ms · ${describeFailure(e)}`
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+const OTHER = [
+  {
+    name: '대체 경로: Wikidata 명소 검색',
+    server: 'query.wikidata.org',
+    run: () =>
+      probeUrl('https://query.wikidata.org/sparql', {
+        method: 'POST',
+        headers: { Accept: 'application/sparql-results+json', 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+          query: `SELECT ?item WHERE { SERVICE wikibase:around { ?item wdt:P625 ?c . bd:serviceParam wikibase:center "Point(${KYOTO[1]} ${KYOTO[0]})"^^geo:wktLiteral . bd:serviceParam wikibase:radius "2" . } } LIMIT 20`,
+        }),
+      }),
+  },
+  {
+    name: '대체 경로: Nominatim 숙소 검색',
+    server: 'nominatim.openstreetmap.org',
+    run: () => probeUrl('https://nominatim.openstreetmap.org/search?q=hotel&format=jsonv2&limit=5&bounded=1&viewbox=135.75,35.02,135.78,35.00'),
+  },
+  { name: '위키 조회수', server: 'wikimedia.org', run: () => probeUrl('https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/user/Kyoto/monthly/20261001/20261031') },
+]
+
 export function Diagnostics() {
   const [rows, setRows] = useState<Row[]>([])
   const [running, setRunning] = useState(false)
   const run = async () => {
     setRunning(true)
     setRows([])
+    for (const o of OTHER) {
+      const result = await o.run()
+      setRows((r) => [...r, { server: o.server, test: o.name, result }])
+    }
     for (const t of TESTS)
       for (const s of SERVERS) {
         const result = await probe(s, t.q)
@@ -59,7 +100,7 @@ export function Diagnostics() {
   return (
     <div className="relative rounded-2xl bg-white p-4 text-sm shadow ring-1 ring-amber-300">
       <p className="font-bold">🔧 서버 연결 진단</p>
-      <p className="mt-1 text-xs text-stone-500">이 브라우저에서 OpenStreetMap(Overpass) 서버 3곳에 직접 요청해 응답 시간을 잽니다. 1~2분 걸려요. 끝나면 화면을 캡처해 주세요.</p>
+      <p className="mt-1 text-xs text-stone-500">이 브라우저에서 대체 경로(Wikidata·Nominatim)와 OpenStreetMap(Overpass) 서버 3곳에 직접 요청해 응답 시간을 잽니다. 최대 3분 걸려요. 끝나면 화면을 캡처해 주세요.</p>
       <button type="button" onClick={run} disabled={running} className="mt-3 rounded-lg bg-amber-600 px-3 py-2 font-medium text-white disabled:opacity-50">
         {running ? '진단 중…' : '진단 시작'}
       </button>

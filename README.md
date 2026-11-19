@@ -49,7 +49,10 @@ npm run dev
 - 공휴일: Nager.Date
 - 환율: Frankfurter, 백업 open.er-api.com
 - 축제: Wikidata SPARQL (나라별 실시간 조회가 40초 이상 걸려 미리 받아 둔 파일 사용)
-- 명소·숙소·식당: Overpass API(OpenStreetMap, 늦으면 공개 미러에 같이 요청), Wikipedia 요약, Wikimedia Pageviews
+- 명소·숙소·식당: Overpass API(OpenStreetMap, 늦으면 공개 미러에 같이 요청)
+  - Overpass가 2.5초 안에 답하지 않으면 대체 경로를 같이 시작: 명소는 Wikidata 위치 검색, 숙소·식당은 Nominatim
+  - Overpass가 완전히 실패하면 15분 동안은 대체 경로만 사용 (일부 네트워크에서 Overpass가 응답하지 않음)
+  - `?diag=1`로 열면 서버별 연결 진단 화면, Wikipedia 요약, Wikimedia Pageviews
 - 지역 검색: Nominatim (OSM 서버 요청은 1초에 1번 이하로 줄 세움)
 - 지도: Leaflet + OpenStreetMap 타일
 - 날씨: Open-Meteo

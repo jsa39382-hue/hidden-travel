@@ -139,7 +139,7 @@ function scoreSpot(s: Spot, st: Style, rand: () => number): Recommendation {
   let score = 10 + w * 6
   const hiddenness = (s.hiddenScore - 50) / 50 // -1 ~ 1
   score += st.hidden * hiddenness * 8
-  if (s.hiddenScore >= 50 && st.hidden > 0) reasons.push(s.views == null ? '숨은 곳 (위키 문서 없음)' : '숨은 곳 (조회수 적음)')
+  if (s.hiddenScore >= 50 && st.hidden > 0) reasons.push(s.views != null ? '숨은 곳 (조회수 적음)' : s.sitelinks ? '숨은 곳 (위키 언어판 적음)' : '숨은 곳 (위키 문서 없음)')
   if (s.hiddenScore < 50 && st.hidden < 0) reasons.push('유명한 곳')
   if (s.koTitle || s.enTitle) score += 3 // 설명을 보여 줄 수 있음
   const distPenalty = st.pace === 'relaxed' ? 0.9 : st.pace === 'packed' ? 0.35 : 0.6

@@ -142,6 +142,11 @@ export function SpotsSection({ country, place }: { country: Country; place: Plac
         ) : (
           <>
             {sp.stale && <Notice>⚠️ 서버에 연결할 수 없어 전에 저장해 둔 결과를 보여 주고 있어요.</Notice>}
+            {sp.base.status === 'success' && sp.base.data.data.source === 'fallback' && (
+              <p className="mb-2 rounded-lg bg-sky-50 px-3 py-2 text-xs text-sky-800">
+                OpenStreetMap 검색 서버가 응답하지 않아 Wikidata(위키 데이터)에 등록된 명소로 찾았어요. 작은 전망대·폭포 같은 곳은 빠질 수 있어요.
+              </p>
+            )}
             {sp.famePending && (
               <p className="mb-2 flex items-center gap-2 rounded-lg bg-stone-50 px-3 py-2 text-xs text-stone-600" role="status">
                 <span className="size-3 animate-spin rounded-full border-2 border-teal-600 border-t-transparent" />
@@ -175,7 +180,7 @@ export function SpotsSection({ country, place }: { country: Country; place: Plac
             <p className="mt-3 text-xs text-stone-500">
               숨은 정도는 위키백과 문서 유무와 최근 30일 조회수로 매겨요. 문서가 없거나 조회수가 적을수록 덜 알려진 곳이에요.
               {sp.fame.status === 'success' && sp.fame.data.data.viewsFailed > 0 && ` (조회수 확인 실패 ${sp.fame.data.data.viewsFailed}곳은 중간 점수로 계산)`} 명소
-              정보: OpenStreetMap 기여자, 설명·사진: 위키백과
+              정보: {sp.base.status === 'success' && sp.base.data.data.source === 'fallback' ? 'Wikidata' : 'OpenStreetMap 기여자'}, 설명·사진: 위키백과
             </p>
           </>
         )}
@@ -211,10 +216,15 @@ export function SpotsSection({ country, place }: { country: Country; place: Plac
             </button>
           ))}
         </div>
+ {near?.source === 'fallback' && (
+          <p className="mb-2 rounded-lg bg-sky-50 px-3 py-2 text-xs text-sky-800">OpenStreetMap 검색 서버가 응답하지 않아 대체 검색(Nominatim)으로 찾았어요. 종류별로 가까운 40곳까지만 나와요.</p>
+        )}
         {nearby.status === 'error' ? (
           <ErrorBox message="주변 숙소·식당을 불러오지 못했어요." detail={errorReasonKo(nearby.error)} onRetry={nearby.retry} />
         ) : !near ? (
           <Loading label="주변 숙소·식당 찾는 중…" />
+        ) : near.source === 'fallback' && nearTab !== 'lodging' && eateries.length === 0 ? (
+          <p className="text-sm text-stone-500">대체 검색(Nominatim)에서 이 근처 {nearTab === 'cafe' ? '카페' : '식당'}를 찾지 못했어요.</p>
         ) : nearTab === 'lodging' ? (
           <LodgingList items={near.lodgings} radiusKm={near.radiusKm} country={country} place={place} selected={selected} onMap={showOnMap} />
         ) : (
@@ -235,7 +245,10 @@ function Legend({ color, label, border }: { color: string; label: string; border
 }
 
 function fameLabel(s: Spot) {
+  if (s.views === undefined && s.sitelinks)
+    return { text: `한국어·영어 위키 없음 · 다른 언어 위키 ${s.sitelinks}곳`, cls: s.hiddenScore >= 50 ? 'bg-teal-50 text-teal-800' : 'bg-violet-50 text-violet-800' }
   if (s.views === undefined) return { text: '위키 문서 없음 · 숨은 곳 후보', cls: 'bg-teal-50 text-teal-800' }
+  if (s.views === null && s.sitelinks) return { text: `위키 언어판 ${s.sitelinks}곳`, cls: s.hiddenScore >= 50 ? 'bg-teal-50 text-teal-800' : 'bg-violet-50 text-violet-800' }
   if (s.views === null) return { text: '조회수 확인 못 함', cls: 'bg-stone-100 text-stone-600' }
   return {
     text: `위키 조회 30일 ${s.views.toLocaleString('ko-KR')}회`,
@@ -291,9 +304,15 @@ function SpotCard({ spot, selected, onMap, onLodging }: { spot: Spot; selected: 
         <a href={googleMapsUrl(spot.lat, spot.lng)} target="_blank" rel="noreferrer" className="rounded-full bg-stone-100 px-2.5 py-1 font-medium text-stone-700">
           구글 지도
         </a>
-        <a href={osmUrl({ type: spot.id.split('/')[0], id: Number(spot.id.split('/')[1]) })} target="_blank" rel="noreferrer" className="rounded-full bg-stone-100 px-2.5 py-1 font-medium text-stone-700">
-          OSM
-        </a>
+        {spot.id.startsWith('wd/') ? (
+          <a href={`https://www.wikidata.org/wiki/${spot.wikidata}`} target="_blank" rel="noreferrer" className="rounded-full bg-stone-100 px-2.5 py-1 font-medium text-stone-700">
+            Wikidata
+          </a>
+        ) : (
+          <a href={osmUrl({ type: spot.id.split('/')[0], id: Number(spot.id.split('/')[1]) })} target="_blank" rel="noreferrer" className="rounded-full bg-stone-100 px-2.5 py-1 font-medium text-stone-700">
+            OSM
+          </a>
+        )}
       </div>
     </li>
   )

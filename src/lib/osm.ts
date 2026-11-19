@@ -205,6 +205,65 @@ export function bboxOf(lat: number, lng: number, radiusKm: number) {
   return `(${f(lat - dLat)},${f(lng - dLng)},${f(lat + dLat)},${f(lng + dLng)})`
 }
 
+// Nominatim 장소 종류 검색 응답 (2026-11 실제 호출로 확인, extratags는 null일 수 있음):
+// [{"osm_type":"node","osm_id":123,"lat":"35.01","lon":"135.76","category":"tourism","type":"hotel","name":"Hotel ...",
+//   "extratags":{"stars":"3","website":"..."} | null, "namedetails":{"name":"...","name:ko":"..."} | null}]
+interface NominatimPoi {
+  osm_type: string
+  osm_id: number
+  lat: string
+  lon: string
+  category: string
+  type: string
+  name: string
+  extratags?: Record<string, string> | null
+  namedetails?: Record<string, string> | null
+}
+
+/**
+ * Nominatim으로 네모 영역 안의 장소 종류(hotel, restaurant 등)를 찾는다. 한 번에 최대 40곳.
+ * 결과는 Overpass 결과와 같은 모양(OsmElement)으로 바꿔 돌려준다.
+ */
+export function nominatimPois(phrase: string, lat: number, lng: number, radiusKm: number, signal?: AbortSignal): Promise<OsmElement[]> {
+  const dLat = radiusKm / 111.32
+  const dLng = radiusKm / (111.32 * Math.max(0.2, Math.cos((lat * Math.PI) / 180)))
+  const viewbox = [lng - dLng, lat + dLat, lng + dLng, lat - dLat].map((n) => n.toFixed(5)).join(',')
+  const url =
+    'https://nominatim.openstreetmap.org/search?' +
+    new URLSearchParams({ q: phrase, format: 'jsonv2', limit: '40', bounded: '1', viewbox, extratags: '1', namedetails: '1', 'accept-language': 'ko' })
+  return nominatimQueue(async () => {
+    if (signal?.aborted) throw new DOMException('요청을 취소했어요', 'AbortError')
+    const ctrl = new AbortController()
+    const timer = setTimeout(() => ctrl.abort(), 15000)
+    const onAbort = () => ctrl.abort()
+    signal?.addEventListener('abort', onAbort)
+    try {
+      const res = await fetch(url, { signal: ctrl.signal })
+      if (!res.ok) throw new HttpError(res.status, url)
+      const data = (await res.json()) as NominatimPoi[]
+      if (!Array.isArray(data)) throw new Error('Nominatim 응답 형식이 예상과 달라요')
+      return data.map((d) => {
+        const local = d.namedetails?.name ?? d.name
+        return {
+          type: (d.osm_type as OsmElement['type']) ?? 'node',
+          id: d.osm_id,
+          lat: Number(d.lat),
+          lon: Number(d.lon),
+          tags: {
+            ...(d.extratags ?? {}),
+            [d.category]: d.type,
+            name: local,
+            ...(d.namedetails?.['name:ko'] ? { 'name:ko': d.namedetails['name:ko'] } : {}),
+          },
+        }
+      })
+    } finally {
+      clearTimeout(timer)
+      signal?.removeEventListener('abort', onAbort)
+    }
+  })
+}
+
 /** 두 좌표 사이 거리(km) */
 export function distanceKm(a: [number, number], b: [number, number]) {
   const r = Math.PI / 180
