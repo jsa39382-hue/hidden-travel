@@ -8,6 +8,7 @@ import { HomeSection } from './components/HomeSection'
 import { Onboarding } from './components/Onboarding'
 import { SectionBoundary } from './components/SectionBoundary'
 import { PwaStatus } from './components/PwaStatus'
+import { PartyChip } from './components/PartyControls'
 import { Diagnostics } from './components/Diagnostics'
 import { Icon } from './components/Icon'
 import { Loading } from './components/Status'
@@ -136,6 +137,10 @@ function Shell({ country, dates, place, setCountry, setDates, setPlace }: ShellP
         </nav>
         <div className="mt-8 border-t border-stone-200 pt-6">
           <p className="mb-4 text-[11px] font-medium uppercase tracking-wider text-stone-400">여행 설정</p>
+          <div className="mb-5">
+            <p className="mb-1.5 text-sm text-stone-600">인원·예산</p>
+            <PartyChip align="left" />
+          </div>
           {setup}
         </div>
         <div className="mt-auto pt-8">
@@ -158,9 +163,10 @@ function Shell({ country, dates, place, setCountry, setDates, setPlace }: ShellP
                 </span>
               </span>
             </button>
-            <button type="button" onClick={() => setEditing(true)} className="flex items-center gap-1.5 rounded-full border border-stone-300 px-3 py-1.5 text-xs font-medium text-stone-700">
+            <PartyChip />
+            <button type="button" onClick={() => setEditing(true)} aria-label="나라·도시·날짜 변경" className="flex h-9 items-center gap-1.5 rounded-full border border-stone-300 px-2.5 text-xs font-medium text-stone-700 sm:px-3">
               <Icon name="edit" className="size-3.5" />
-              변경
+              <span className="hidden sm:inline">변경</span>
             </button>
           </div>
           {/* 태블릿: 가로 탭 */}

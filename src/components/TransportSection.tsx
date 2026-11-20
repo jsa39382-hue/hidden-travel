@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { motion } from 'motion/react'
 import type { Country, Place } from '../types'
 import { useAsync } from '../lib/useAsync'
 import { getKrwRate } from '../lib/exchange'
 import { TIPS } from '../lib/survivalData'
+import { partyNumbers, usePartyPrefs } from '../lib/party'
 import { TRANSPORT_UPDATED, getRoute, getTransport, nearestAirport, toCandidates, type Airport, type TransportCountry } from '../lib/transport'
 import { cityTransitAdvice, recommendTransfer, taxiFare, type Evaluated, type Luggage, type Mode, type Range } from '../lib/transferRule'
 import { useStored } from '../lib/stored'
@@ -60,17 +61,9 @@ function NoData({ country }: { country: Country }) {
 
 function WithData({ country, place, t }: { country: Country; place: Place; t: TransportCountry }) {
   const [prefs, setPrefs] = useStored<Prefs>(`hidden-travel:transport:${country.code}`, { arrival: '14:00', luggage: 'normal', rides: 4 }, (v) => !!v && typeof v === 'object')
-  // 인원·예산 스타일은 경비 탭 설정을 그대로 쓴다 (읽기만)
-  const party = useMemo(() => {
-    try {
-      const v = JSON.parse(localStorage.getItem('hidden-travel:budget') ?? '{}') as { party?: { type?: string; adults?: number; kids?: number }; tier?: 0 | 1 | 2 }
-      const p = v.party ?? {}
-      const adults = p.type === 'solo' ? 1 : p.type === 'couple' ? 2 : Math.max(1, p.adults ?? 2)
-      return { adults, kids: p.type === 'family' ? Math.max(0, p.kids ?? 0) : 0, tier: ([0, 1, 2] as const).includes(v.tier as 0) ? (v.tier as 0 | 1 | 2) : (1 as const) }
-    } catch {
-      return { adults: 2, kids: 0, tier: 1 as const }
-    }
-  }, [])
+  // 인원·예산 스타일은 상단 버튼·경비 탭과 같은 설정 (바꾸면 바로 반영)
+  const [partyPrefs] = usePartyPrefs()
+  const party = partyNumbers(partyPrefs)
   const near = nearestAirport(t, place.lat, place.lng)
   const airport = t.airports.find((a) => a.code === prefs.airport) ?? near
   const krw = useAsync(() => getKrwRate(t.currency), [t.currency])

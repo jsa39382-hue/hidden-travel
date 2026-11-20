@@ -4,52 +4,22 @@ import { diffDays } from '../lib/dates'
 import { useAsync } from '../lib/useAsync'
 import { getKrwRate, formatNumber } from '../lib/exchange'
 import { errorReasonKo } from '../lib/cache'
-import { COSTS_UPDATED, TIERS, calcBudget, getCostRow, headcount, regionOfCountry, type Party, type PartyType, type Tier } from '../lib/budget'
+import { COSTS_UPDATED, calcBudget, getCostRow, headcount, regionOfCountry } from '../lib/budget'
+import { usePartyPrefs } from '../lib/party'
+import { Field, PartyControls, Stepper } from './PartyControls'
 import { DEFAULT_EXTRAS, KID_FLIGHT_RATE, SHOPPING, flightEstimate, insuranceEstimate, simEstimate, type ExtraLine, type ExtraPrefs } from '../lib/extras'
 import { ErrorBox, Loading } from './Status'
 import { transportBudget } from '../lib/transport'
 import { Num, roundKrw } from './ui/Num'
 
-const PREFS_KEY = 'hidden-travel:budget'
-const PARTY_TYPES: { type: PartyType; label: string }[] = [
-  { type: 'solo', label: '혼자' },
-  { type: 'couple', label: '커플·2인' },
-  { type: 'friends', label: '친구 3인 이상' },
-  { type: 'family', label: '가족' },
-]
-
-interface Prefs {
-  party: Party
-  tier: Tier
-  extras?: ExtraPrefs
-}
-function loadPrefs(): Prefs {
-  const fallback: Prefs = { party: { type: 'couple', adults: 2, kids: 0 }, tier: 1 }
-  try {
-    const p = JSON.parse(localStorage.getItem(PREFS_KEY) ?? 'null') as Prefs | null
-    if (p && PARTY_TYPES.some((t) => t.type === p.party?.type) && [0, 1, 2].includes(p.tier)) return p
-  } catch {
-    /* 무시 */
-  }
-  return fallback
-}
-
 export function BudgetCalculator({ country, dates, place }: { country: Country; dates: TripDates; place: Place }) {
-  const [prefs, setPrefs] = useState<Prefs>(loadPrefs)
+  const [prefs, setPrefs] = usePartyPrefs()
   const tripDays = Math.max(1, diffDays(dates.start, dates.end) + 1)
   const [days, setDays] = useState(tripDays)
   useEffect(() => setDays(tripDays), [tripDays])
-  useEffect(() => {
-    try {
-      localStorage.setItem(PREFS_KEY, JSON.stringify(prefs))
-    } catch {
-      /* 무시 */
-    }
-  }, [prefs])
 
   const { party, tier } = prefs
   const extras = { ...DEFAULT_EXTRAS, ...prefs.extras }
-  const setParty = (p: Partial<Party>) => setPrefs((s) => ({ ...s, party: { ...s.party, ...p } }))
   const setExtras = (e: Partial<ExtraPrefs>) => setPrefs((s) => ({ ...s, extras: { ...DEFAULT_EXTRAS, ...s.extras, ...e } }))
   const { row, basis, region } = getCostRow(country.code)
   const base = calcBudget(row, tier, party, days, place.factor)
@@ -116,44 +86,7 @@ export function BudgetCalculator({ country, dates, place }: { country: Country; 
     <div className="space-y-6 lg:grid lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start lg:gap-10 lg:space-y-0">
       {/* 입력 */}
       <div className="space-y-5">
-        <Field label="누구와 가나요?">
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {PARTY_TYPES.map((t) => (
-              <Toggle
-                key={t.type}
-                active={party.type === t.type}
-                onClick={() =>
-                  setParty({
-                    type: t.type,
-                    adults: t.type === 'friends' ? Math.max(3, party.adults) : t.type === 'family' ? Math.max(2, party.adults) : party.adults,
-                  })
-                }
-              >
-                {t.label}
-              </Toggle>
-            ))}
-          </div>
-          {party.type === 'friends' && (
-            <Stepper label="인원" value={Math.max(3, party.adults)} min={3} max={20} onChange={(v) => setParty({ adults: v })} />
-          )}
-          {party.type === 'family' && (
-            <div className="mt-2 grid grid-cols-2 gap-2">
-              <Stepper label="어른" value={Math.max(1, party.adults)} min={1} max={10} onChange={(v) => setParty({ adults: v })} />
-              <Stepper label="아이" value={party.kids} min={0} max={10} onChange={(v) => setParty({ kids: v })} />
-            </div>
-          )}
-        </Field>
-
-        <Field label="예산 스타일">
-          <div className="grid grid-cols-3 gap-2">
-            {TIERS.map((t, i) => (
-              <Toggle key={t.label} active={tier === i} onClick={() => setPrefs((s) => ({ ...s, tier: i as Tier }))}>
-                {t.label}
-              </Toggle>
-            ))}
-          </div>
-          <p className="mt-1 text-xs text-stone-500">{TIERS[tier].desc}</p>
-        </Field>
+        <PartyControls />
 
         <Field label="여행 일수">
           <Stepper label="일" value={days} min={1} max={90} onChange={setDays} suffix={`일 (${Math.max(0, days - 1)}박)`} />
@@ -354,72 +287,8 @@ function ResultTable({
   )
 }
 
-function Field({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <p className="mb-1.5 text-sm font-medium text-stone-600">{label}</p>
-      {children}
-    </div>
-  )
-}
 
-function Toggle({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <button
-      type="button"
-      aria-pressed={active}
-      onClick={onClick}
-      className={`h-11 rounded-xl px-2 text-sm font-medium ring-1 transition ${
-        active ? 'bg-stone-900 text-stone-50 ring-stone-900' : 'bg-white text-stone-700 ring-stone-300 active:bg-stone-50'
-      }`}
-    >
-      {children}
-    </button>
-  )
-}
 
-function Stepper({
-  label,
-  value,
-  min,
-  max,
-  onChange,
-  suffix,
-}: {
-  label: string
-  value: number
-  min: number
-  max: number
-  onChange: (v: number) => void
-  suffix?: string
-}) {
-  const clamp = (v: number) => Math.min(max, Math.max(min, v))
-  return (
-    <div className="mt-2 flex items-center gap-2">
-      {!suffix && <span className="w-8 text-sm text-stone-500">{label}</span>}
-      <button type="button" aria-label={`${label} 줄이기`} onClick={() => onChange(clamp(value - 1))} disabled={value <= min} className="size-10 rounded-lg bg-stone-100 text-lg disabled:opacity-40">
-        −
-      </button>
-      <input
-        type="number"
-        inputMode="numeric"
-        aria-label={label}
-        value={value}
-        min={min}
-        max={max}
-        onChange={(e) => {
-          const n = Number(e.target.value)
-          if (Number.isFinite(n) && e.target.value !== '') onChange(clamp(Math.round(n)))
-        }}
-        className="h-10 w-14 rounded-lg border border-stone-300 text-center text-base tabular-nums"
-      />
-      <button type="button" aria-label={`${label} 늘리기`} onClick={() => onChange(clamp(value + 1))} disabled={value >= max} className="size-10 rounded-lg bg-stone-100 text-lg disabled:opacity-40">
-        +
-      </button>
-      {suffix ? <span className="text-sm text-stone-600">{suffix}</span> : <span className="text-sm text-stone-600">명</span>}
-    </div>
-  )
-}
 
 
 function Check({ checked, onChange, label, hint }: { checked: boolean; onChange: (v: boolean) => void; label: string; hint?: string }) {

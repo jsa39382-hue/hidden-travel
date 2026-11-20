@@ -6,6 +6,7 @@ import { getGoodTime, grade, rankCountries, type Part } from '../lib/goodTime'
 import { getWeather } from '../lib/weather'
 import { plugAdvice, timeDiff, useSurvival, voltageAdvice, type SurvivalData } from '../lib/survival'
 import { climateForTrip } from '../lib/climate'
+import { partyNumbers, usePartyPrefs } from '../lib/party'
 import { localHHMM, sunTimes, timeZoneFor, tzOffsetSec } from '../lib/sun'
 import { makePackingList, type PackItem } from '../lib/packing'
 import { useStored } from '../lib/stored'
@@ -266,16 +267,9 @@ const GROUPS: PackItem['group'][] = ['필수', '옷', '전자기기', '생활', 
 
 function Packing({ country, place, dates }: { country: Country; place: Place; dates: TripDates }) {
   const w = useAsync(() => getWeather(place.lat, place.lng), [place.lat, place.lng])
-  // 경비 탭에서 고른 인원 (읽기만)
-  const party = useMemo(() => {
-    try {
-      return (JSON.parse(localStorage.getItem('hidden-travel:budget') ?? '{}') ?? {}) as { party?: { adults: number; kids: number } }
-    } catch {
-      return {}
-    }
-  }, [])
-  const people = Math.max(1, party.party?.adults ?? 2)
-  const kids = party.party?.kids ?? 0
+  // 인원은 상단 버튼·경비 탭과 같은 설정 (바꾸면 바로 반영)
+  const [partyPrefs] = usePartyPrefs()
+  const { adults: people, kids } = partyNumbers(partyPrefs)
   const days = Math.max(1, diffDays(dates.start, dates.end) + 1)
   const forecast = useMemo(() => (w.status === 'success' ? w.data.data.days.filter((d) => isWithin(d.date, dates.start, dates.end)) : []), [w, dates.start, dates.end])
   // 예보가 없으면(막힘·16일 밖) 평년 기후로 옷차림을 정한다

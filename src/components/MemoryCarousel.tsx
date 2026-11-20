@@ -9,6 +9,7 @@ import { readCache } from '../lib/cache'
 import { estimateAll } from '../lib/budgetFinder'
 import { Flag } from './Flag'
 import { countVisited, drawRetro, readSpent } from './RetroSection'
+import { partyNumbers, readPartyPrefs, usePartyPrefs } from '../lib/party'
 import { shareOrDownload } from './HomeSection'
 
 const GAP = 16
@@ -19,6 +20,8 @@ type Store = ReturnType<typeof useMemories>
 
 /** 추억 앨범: 요약 카드 + 여행 카드를 옆으로 넘기며 본다 */
 export function MemoryCarousel({ memories, focusKey, onMake }: { memories: Store; focusKey: string | null; onMake: () => void }) {
+  // 인원·예산 설정이 바뀌면 예상 경비도 다시 계산되도록 구독만 한다
+  usePartyPrefs()
   const list = useMemo(() => sortMemories(memories.list), [memories.list])
   const [index, setIndex] = useState(0)
   const [undo, setUndo] = useState<{ memory: TripMemory; timer: ReturnType<typeof setTimeout> } | null>(null)
@@ -263,16 +266,10 @@ function usePhotoUrl(id: string | undefined) {
   return url
 }
 
-/** 경비 탭에서 고른 인원·예산 스타일 (없으면 2명·보통) */
+/** 상단 버튼·경비 탭의 인원·예산 스타일 (어른 수 기준으로 예상) */
 function budgetPrefs(): { adults: number; tier: 0 | 1 | 2 } {
-  try {
-    const v = JSON.parse(localStorage.getItem('hidden-travel:budget') ?? '{}') as { party?: { type?: string; adults?: number }; tier?: number }
-    const p = v.party ?? {}
-    const adults = p.type === 'solo' ? 1 : p.type === 'couple' ? 2 : Math.max(1, p.adults ?? 2)
-    return { adults, tier: v.tier === 0 || v.tier === 2 ? v.tier : 1 }
-  } catch {
-    return { adults: 2, tier: 1 }
-  }
+  const { adults, tier } = partyNumbers(readPartyPrefs())
+  return { adults, tier }
 }
 
 /** 예상 경비 (경비 탭 인원·스타일, 저장된 USD 환율로 계산, 없으면 null). local은 항공권을 뺀 현지 경비 */
