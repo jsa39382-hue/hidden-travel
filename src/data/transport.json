@@ -1,5 +1,5 @@
 {
- "_설명": "나라별 공항 이동·시내 교통·택시·도시 간 이동 데이터. costs.json처럼 나라 코드별로 넣는다. price는 [최소, 최대] 현지 통화(대중교통은 1인, 택시·차량 호출은 1대 기준). firstLast는 '05:30-23:40'(막차가 자정을 넘기면 '05:30-00:20'). 공식 사이트에서 확인한 값만 넣고, 확인하지 못한 값은 null로 둔다. taxi는 base(기본요금)·includedKm(기본요금에 포함된 거리)·perKm·afterAmount/perKmAfter(일정 금액 이후 바뀌는 km당 요금)·note. transfers는 갈아타는 횟수(null이면 rail 1, 그 밖 0으로 본다). childRate는 아이 요금 비율(null이면 어른 요금으로 계산).",
+ "_설명": "basis는 출처 등급(official: 공식 사이트에서 확인, reference: 위키백과 등 공개 자료 참고 · 공식 아님). 나라별 공항 이동·시내 교통·택시·도시 간 이동 데이터. costs.json처럼 나라 코드별로 넣는다. price는 [최소, 최대] 현지 통화(대중교통은 1인, 택시·차량 호출은 1대 기준). firstLast는 '05:30-23:40'(막차가 자정을 넘기면 '05:30-00:20'). 공식 사이트에서 확인한 값만 넣고, 확인하지 못한 값은 null로 둔다. taxi는 base(기본요금)·includedKm(기본요금에 포함된 거리)·perKm·afterAmount/perKmAfter(일정 금액 이후 바뀌는 km당 요금)·note. transfers는 갈아타는 횟수(null이면 rail 1, 그 밖 0으로 본다). childRate는 아이 요금 비율(null이면 어른 요금으로 계산).",
  "updated": "2026-11",
  "countries": {
   "JP": {
@@ -207,7 +207,8 @@
     "https://www.wikidata.org/wiki/Q193682",
     "https://www.wikidata.org/wiki/Q204853",
     "https://www.wikidata.org/wiki/Q36454"
-   ]
+   ],
+   "basis": "official"
   },
   "US": {
    "currency": "USD",
@@ -255,7 +256,8 @@
    "sources": [
     "https://www.nyc.gov/site/tlc/passengers/taxi-fare.page",
     "https://www.wikidata.org/wiki/Q8685"
-   ]
+   ],
+   "basis": "official"
   },
   "CA": {
    "currency": "CAD",
@@ -357,7 +359,8 @@
     "https://www.upexpress.com/en/fares",
     "https://www.wikidata.org/wiki/Q321224",
     "https://www.wikidata.org/wiki/Q242066"
-   ]
+   ],
+   "basis": "official"
   },
   "AU": {
    "currency": "AUD",
@@ -415,7 +418,8 @@
     "https://transportnsw.info/tickets-fares/fares",
     "https://www.sydneyairport.com.au/info-sheet/transport-options",
     "https://www.wikidata.org/wiki/Q17581"
-   ]
+   ],
+   "basis": "official"
   },
   "NZ": {
    "currency": "NZD",
@@ -470,7 +474,8 @@
     "https://at.govt.nz/bus-train-ferry/at-hop-card/buy-at-hop-card",
     "https://at.govt.nz/bus-train-ferry/at-hop-card/7-day-fare-cap-for-auckland-public-transport",
     "https://www.wikidata.org/wiki/Q45938"
-   ]
+   ],
+   "basis": "official"
   },
   "CZ": {
    "currency": "CZK",
@@ -566,7 +571,8 @@
     "https://www.prg.aero/en/airport-express",
     "https://www.prg.aero/en/taxi",
     "https://www.wikidata.org/wiki/Q99172"
-   ]
+   ],
+   "basis": "official"
   },
   "HK": {
    "currency": "HKD",
@@ -611,7 +617,8 @@
    "sources": [
     "https://www.td.gov.hk/en/transport_in_hong_kong/public_transport/taxi/taxi_fare_of_hong_kong/index.html",
     "https://www.wikidata.org/wiki/Q17704"
-   ]
+   ],
+   "basis": "official"
   },
   "IT": {
    "currency": "EUR",
@@ -659,7 +666,8 @@
    "sources": [
     "https://www.trenitalia.com/en/connections/leonardo-express.html",
     "https://www.wikidata.org/wiki/Q19101"
-   ]
+   ],
+   "basis": "official"
   },
   "ES": {
    "currency": "EUR",
@@ -718,7 +726,8 @@
    "sources": [
     "https://www.tmb.cat/en/barcelona-fares-metro-bus",
     "https://www.wikidata.org/wiki/Q56973"
-   ]
+   ],
+   "basis": "official"
   },
   "TH": {
    "currency": "THB",
@@ -766,6 +775,1080 @@
    "sources": [
     "https://suvarnabhumi.airportthai.co.th/",
     "https://www.wikidata.org/wiki/Q194316"
+   ],
+   "basis": "official"
+  },
+  "CN": {
+   "basis": "reference",
+   "currency": "CNY",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "PVG",
+     "name": "상하이 푸둥 국제공항",
+     "lat": 31.1433,
+     "lng": 121.8053,
+     "cities": [
+      "상하이"
+     ],
+     "options": [
+      {
+       "mode": "rail",
+       "name": "상하이 지하철 2호선 (푸둥공항 → 시내)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "푸둥공항 1·2터미널역",
+       "note": null,
+       "transfers": null
+      },
+      {
+       "mode": "rail",
+       "name": "공항연계선 (Airport Link Line)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": "2024년 12월 개통한 교외 철도",
+       "transfers": null
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    },
+    {
+     "code": "PEK",
+     "name": "베이징 서우두 국제공항",
+     "lat": 40.08,
+     "lng": 116.5844,
+     "cities": [
+      "베이징"
+     ],
+     "options": [
+      {
+       "mode": "rail",
+       "name": "서우두공항 익스프레스 (공항 → 둥즈먼·베이신차오)",
+       "minutes": 20,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": "약 16~20분, 6~23시 10분 간격(그 밖 30분)",
+       "transfers": null
+      },
+      {
+       "mode": "bus",
+       "name": "공항버스 (각 터미널 → 시내)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": "노선에 따라 최대 30위안",
+       "transfers": 0
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://en.wikipedia.org/wiki/Shanghai_Pudong_International_Airport",
+    "https://en.wikipedia.org/wiki/Beijing_Capital_International_Airport",
+    "https://www.wikidata.org/wiki/Q36420",
+    "https://www.wikidata.org/wiki/Q32190"
+   ]
+  },
+  "MO": {
+   "basis": "reference",
+   "currency": "MOP",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "MFM",
+     "name": "마카오 국제공항",
+     "lat": 22.1494,
+     "lng": 113.5914,
+     "cities": [
+      "마카오"
+     ],
+     "options": [
+      {
+       "mode": "rail",
+       "name": "마카오 경전철 타이파선 (공항역)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "웨이롱 대로 공항역",
+       "note": null,
+       "transfers": null
+      },
+      {
+       "mode": "bus",
+       "name": "AP1 버스 (공항 ↔ 관문 보더게이트)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": null,
+       "transfers": 0
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://en.wikipedia.org/wiki/Macau_International_Airport",
+    "https://www.wikidata.org/wiki/Q525486"
+   ]
+  },
+  "TW": {
+   "basis": "reference",
+   "currency": "TWD",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "TPE",
+     "name": "타이완 타오위안 국제공항",
+     "lat": 25.0764,
+     "lng": 121.2239,
+     "cities": [
+      "타이베이"
+     ],
+     "options": [
+      {
+       "mode": "rail",
+       "name": "타오위안공항 MRT 직통 (공항 → 타이베이역)",
+       "minutes": 38,
+       "price": null,
+       "firstLast": null,
+       "where": "A12(1터미널)·A13(2터미널)역",
+       "note": "직통열차 약 38분",
+       "transfers": null
+      },
+      {
+       "mode": "bus",
+       "name": "공항버스 (공항 → 타이베이)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": null,
+       "transfers": 0
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://en.wikipedia.org/wiki/Taoyuan_International_Airport",
+    "https://www.wikidata.org/wiki/Q44856"
+   ]
+  },
+  "MN": {
+   "basis": "reference",
+   "currency": "MNT",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "UBN",
+     "name": "칭기즈칸 국제공항",
+     "lat": 47.6434,
+     "lng": 106.8188,
+     "cities": [
+      "울란바토르"
+     ],
+     "options": [
+      {
+       "mode": "shuttle",
+       "name": "공항 셔틀버스 (공항 → 울란바토르)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": "시내까지 약 50km",
+       "transfers": 0
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://en.wikipedia.org/wiki/Chinggis_Khaan_International_Airport",
+    "https://www.wikidata.org/wiki/Q14697701"
+   ]
+  },
+  "VN": {
+   "basis": "reference",
+   "currency": "VND",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "SGN",
+     "name": "떤선녓 국제공항",
+     "lat": 10.8188,
+     "lng": 106.652,
+     "cities": [
+      "호찌민"
+     ],
+     "options": [
+      {
+       "mode": "bus",
+       "name": "109·152번 버스 (공항 → 시내)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "국제선 터미널 앞 버스 정류장",
+       "note": null,
+       "transfers": 0
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    },
+    {
+     "code": "HAN",
+     "name": "노이바이 국제공항",
+     "lat": 21.2211,
+     "lng": 105.8072,
+     "cities": [
+      "하노이"
+     ],
+     "options": [
+      {
+       "mode": "bus",
+       "name": "86번 버스 (공항 → 구시가지·하노이역)",
+       "minutes": null,
+       "price": [
+        45000,
+        45000
+       ],
+       "firstLast": null,
+       "where": "1·2터미널",
+       "note": "주황색 버스, 45,000동",
+       "transfers": 0
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://en.wikipedia.org/wiki/Tan_Son_Nhat_International_Airport",
+    "https://en.wikipedia.org/wiki/Noi_Bai_International_Airport",
+    "https://www.wikidata.org/wiki/Q478595",
+    "https://www.wikidata.org/wiki/Q844098"
+   ]
+  },
+  "PH": {
+   "basis": "reference",
+   "currency": "PHP",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "MNL",
+     "name": "니노이 아키노 국제공항",
+     "lat": 14.5086,
+     "lng": 121.0194,
+     "cities": [
+      "마닐라"
+     ],
+     "options": [
+      {
+       "mode": "bus",
+       "name": "UBE Express 버스 (공항 → 마닐라·마카티 등)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "3터미널 등",
+       "note": null,
+       "transfers": 0
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://en.wikipedia.org/wiki/Ninoy_Aquino_International_Airport",
+    "https://www.wikidata.org/wiki/Q86446"
+   ]
+  },
+  "SG": {
+   "basis": "reference",
+   "currency": "SGD",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "SIN",
+     "name": "싱가포르 창이 공항",
+     "lat": 1.3592,
+     "lng": 103.9894,
+     "cities": [
+      "싱가포르"
+     ],
+     "options": [
+      {
+       "mode": "rail",
+       "name": "MRT 동서선 (창이공항역 → 타나메라 환승 → 시내)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "2·3터미널 사이 지하",
+       "note": null,
+       "transfers": 1
+      },
+      {
+       "mode": "bus",
+       "name": "시내버스 (터미널 지하 버스 정류장)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": null,
+       "transfers": null
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://en.wikipedia.org/wiki/Changi_Airport",
+    "https://www.wikidata.org/wiki/Q32159"
+   ]
+  },
+  "MY": {
+   "basis": "reference",
+   "currency": "MYR",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "KUL",
+     "name": "쿠알라룸푸르 국제공항",
+     "lat": 2.7456,
+     "lng": 101.7097,
+     "cities": [
+      "쿠알라룸푸르"
+     ],
+     "options": [
+      {
+       "mode": "rail",
+       "name": "KLIA Ekspres (공항 → KL Sentral)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "KLIA·KLIA2 역",
+       "note": null,
+       "transfers": null
+      },
+      {
+       "mode": "bus",
+       "name": "공항버스 (공항 → KL Sentral·TBS)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "KLIA 1층 C블록, KLIA2 1층 버스 터미널",
+       "note": null,
+       "transfers": 0
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://en.wikipedia.org/wiki/Kuala_Lumpur_International_Airport",
+    "https://www.wikidata.org/wiki/Q500253"
+   ]
+  },
+  "ID": {
+   "basis": "reference",
+   "currency": "IDR",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "DPS",
+     "name": "응우라라이 국제공항 (발리)",
+     "lat": -8.7481,
+     "lng": 115.1675,
+     "cities": [
+      "발리"
+     ],
+     "options": [
+      {
+       "mode": "bus",
+       "name": "BRT 버스 (공항 정류장)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": "2026년 1월 기준 공항을 지나는 BRT 1개 노선",
+       "transfers": 0
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://en.wikipedia.org/wiki/Ngurah_Rai_International_Airport",
+    "https://www.wikidata.org/wiki/Q1061846"
+   ]
+  },
+  "IN": {
+   "basis": "reference",
+   "currency": "INR",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "DEL",
+     "name": "인디라 간디 국제공항",
+     "lat": 28.5574,
+     "lng": 77.0833,
+     "cities": [
+      "델리"
+     ],
+     "options": [
+      {
+       "mode": "rail",
+       "name": "델리 메트로 공항 익스프레스선 (공항 → 뉴델리역)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": "10분 간격",
+       "transfers": null
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://en.wikipedia.org/wiki/Indira_Gandhi_International_Airport",
+    "https://www.wikidata.org/wiki/Q821275"
+   ]
+  },
+  "AE": {
+   "basis": "reference",
+   "currency": "AED",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "DXB",
+     "name": "두바이 국제공항",
+     "lat": 25.2528,
+     "lng": 55.3644,
+     "cities": [
+      "두바이"
+     ],
+     "options": [
+      {
+       "mode": "rail",
+       "name": "두바이 메트로 레드라인 (1·3터미널역)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "1터미널역 · 3터미널역",
+       "note": null,
+       "transfers": null
+      },
+      {
+       "mode": "bus",
+       "name": "시내버스 (1·3터미널)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": null,
+       "transfers": null
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://en.wikipedia.org/wiki/Dubai_International_Airport",
+    "https://www.wikidata.org/wiki/Q193439"
+   ]
+  },
+  "TR": {
+   "basis": "reference",
+   "currency": "TRY",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "IST",
+     "name": "이스탄불 공항",
+     "lat": 41.2608,
+     "lng": 28.7422,
+     "cities": [
+      "이스탄불"
+     ],
+     "options": [
+      {
+       "mode": "rail",
+       "name": "M11 지하철 (공항 → 가이레테페 등)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "공항 지하철역",
+       "note": null,
+       "transfers": null
+      },
+      {
+       "mode": "bus",
+       "name": "Havaist 공항버스 (공항 → 시내 각 지역)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": null,
+       "transfers": 0
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "도착·출발층 밖 택시 승강장 (24시간)",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://en.wikipedia.org/wiki/Istanbul_Airport",
+    "https://www.wikidata.org/wiki/Q3661908"
+   ]
+  },
+  "GB": {
+   "basis": "reference",
+   "currency": "GBP",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "LHR",
+     "name": "런던 히스로 공항",
+     "lat": 51.4775,
+     "lng": -0.4614,
+     "cities": [
+      "런던"
+     ],
+     "options": [
+      {
+       "mode": "rail",
+       "name": "히스로 익스프레스 (공항 → 패딩턴)",
+       "minutes": 15,
+       "price": null,
+       "firstLast": null,
+       "where": "히스로 센트럴(2·3터미널) · 5터미널역",
+       "note": "논스톱, 15분 간격 · 5터미널에서는 21분",
+       "transfers": 0
+      },
+      {
+       "mode": "rail",
+       "name": "엘리자베스 라인 (공항 → 런던 중심)",
+       "minutes": 35,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": "약 35분, 시간당 6편",
+       "transfers": null
+      },
+      {
+       "mode": "rail",
+       "name": "지하철 피카딜리선 (공항 → 런던 중심)",
+       "minutes": 50,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": "보통 40~50분",
+       "transfers": null
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://en.wikipedia.org/wiki/Heathrow_Airport",
+    "https://www.wikidata.org/wiki/Q8691"
+   ]
+  },
+  "FR": {
+   "basis": "reference",
+   "currency": "EUR",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "CDG",
+     "name": "파리 샤를드골 공항",
+     "lat": 49.0097,
+     "lng": 2.5478,
+     "cities": [
+      "파리"
+     ],
+     "options": [
+      {
+       "mode": "rail",
+       "name": "RER B (공항 → 파리 북역·샤틀레)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "공항 RER역",
+       "note": null,
+       "transfers": null
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://en.wikipedia.org/wiki/Charles_de_Gaulle_Airport",
+    "https://www.wikidata.org/wiki/Q46280"
+   ]
+  },
+  "DE": {
+   "basis": "reference",
+   "currency": "EUR",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "FRA",
+     "name": "프랑크푸르트 공항",
+     "lat": 50.0333,
+     "lng": 8.5705,
+     "cities": [
+      "프랑크푸르트"
+     ],
+     "options": [
+      {
+       "mode": "rail",
+       "name": "S-Bahn S8·S9 (공항 → 프랑크푸르트 중앙역)",
+       "minutes": 12,
+       "price": null,
+       "firstLast": null,
+       "where": "1터미널 B콘코스 지역 열차역",
+       "note": "10~12분, 낮에는 15분 간격",
+       "transfers": null
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": 15,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "중앙역·시내까지 약 10~15분 · 거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://en.wikipedia.org/wiki/Frankfurt_Airport",
+    "https://www.wikidata.org/wiki/Q46033"
+   ]
+  },
+  "CH": {
+   "basis": "reference",
+   "currency": "CHF",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "ZRH",
+     "name": "취리히 공항",
+     "lat": 47.4581,
+     "lng": 8.5481,
+     "cities": [
+      "취리히"
+     ],
+     "options": [
+      {
+       "mode": "rail",
+       "name": "기차 (공항 → 취리히 중앙역)",
+       "minutes": 13,
+       "price": null,
+       "firstLast": null,
+       "where": "공항역",
+       "note": "9~13분, 시간당 약 13편",
+       "transfers": null
+      },
+      {
+       "mode": "rail",
+       "name": "트램 10번 (공항 → 시내)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "에어포트 센터 앞",
+       "note": null,
+       "transfers": null
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://en.wikipedia.org/wiki/Zurich_Airport",
+    "https://www.wikidata.org/wiki/Q15114"
+   ]
+  },
+  "AT": {
+   "basis": "reference",
+   "currency": "EUR",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "VIE",
+     "name": "빈 국제공항",
+     "lat": 48.1103,
+     "lng": 16.5697,
+     "cities": [
+      "빈"
+     ],
+     "options": [
+      {
+       "mode": "rail",
+       "name": "CAT 시티 에어포트 트레인 (공항 → 빈 미테)",
+       "minutes": 16,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": "직통 16분, S7보다 비싸요",
+       "transfers": 0
+      },
+      {
+       "mode": "rail",
+       "name": "S7 (공항 → 시내)",
+       "minutes": 25,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": "약 25분",
+       "transfers": null
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://en.wikipedia.org/wiki/Vienna_International_Airport",
+    "https://www.wikidata.org/wiki/Q32999"
+   ]
+  },
+  "PT": {
+   "basis": "reference",
+   "currency": "EUR",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "LIS",
+     "name": "리스본 공항",
+     "lat": 38.7742,
+     "lng": -9.1342,
+     "cities": [
+      "리스본"
+     ],
+     "options": [
+      {
+       "mode": "rail",
+       "name": "리스본 지하철 빨간선 (공항 → 시내)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": "교통카드(7 Colinas/Viva Viagem) 또는 컨택리스",
+       "transfers": null
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": 15,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "시내까지 약 15분 · 거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://en.wikipedia.org/wiki/Lisbon_Airport",
+    "https://www.wikidata.org/wiki/Q403671"
+   ]
+  },
+  "GR": {
+   "basis": "reference",
+   "currency": "EUR",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "ATH",
+     "name": "아테네 국제공항",
+     "lat": 37.9364,
+     "lng": 23.9444,
+     "cities": [
+      "아테네"
+     ],
+     "options": [
+      {
+       "mode": "rail",
+       "name": "지하철 3호선 (공항 → 시내)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": null,
+       "transfers": null
+      },
+      {
+       "mode": "bus",
+       "name": "아테네 시내 공항버스",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": null,
+       "transfers": null
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "도착층 3번 출구 택시 승강장",
+       "note": "거리로 계산해요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": null,
+   "rideApps": [],
+   "intercity": [],
+   "sources": [
+    "https://en.wikipedia.org/wiki/Athens_International_Airport",
+    "https://www.wikidata.org/wiki/Q211734"
    ]
   }
  }

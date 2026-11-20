@@ -78,6 +78,7 @@ function WithData({ country, place, t }: { country: Country; place: Place; t: Tr
 
   return (
     <div className="space-y-10">
+      <BasisBadge basis={t.basis} />
       {airport && (
         <section aria-label="공항에서 숙소까지">
           <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-stone-500">공항 → {place.name}</h3>
@@ -168,7 +169,10 @@ function WithData({ country, place, t }: { country: Country; place: Place; t: Tr
       )}
 
       <footer className="space-y-1 text-[11px] leading-relaxed text-stone-400">
-        <p>{TRANSPORT_UPDATED ?? '작성일 미상'} 기준이에요. 실제 요금·시간은 달라질 수 있어요. '확인 필요'는 아직 공식 값을 넣지 않은 항목이에요.</p>
+        <p>
+          {TRANSPORT_UPDATED ?? '작성일 미상'} 기준이에요. 실제 요금·시간은 달라질 수 있어요.{' '}
+          {t.basis === 'reference' ? "위키백과 같은 공개 자료를 참고한 값이라 공식 값이 아니에요. '확인 필요'는 자료에 없던 항목이에요." : "'확인 필요'는 아직 공식 값을 넣지 않은 항목이에요."}
+        </p>
         {t.sources.length > 0 && (
           <p className="flex flex-wrap gap-x-3">
             출처:
@@ -407,5 +411,20 @@ function CityTransitBlock({ t, rides, setRides, krwPer }: { t: TransportCountry;
         </div>
       </div>
     </section>
+  )
+}
+
+/** 데이터 출처 등급: 공식 사이트 확인 / 공개 자료 참고 */
+function BasisBadge({ basis }: { basis: TransportCountry['basis'] }) {
+  return basis === 'official' ? (
+    <p className="flex items-center gap-2 text-xs text-stone-500">
+      <span className="rounded-full bg-teal-700 px-2.5 py-0.5 font-semibold text-stone-50">공식</span>
+      공항·교통 운영사의 공식 사이트에서 확인한 값이에요
+    </p>
+  ) : (
+    <p className="flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs leading-relaxed text-amber-800">
+      <span className="shrink-0 rounded-full border border-amber-500 px-2.5 py-0.5 font-semibold">참고</span>
+      공식 사이트에서 확인하지 못해 위키백과 공항 문서를 참고했어요. 수단과 소요 시간 위주이고, 요금은 대부분 비어 있어요. 떠나기 전에 공식 사이트에서 꼭 확인해 주세요.
+    </p>
   )
 }

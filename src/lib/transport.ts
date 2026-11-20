@@ -42,7 +42,10 @@ export interface Intercity {
   price: Range | null
   booking: string | null
 }
+/** official: 공항·교통 운영사 등 공식 사이트에서 확인 / reference: 위키백과 등 공개 자료 참고 (공식 아님) */
+export type Basis = 'official' | 'reference'
 export interface TransportCountry {
+  basis: Basis
   currency: string
   childRate: number | null
   airports: Airport[]
@@ -95,6 +98,7 @@ export function parseCountry(v: unknown): TransportCountry | null {
   if (!isObj(v) || !str(v.currency)) return null
   const t = isObj(v.taxi) ? v.taxi : null
   return {
+    basis: v.basis === 'reference' ? 'reference' : 'official',
     currency: str(v.currency)!,
     childRate: num(v.childRate),
     airports: arr(v.airports, parseAirport),
