@@ -3,9 +3,10 @@ import { motion } from 'motion/react'
 import type { Country, Place, TripDates } from '../types'
 import { useAsync } from '../lib/useAsync'
 import { getGoodTime, grade, rankCountries, type Part } from '../lib/goodTime'
-import { getWeather, goldenHours } from '../lib/weather'
+import { getWeather } from '../lib/weather'
 import { plugAdvice, timeDiff, useSurvival, voltageAdvice, type SurvivalData } from '../lib/survival'
 import { climateForTrip } from '../lib/climate'
+import { localHHMM, sunTimes, timeZoneFor, tzOffsetSec } from '../lib/sun'
 import { makePackingList, type PackItem } from '../lib/packing'
 import { useStored } from '../lib/stored'
 import { COUNTRIES, POPULAR_CODES } from '../lib/countries'
@@ -24,7 +25,7 @@ export function HomeSection({ country, place, dates, onPickCountry }: { country:
         <SurvivalCard country={country} place={place} />
       </div>
       <div className="grid gap-4 lg:grid-cols-2">
-        <GoldenHour place={place} dates={dates} />
+        <GoldenHour country={country} place={place} dates={dates} />
         <Packing country={country} place={place} dates={dates} />
       </div>
       <Compare dates={dates} current={country.code} onPick={onPickCountry} />
@@ -102,9 +103,12 @@ function survivalRows(country: Country, offsetSec: number | undefined, sv: Survi
 }
 
 function SurvivalCard({ country, place }: { country: Country; place: Place }) {
-  const w = useAsync(() => getWeather(place.lat, place.lng), [place.lat, place.lng])
+  const tz = timeZoneFor(country.code, place.lat, place.lng)
+  const w = useAsync(() => (tz ? Promise.resolve(null) : getWeather(place.lat, place.lng)), [tz, place.lat, place.lng])
   const sv = useSurvival()
-  const rows = survivalRows(country, w.status === 'success' ? w.data.data.utcOffsetSec : undefined, sv)
+  // 시차는 시간대로 계산 (날씨 서버가 막혀도 나오게), 시간대를 모르는 나라만 날씨 응답 값
+  const offset = tz ? tzOffsetSec(tz) : w.status === 'success' && w.data ? w.data.data.utcOffsetSec : undefined
+  const rows = survivalRows(country, offset, sv)
   const [saving, setSaving] = useState(false)
   const save = async () => {
     setSaving(true)
@@ -210,42 +214,46 @@ export async function shareOrDownload(blob: Blob, name: string) {
 
 // ---------------- 골든아워 ----------------
 
-function GoldenHour({ place, dates }: { place: Place; dates: TripDates }) {
-  const w = useAsync(() => getWeather(place.lat, place.lng), [place.lat, place.lng])
-  const days = w.status === 'success' ? w.data.data.days : []
-  const trip = days.filter((d) => isWithin(d.date, dates.start, dates.end))
-  const list = (trip.length ? trip : days.slice(0, 3)).slice(0, 4)
+function GoldenHour({ country, place, dates }: { country: Country; place: Place; dates: TripDates }) {
+  // 일출·일몰은 날짜와 좌표로 직접 계산한다 (인터넷 없이, 16일 예보 밖 날짜도)
+  const tz = timeZoneFor(country.code, place.lat, place.lng)
+  const list = useMemo(() => {
+    if (!tz) return []
+    const out: { date: string; morning: [string, string]; evening: [string, string] }[] = []
+    const d = new Date(`${dates.start}T00:00:00Z`)
+    for (let i = 0; i < 4 && d.toISOString().slice(0, 10) <= dates.end; i++, d.setUTCDate(d.getUTCDate() + 1)) {
+      const date = d.toISOString().slice(0, 10)
+      const s = sunTimes(date, place.lat, place.lng)
+      if (!s) continue
+      const hm = (t: Date) => localHHMM(t, tz)
+      out.push({ date, morning: [hm(s.sunrise), hm(new Date(s.sunrise.getTime() + 3600000))], evening: [hm(new Date(s.sunset.getTime() - 3600000)), hm(s.sunset)] })
+    }
+    return out
+  }, [tz, dates.start, dates.end, place.lat, place.lng])
   return (
     <div className="rounded-3xl border border-stone-200 bg-white p-5">
       <p className="text-xs font-medium uppercase tracking-wider text-stone-500">사진 찍기 좋은 골든아워</p>
-      {w.status === 'error' ? (
-        <ErrorBox message="일출·일몰 시간을 불러오지 못했어요." detail={errorReasonKo(w.error)} onRetry={w.retry} />
-      ) : w.status !== 'success' ? (
-        <Loading />
+      {!list.length ? (
+        <p className="mt-2 text-sm text-stone-500">이 지역은 일출·일몰을 계산하지 못했어요.</p>
       ) : (
         <>
-          {!trip.length && <p className="mt-2 text-xs text-stone-500">여행 날짜가 예보 범위 밖이라 가까운 날짜로 보여 드려요.</p>}
           <ul className="mt-3 divide-y divide-stone-200">
-            {list.map((d) => {
-              const g = goldenHours(d)
-              if (!g) return null
-              return (
-                <li key={d.date} className="flex items-center justify-between gap-3 py-2.5 text-sm">
-                  <span className="w-24 shrink-0 text-stone-500">{formatKo(d.date)}</span>
-                  <span className="flex-1 text-right tabular-nums">
-                    <span className="text-amber-700">
-                      ☀ {g.morning[0]}–{g.morning[1]}
-                    </span>
-                    <span className="mx-2 text-stone-300">·</span>
-                    <span className="text-amber-700">
-                      {g.evening[0]}–{g.evening[1]} ☾
-                    </span>
+            {list.map((g) => (
+              <li key={g.date} className="flex items-center justify-between gap-3 py-2.5 text-sm">
+                <span className="w-24 shrink-0 text-stone-500">{formatKo(g.date)}</span>
+                <span className="flex-1 text-right tabular-nums">
+                  <span className="text-amber-700">
+                    ☀ {g.morning[0]}–{g.morning[1]}
                   </span>
-                </li>
-              )
-            })}
+                  <span className="mx-2 text-stone-300">·</span>
+                  <span className="text-amber-700">
+                    {g.evening[0]}–{g.evening[1]} ☾
+                  </span>
+                </span>
+              </li>
+            ))}
           </ul>
-          <p className="mt-2 text-[11px] text-stone-400">{place.name} 현지 시각 · 일출 직후·일몰 직전 약 1시간 (Open-Meteo 일출·일몰 기준)</p>
+          <p className="mt-2 text-[11px] text-stone-400">{place.name} 현지 시각 · 일출 직후·일몰 직전 약 1시간 (날짜와 좌표로 계산, 오차 1~2분)</p>
         </>
       )}
     </div>

@@ -91,3 +91,19 @@ test('두 단계 택시 요금: 기본 거리 포함, 일정 금액 이후 km당
   assert.equal(mid(taxiFare(hk, 4)), 50) // 29 + 2×10.5
   assert.equal(mid(taxiFare(hk, 19)), 102.5 + 7 * 10) // 102.5 도달 지점(9km) 이후 10km × 7
 })
+
+test('일출·일몰 계산: 알려진 값과 2분 안', async () => {
+  const { sunTimes, localHHMM, timeZoneFor } = await import('../src/lib/sun.ts')
+  const min = (hhmm: string) => Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3))
+  // 기준값: 널리 알려진 일출·일몰 시각 (서울 하지, 뉴욕 독립기념일), 2분 오차까지 허용
+  const cases: [string, string, number, number, string, string, string][] = [
+    ['KR', '2026-06-21', 37.5665, 126.978, 'Asia/Seoul', '05:11', '19:57'],
+    ['US', '2026-07-04', 40.71, -74.0, '', '05:29', '20:31'],
+  ]
+  for (const [code, date, lat, lng, tzIn, rise, set] of cases) {
+    const tz = tzIn || timeZoneFor(code, lat, lng)!
+    const s = sunTimes(date, lat, lng)!
+    assert.ok(Math.abs(min(localHHMM(s.sunrise, tz)) - min(rise)) <= 2, `${code} 일출 ${localHHMM(s.sunrise, tz)}`)
+    assert.ok(Math.abs(min(localHHMM(s.sunset, tz)) - min(set)) <= 2, `${code} 일몰 ${localHHMM(s.sunset, tz)}`)
+  }
+})

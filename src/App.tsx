@@ -415,6 +415,16 @@ function Footer({ compact }: { compact?: boolean }) {
         </button>
       </p>
       <p>
+        시연 모드(미리 받아 둔 데이터로 열기):{' '}
+        <button type="button" onClick={() => import('./lib/demo').then((m) => m.startDemo('JP'))} className="text-stone-500 underline underline-offset-2">
+          도쿄
+        </button>{' '}
+        ·{' '}
+        <button type="button" onClick={() => import('./lib/demo').then((m) => m.startDemo('FR'))} className="text-stone-500 underline underline-offset-2">
+          파리
+        </button>
+      </p>
+      <p>
         데이터: Wikidata · OpenStreetMap 기여자 · Nominatim · 위키백과·위키미디어 공용 · Frankfurter · ExchangeRate-API · Nager.Date · Open-Meteo · MyMemory · 국기 flagcdn.com
       </p>
     </footer>

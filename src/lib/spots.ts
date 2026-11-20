@@ -247,7 +247,7 @@ const hasWikiOf = (s: Spot) => !!(s.enTitle || s.wiki || s.koTitle || s.wikidata
 async function loadBase(lat: number, lng: number, radiusKm: number, signal?: AbortSignal): Promise<SpotsResult> {
   const { data, source } = await raceWithFallback(
     (sig) => loadBaseOsm(lat, lng, radiusKm, sig),
-    (sig) => loadBaseWikidata(lat, lng, radiusKm, sig),
+    (sig) => loadBaseWikidataShrinking(lat, lng, radiusKm, sig),
     { signal },
   )
   return { ...data, source }
@@ -472,6 +472,23 @@ interface WdRow {
   ko?: { value: string }
   en?: { value: string }
   img?: { value: string }
+}
+
+/**
+ * 파리·런던처럼 명소가 아주 많은 도심은 반경 10km 질의가 30초 안에 끝나지 않는다.
+ * 시간 초과나 서버 오류면 반경을 줄여(10 → 4 → 2km) 다시 묻는다.
+ */
+async function loadBaseWikidataShrinking(lat: number, lng: number, radiusKm: number, signal?: AbortSignal): Promise<SpotsResult> {
+  let r = radiusKm
+  for (;;) {
+    try {
+      return await loadBaseWikidata(lat, lng, r, signal)
+    } catch (e) {
+      const retryable = !signal?.aborted && (e instanceof DOMException || (e instanceof HttpError && e.status >= 500))
+      if (!retryable || r <= 2) throw e
+      r = r > 4 ? 4 : 2
+    }
+  }
 }
 
 async function loadBaseWikidata(lat: number, lng: number, radiusKm: number, signal?: AbortSignal): Promise<SpotsResult> {

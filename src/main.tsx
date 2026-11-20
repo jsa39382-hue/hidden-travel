@@ -18,10 +18,16 @@ document.addEventListener(
   { passive: true },
 )
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <MotionConfig reducedMotion="user" transition={{ type: 'spring', stiffness: 300, damping: 22 }}>
-      <App />
-    </MotionConfig>
-  </StrictMode>,
-)
+// ?demo(도쿄) · ?demo=FR(파리): 시연 데이터를 채우고 그 여행 화면으로 (화면은 이동한 뒤에 그린다)
+const demo = new URLSearchParams(location.search).get('demo')
+if (demo !== null) {
+  import('./lib/demo').then((m) => m.startDemo(demo.toUpperCase() === 'FR' ? 'FR' : 'JP'))
+} else {
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <MotionConfig reducedMotion="user" transition={{ type: 'spring', stiffness: 300, damping: 22 }}>
+        <App />
+      </MotionConfig>
+    </StrictMode>,
+  )
+}

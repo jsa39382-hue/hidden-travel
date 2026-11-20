@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { plugAdvice, timeDiff, voltageAdvice } from '../lib/survival'
 import { FACTS, TIPS } from '../lib/survivalData'
+import { timeZoneFor, tzOffsetSec } from '../lib/sun'
 import type { Country, Place } from '../types'
 import { useAsync } from '../lib/useAsync'
 import { getWeather } from '../lib/weather'
@@ -45,8 +46,10 @@ function speak(text: string, lang: string) {
 export function TipsSection({ country, place }: { country: Country; place: Place }) {
   const tip = TIPS[country.code]
   const facts = FACTS[country.code] ?? {}
-  const w = useAsync(() => getWeather(place.lat, place.lng), [place.lat, place.lng])
-  const td = timeDiff(w.status === 'success' ? w.data.data.utcOffsetSec : undefined)
+  // 시차는 시간대로 계산 (날씨 서버가 막혀도), 시간대를 모르는 나라만 날씨 응답 값
+  const tz = timeZoneFor(country.code, place.lat, place.lng)
+  const w = useAsync(() => (tz ? Promise.resolve(null) : getWeather(place.lat, place.lng)), [tz, place.lat, place.lng])
+  const td = timeDiff(tz ? tzOffsetSec(tz) : w.status === 'success' && w.data ? w.data.data.utcOffsetSec : undefined)
   const plug = plugAdvice(facts)
   const volt = voltageAdvice(facts.voltage)
   const canSpeak = typeof window !== 'undefined' && 'speechSynthesis' in window
