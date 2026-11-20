@@ -350,7 +350,7 @@ function SwipePicker({ place }: { place: Place }) {
         <div>
           <p className="text-sm font-semibold">카드 넘기며 고르기</p>
           <p className="text-xs text-stone-500">
-            가고 싶다 {wish.liked.length} · 별로 {wish.disliked.length}
+            가고 싶다(관심 목록) {wish.liked.length} · 별로 {wish.disliked.length}
             {(wish.liked.length > 0 || wish.disliked.length > 0) && (
               <button type="button" onClick={reset} className="ml-2 underline underline-offset-2">
                 초기화

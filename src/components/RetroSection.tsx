@@ -30,7 +30,7 @@ export function RetroSection({ country, place, dates }: { country: Country; plac
   const make = async () => {
     setBusy(true)
     try {
-      // 명소: 관심 목록(하트) 기능이 생기면 그 목록을, 지금은 카드 넘기기의 '가고 싶다' 목록을 쓴다
+      // 명소: 관심 목록(명소 카드의 하트 + 일정 탭 카드 넘기기의 '가고 싶다'는 같은 목록)
       const spots = wish.liked.slice(0, 4).map((s) => ({ id: s.id, name: s.name, ...(s.image ? { image: s.image } : {}) }))
       const data = { code: country.code, name: country.nameKo, place: { name: place.name, lat: place.lat, lng: place.lng }, start: dates.start, end: dates.end, spots, spent: spent || null }
       memories.upsert(data)
@@ -57,11 +57,11 @@ export function RetroSection({ country, place, dates }: { country: Country; plac
           <div className="grid grid-cols-3 gap-3">
             <Stat label="다녀온 나라" value={countries} suffix="개국" />
             <Stat label="이번 여행" value={days} suffix="일" />
-            <Stat label="가고 싶다로 고른 곳" value={wish.liked.length} suffix="곳" />
+            <Stat label="관심 목록" value={wish.liked.length} suffix="곳" />
           </div>
           <div className="rounded-2xl border border-stone-200 p-4 text-sm text-stone-600">
             <p>
-              카드에 들어가는 것: 나라·도시·날짜, <b className="text-stone-800">일정 탭에서 '가고 싶다'로 고른 명소</b>(최대 4곳),{' '}
+              카드에 들어가는 것: 나라·도시·날짜, <b className="text-stone-800">관심 목록(♥)에 넣은 명소</b>(최대 4곳),{' '}
               <b className="text-stone-800">돈 탭 더치페이에 기록한 총액</b>
               {spent ? ` (${Math.round(spent).toLocaleString('ko-KR')}원)` : ' (기록이 없으면 빠져요)'}. 만들면 위 앨범에도 쌓여요.
             </p>

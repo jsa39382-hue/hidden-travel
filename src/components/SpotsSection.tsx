@@ -11,12 +11,14 @@ import { getCostRow, TIERS } from '../lib/budget'
 import { dailyFactor, lodgingFactor } from '../lib/places'
 import { getKrwRate } from '../lib/exchange'
 import { ErrorBox, Loading, Notice } from './Status'
+import { placeKeyOf, useWishlist } from '../lib/wishlist'
+import { motion } from 'motion/react'
 
 const SpotsMap = lazy(() => import('./SpotsMap'))
 
 const RADII = [5, 10, 20] as const
 const PAGE = 15
-const COLORS = { hidden: '#5eead4', famous: '#c4b5fd' }
+const COLORS = { hidden: '#5eead4', famous: '#c4b5fd', saved: '#fb7185' }
 
 interface LodgingCenter {
   name: string
@@ -27,7 +29,7 @@ interface LodgingCenter {
 export function SpotsSection({ country, place, active = true }: { country: Country; place: Place; active?: boolean }) {
   const [view, setView] = useState<'spots' | 'nearby'>('spots')
   const [radius, setRadius] = useState<(typeof RADII)[number]>(10)
-  const [tab, setTab] = useState<'hidden' | 'famous'>('hidden')
+  const [tab, setTab] = useState<'hidden' | 'famous' | 'saved'>('hidden')
   const [shown, setShown] = useState(PAGE)
   const [selected, setSelected] = useState<string | undefined>()
   const [focus, setFocus] = useState<[number, number] | null>(null)
@@ -48,7 +50,14 @@ export function SpotsSection({ country, place, active = true }: { country: Count
   const nearby = useAsync((force, signal) => getNearby(lodgingAt.lat, lodgingAt.lng, force, signal), [lodgingAt.lat, lodgingAt.lng])
 
   const split = useMemo(() => (sp.spots ? splitSpots(sp.spots) : { hidden: [], famous: [] }), [sp.spots])
-  const list = split[tab]
+  // 관심 목록: 하트를 누른 명소 (지금 검색 반경 밖이어도 저장한 정보로 보여 준다)
+  const wl = useWishlist(placeKeyOf(place))
+  const likedIds = useMemo(() => new Set(wl.wish.liked.map((x) => x.id)), [wl.wish.liked])
+  const saved = useMemo(() => {
+    const byId = new Map((sp.spots ?? []).map((s) => [s.id, s]))
+    return wl.wish.liked.map((x) => byId.get(x.id) ?? ({ ...x, hiddenScore: 0, interest: 0, distKm: NaN, category: 'other' } as unknown as Spot))
+  }, [wl.wish.liked, sp.spots])
+  const list = tab === 'saved' ? saved : split[tab]
   const visible = list.slice(0, shown)
   const near = nearby.status === 'success' ? nearby.data.data : null
   const lodgings = near && view === 'nearby' && nearTab === 'lodging' ? near.lodgings.slice(0, 30) : []
@@ -137,12 +146,16 @@ export function SpotsSection({ country, place, active = true }: { country: Count
               focus={focus}
               visible={active}
               onSelectSpot={selectSpot}
+              likedIds={likedIds}
               onSelectLodging={(id) => (setSelected(id), scrollToItem(id))}
             />
           </Suspense>
           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-stone-500">
             {view === 'spots' ? (
-              <Legend color={COLORS[tab]} label={tab === 'hidden' ? '숨은 명소' : '유명 명소'} />
+              <>
+                <Legend color={COLORS[tab]} label={tab === 'hidden' ? '숨은 명소' : tab === 'famous' ? '유명 명소' : '관심 목록'} />
+                {tab !== 'saved' && likedIds.size > 0 && <Legend color={COLORS.saved} label="관심 목록" />}
+              </>
             ) : nearTab === 'lodging' ? (
               <Legend color="#fb923c" label="숙소" />
             ) : (
@@ -162,10 +175,21 @@ export function SpotsSection({ country, place, active = true }: { country: Count
                 options={[
                   ['hidden', '숨은 명소', sp.spots ? split.hidden.length : undefined],
                   ['famous', '유명 명소', sp.spots ? split.famous.length : undefined],
+                  ['saved', '♥ 관심 목록', saved.length],
                 ]}
               />
               <div className="mt-4">
-                {sp.base.status === 'error' ? (
+                {tab === 'saved' ? (
+                  <SavedList
+                    items={saved}
+                    full={new Set((sp.spots ?? []).map((x) => x.id))}
+                    countryCode={country.code}
+                    selected={selected}
+                    onMap={showOnMap}
+                    onLodging={nearbyOf}
+                    onToggle={wl.toggle}
+                  />
+                ) : sp.base.status === 'error' ? (
                   <ErrorBox message="명소를 불러오지 못했어요." detail={`${errorReasonKo(sp.base.error)} 잠시 뒤 다시 시도하거나 반경을 줄여 보세요.`} onRetry={sp.retry} />
                 ) : !sp.spots ? (
                   <Loading label="명소 찾는 중… (보통 5~15초)" />
@@ -193,7 +217,7 @@ export function SpotsSection({ country, place, active = true }: { country: Count
                     ) : (
                       <ul className="space-y-3">
                         {visible.map((s) => (
-                          <SpotCard key={s.id} spot={s} countryCode={country.code} selected={s.id === selected} onMap={() => showOnMap(s)} onLodging={() => nearbyOf(s)} />
+                          <SpotCard key={s.id} spot={s} countryCode={country.code} selected={s.id === selected} onMap={() => showOnMap(s)} onLodging={() => nearbyOf(s)} liked={likedIds.has(s.id)} onToggleLike={() => wl.toggle(s)} />
                         ))}
                       </ul>
                     )}
@@ -311,7 +335,7 @@ function fameLabel(s: Spot) {
   }
 }
 
-function SpotCard({ spot, selected, onMap, onLodging, countryCode }: { spot: Spot; selected: boolean; onMap: () => void; onLodging: () => void; countryCode: string }) {
+function SpotCard({ spot, selected, onMap, onLodging, countryCode, liked, onToggleLike }: { spot: Spot; selected: boolean; onMap: () => void; onLodging: () => void; countryCode: string; liked: boolean; onToggleLike: () => void }) {
   const [open, setOpen] = useState(false)
   const hasWiki = !!(spot.koTitle || spot.enTitle || (spot.wiki && ['ko', 'en'].includes(spot.wiki.lang)))
   const sum = useAsync(hasWiki ? () => getSummary(spot) : null, [spot.id])
@@ -346,6 +370,7 @@ function SpotCard({ spot, selected, onMap, onLodging, countryCode }: { spot: Spo
             {fame.text} · 숨은 정도 {spot.hiddenScore}
           </span>
         </div>
+        <HeartButton name={spot.name} liked={liked} onToggle={onToggleLike} />
       </div>
       {hasWiki && (
         <div className="px-4 pb-3 text-sm text-stone-600">
@@ -663,5 +688,78 @@ function Photo({ src, alt }: { src: string; alt: string }) {
     <div className="aspect-[16/9] w-full overflow-hidden bg-stone-100">
       <img src={src} alt={alt} loading="lazy" onError={() => setFailed(true)} className="size-full object-cover" />
     </div>
+  )
+}
+
+/** 관심 목록 하트 (누르면 넣고 다시 누르면 뺀다) */
+function HeartButton({ name, liked, onToggle }: { name: string; liked: boolean; onToggle: () => void }) {
+  return (
+    <motion.button
+      type="button"
+      aria-pressed={liked}
+      aria-label={liked ? `${name} 관심 목록에서 빼기` : `${name} 관심 목록에 넣기`}
+      onClick={onToggle}
+      whileTap={{ scale: 0.85 }}
+      className={`flex size-11 shrink-0 items-center justify-center rounded-full border ${liked ? 'border-rose-400 text-rose-600' : 'border-stone-300 text-stone-500'}`}
+    >
+      <motion.svg viewBox="0 0 24 24" className="size-5" aria-hidden animate={{ scale: liked ? [1, 1.25, 1] : 1 }} transition={{ duration: 0.3 }}>
+        <path
+          d="M12 20.5s-7.5-4.6-9.2-9.3C1.6 7.8 3.8 4.5 7.2 4.5c2 0 3.6 1.1 4.8 2.8 1.2-1.7 2.8-2.8 4.8-2.8 3.4 0 5.6 3.3 4.4 6.7-1.7 4.7-9.2 9.3-9.2 9.3z"
+          fill={liked ? 'currentColor' : 'none'}
+          stroke="currentColor"
+          strokeWidth={1.8}
+          strokeLinejoin="round"
+        />
+      </motion.svg>
+    </motion.button>
+  )
+}
+
+/** 관심 목록 탭: 지금 결과에 있는 명소는 전체 카드, 반경 밖은 간단한 줄로 */
+function SavedList({
+  items,
+  full,
+  countryCode,
+  selected,
+  onMap,
+  onLodging,
+  onToggle,
+}: {
+  items: Spot[]
+  full: Set<string>
+  countryCode: string
+  selected?: string
+  onMap: (s: Spot) => void
+  onLodging: (s: Spot) => void
+  onToggle: (s: Spot) => void
+}) {
+  if (!items.length)
+    return (
+      <p className="py-6 text-sm leading-relaxed text-stone-500">
+        명소 카드의 ♡를 누르면 여기에 모여요. 관심 목록은 일정 짜기와 회고 카드에 그대로 쓰여요.
+      </p>
+    )
+  return (
+    <>
+      <p className="mb-3 text-xs text-stone-500">{items.length}곳 · 일정 탭의 '가고 싶다'와 같은 목록이에요</p>
+      <ul className="space-y-3">
+        {items.map((s) =>
+          full.has(s.id) ? (
+            <SpotCard key={s.id} spot={s} countryCode={countryCode} selected={s.id === selected} onMap={() => onMap(s)} onLodging={() => onLodging(s)} liked onToggleLike={() => onToggle(s)} />
+          ) : (
+            <li key={s.id} data-id={s.id} className="flex items-center gap-3 rounded-2xl border border-stone-200 bg-white p-4">
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-semibold">{s.name}</p>
+                <p className="text-xs text-stone-500">{s.kind} · 지금 검색 반경 밖</p>
+                <button type="button" onClick={() => onMap(s)} className="mt-1 text-xs text-teal-700 underline underline-offset-2">
+                  지도에서 보기
+                </button>
+              </div>
+              <HeartButton name={s.name} liked onToggle={() => onToggle(s)} />
+            </li>
+          ),
+        )}
+      </ul>
+    </>
   )
 }

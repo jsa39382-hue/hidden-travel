@@ -16,6 +16,8 @@ export interface MapProps {
   /** 숨겨진 탭에서 다시 보일 때 지도 크기를 다시 계산 */
   visible?: boolean
   onSelectSpot: (id: string) => void
+  /** 관심 목록에 넣은 명소 (하트 색으로 표시) */
+  likedIds?: Set<string>
   onSelectLodging: (id: string) => void
 }
 
@@ -47,7 +49,7 @@ function Recenter({ center, radiusKm }: { center: [number, number]; radiusKm: nu
   return null
 }
 
-export default function SpotsMap({ center, radiusKm, spots, spotColor, lodgings, eateries = [], selectedId, focus, visible, onSelectSpot, onSelectLodging }: MapProps) {
+export default function SpotsMap({ center, radiusKm, spots, spotColor, lodgings, eateries = [], selectedId, focus, visible, onSelectSpot, onSelectLodging, likedIds }: MapProps) {
   return (
     <MapContainer center={center} zoom={12} scrollWheelZoom={false} className="h-64 w-full rounded-2xl sm:h-80 lg:h-[calc(100dvh-12rem)] xl:h-[calc(100dvh-8rem)]" style={{ zIndex: 0 }}>
       <TileLayer
@@ -90,10 +92,11 @@ export default function SpotsMap({ center, radiusKm, spots, spotColor, lodgings,
           key={s.id}
           center={[s.lat, s.lng]}
           radius={s.id === selectedId ? 10 : 7}
-          pathOptions={{ color: s.id === selectedId ? '#fafafa' : '#0a0a0a', fillColor: spotColor, fillOpacity: 0.95, weight: s.id === selectedId ? 3 : 1.5 }}
+          pathOptions={{ color: s.id === selectedId ? '#fafafa' : '#0a0a0a', fillColor: likedIds?.has(s.id) ? '#fb7185' : spotColor, fillOpacity: 0.95, weight: s.id === selectedId ? 3 : 1.5 }}
           eventHandlers={{ click: () => onSelectSpot(s.id) }}
         >
           <Tooltip>
+            {likedIds?.has(s.id) ? '♥ ' : ''}
             {s.name} · {s.kind}
           </Tooltip>
         </CircleMarker>
