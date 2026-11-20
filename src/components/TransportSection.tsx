@@ -141,7 +141,7 @@ function WithData({ country, place, t }: { country: Country; place: Place; t: Tr
       {t.intercity.length > 0 && (
         <section aria-label="도시 간 이동">
           <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-stone-500">도시 간 이동</h3>
-          <div className="overflow-x-auto rounded-2xl border border-stone-200">
+          <div tabIndex={0} role="region" aria-label="도시 간 이동 비교표 (옆으로 밀어 보기)" className="overflow-x-auto rounded-2xl border border-stone-200 focus-visible:outline-2 focus-visible:outline-teal-700">
             <table className="w-full min-w-[34rem] text-sm">
               <thead>
                 <tr className="border-b border-stone-200 text-left text-xs text-stone-500">

@@ -142,9 +142,9 @@ function MonthCalendar({
         </button>
       </div>
 
-      <div className="grid grid-cols-7 text-center text-xs" role="grid" aria-label={`${y}년 ${m}월 달력`}>
+      <div className="grid grid-cols-7 text-center text-xs" role="group" aria-label={`${y}년 ${m}월 달력`}>
         {WEEK.map((w, i) => (
-          <div key={w} className={`pb-1 font-medium ${i === 0 ? 'text-rose-500' : i === 6 ? 'text-sky-600' : 'text-stone-400'}`}>
+          <div key={w} className={`pb-1 font-medium ${i === 0 ? 'text-rose-600' : i === 6 ? 'text-sky-600' : 'text-stone-400'}`}>
             {w}
           </div>
         ))}
@@ -157,12 +157,13 @@ function MonthCalendar({
           const isStart = date === dates.start
           const isEnd = date === dates.end
           const dow = i % 7
-          const color = hs?.some((h) => h.dayOff) ? 'text-rose-600 font-bold' : dow === 0 ? 'text-rose-500' : dow === 6 ? 'text-sky-600' : 'text-stone-800'
+          // 여행 기간 칸(어두운 청록) 위에서도 4.5:1 이상 되는 색
+          const color = hs?.some((h) => h.dayOff) ? 'text-rose-700 font-bold' : dow === 0 ? 'text-rose-600' : dow === 6 ? 'text-sky-600' : 'text-stone-800'
           return (
             <div
               key={date}
               title={[...(hs ?? []).map((h) => h.name), ...(fs ?? []).map((f) => f.name)].join(', ') || undefined}
-              className={`relative flex h-11 flex-col items-center justify-center ${inTrip ? 'bg-teal-100' : ''} ${isStart ? 'rounded-l-full' : ''} ${isEnd ? 'rounded-r-full' : ''}`}
+              className={`relative flex h-11 flex-col items-center justify-center ${inTrip ? 'bg-teal-50' : ''} ${isStart ? 'rounded-l-full' : ''} ${isEnd ? 'rounded-r-full' : ''}`}
             >
               <span className={`text-sm tabular-nums ${color}`}>{d}</span>
               <span className="mt-0.5 flex h-1.5 gap-0.5">
@@ -176,7 +177,7 @@ function MonthCalendar({
 
       <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-stone-500">
         <span className="flex items-center gap-1">
-          <span className="inline-block h-3 w-5 rounded-full bg-teal-100" /> 여행 기간
+          <span className="inline-block h-3 w-5 rounded-full bg-teal-50 ring-1 ring-teal-300" /> 여행 기간
         </span>
         <span className="flex items-center gap-1">
           <span className="size-1.5 rounded-full bg-rose-500" /> 공휴일

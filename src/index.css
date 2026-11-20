@@ -15,9 +15,9 @@
   --color-stone-100: #1a1a1a;
   --color-stone-200: #262626;
   --color-stone-300: #363636;
-  --color-stone-400: #6b6b6b;
-  --color-stone-500: #8f8f8f;
-  --color-stone-600: #ababab;
+  --color-stone-400: #878787; /* 작은 글씨도 4.5:1 이상 (카드 #1a1a1a 위 4.8:1) */
+  --color-stone-500: #a3a3a3;
+  --color-stone-600: #bababa;
   --color-stone-700: #c9c9c9;
   --color-stone-800: #e4e4e4;
   --color-stone-900: #f4f4f4;

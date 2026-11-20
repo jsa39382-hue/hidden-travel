@@ -319,7 +319,7 @@ function SpentCompare({ c }: { c: NonNullable<ReturnType<typeof compareSpent>> }
           </span>
         </div>
       ))}
-      <p className="text-[10px] text-stone-400">예상은 항공권을 뺀 현지 경비({c.adults}명, 경비 탭 설정 기준), 실제는 정산 탭 기록이에요</p>
+      <p className="text-[11px] text-stone-400">예상은 항공권을 뺀 현지 경비({c.adults}명, 경비 탭 설정 기준), 실제는 정산 탭 기록이에요</p>
     </div>
   )
 }

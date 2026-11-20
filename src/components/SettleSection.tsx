@@ -193,7 +193,7 @@ function ExpenseForm({ members, currencies, onAdd }: { members: Member[]; curren
           placeholder="금액"
           className="h-11 min-w-0 flex-1 rounded-xl border border-stone-300 bg-white px-3 text-right text-base tabular-nums"
         />
-        <select value={currency} onChange={(e) => setCurrency(e.target.value)} className="h-11 rounded-xl border border-stone-300 bg-white px-2 text-sm">
+        <select aria-label="통화" value={currency} onChange={(e) => setCurrency(e.target.value)} className="h-11 rounded-xl border border-stone-300 bg-white px-2 text-sm">
           {currencies.map((c) => (
             <option key={c}>{c}</option>
           ))}
