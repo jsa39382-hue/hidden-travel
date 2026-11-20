@@ -52,7 +52,8 @@ export function climateDays(c: ClimateCity, dates: TripDates): DayWeather[] {
       code: null,
       max: c.high[m],
       min: c.low[m],
-      rainMm: c.rainMm ? c.rainMm[m] / daysInMonth(d.getUTCFullYear(), m) : null,
+      // 월 강수량을 날마다 나누면 모든 날이 '비 오는 날'로 잡히므로 넣지 않는다
+      rainMm: null,
       // 그 달에 비 오는 날의 비율을 '비 올 확률'로 본다
       rainProb: rainDays != null ? Math.round((rainDays / daysInMonth(d.getUTCFullYear(), m)) * 100) : null,
     })

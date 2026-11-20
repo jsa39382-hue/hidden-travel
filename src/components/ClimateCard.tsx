@@ -15,7 +15,12 @@ export function ClimateCard({ place, dates, reason }: { place: Place; dates: Tri
 
   const city = c.data
   const months = tripMonths(dates)
-  const tips = packingTips(climateDays(city, dates))
+  // 평년 자료는 '그 달에 비 오는 날 수'로만 우산 여부를 말한다
+  const rainy = city.rainDays ? Math.max(...months.map((m) => city.rainDays![m] / 30)) : 0
+  const tips = [
+    ...packingTips(climateDays(city, dates)).filter((t) => !t.startsWith('☂️')),
+    ...(rainy >= 0.3 ? [`☂️ 이맘때는 한 달에 비 오는 날이 ${Math.round(rainy * 30)}일쯤이에요. 우산을 챙기세요.`] : []),
+  ]
   return (
     <section className="rounded-2xl border border-stone-200 bg-white p-5">
       <div className="flex flex-wrap items-baseline justify-between gap-2">

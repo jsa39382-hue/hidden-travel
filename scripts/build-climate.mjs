@@ -79,7 +79,7 @@ function parseBox(text) {
   const low = series(['low C']).some((v) => v != null) ? series(['low C']) : series(['low F'], fToC)
   const rainMm = series(['precipitation mm', 'rain mm']).some((v) => v != null) ? series(['precipitation mm', 'rain mm']) : series(['precipitation inch', 'rain inch'], (v) => v * 25.4)
   const rainDays = series(['precipitation days', 'rain days'])
-  const location = /\|\s*location\s*=\s*([^|\n]+)/i.exec(box.replace(/<ref[^>]*\/>|<ref[^>]*>[\s\S]*?<\/ref>|<ref[^>]*>[^|]*/g, ''))?.[1]?.replace(/\[\[(?:[^|\]]*\|)?([^\]]+)\]\]/g, '$1').replace(/\{\{[^}]*\}?\}?/g, '').trim() ?? null
+  const location = /\|\s*location\s*=\s*([^|\n]+)/i.exec(box.replace(/<ref[^>]*\/>|<ref[^>]*>[\s\S]*?<\/ref>|<ref[^>]*>[^|]*/g, ''))?.[1]?.replace(/\[\[(?:[^|\]]*\|)?([^\]]+)\]\]/g, '$1').replace(/\{\{[^}]*\}?\}?/g, '').replace(/&ndash;/g, '–').replace(/&nbsp;/g, ' ').replace(/,\s*$/, '').trim() ?? null
   const full = (a) => a.filter((v) => v != null).length >= 12
   if (!full(high) || !full(low)) return null
   return { location, high, low, rainMm: full(rainMm) ? rainMm : null, rainDays: full(rainDays) ? rainDays : null }
@@ -194,6 +194,26 @@ for (const c of list) {
   ;(out.countries[c.code] ??= []).push({ name: c.name, lat: c.lat, lng: c.lng, source: `https://en.wikipedia.org/wiki/${encodeURIComponent(src.replace(/ /g, '_'))}`, ...parsed })
   ok++
   console.log(`${c.code} ${c.name} ← ${src} (${parsed.location ?? ''})`)
+}
+
+// 도시 문서에 기후표가 없는 도시국가는 'Climate of ...' 문서와 나라 문서에서 찾는다
+const CITY_STATES = { HK: 'Hong Kong', MO: 'Macau', SG: 'Singapore' }
+for (const [code, en] of Object.entries(CITY_STATES)) {
+  if (out.countries[code]?.length) continue
+  const first = list.find((c) => c.code === code)
+  if (!first) continue
+  const titles = [`Climate of ${en}`, en]
+  const got = await contents(titles, 5)
+  const tpl = titles.map((t) => ownOf(got.get(t))).filter(Boolean)
+  const more = tpl.length ? await contents(tpl, 5) : new Map()
+  for (const t of [...titles, ...tpl]) {
+    const parsed = parseBox(got.get(t) ?? more.get(t) ?? '')
+    if (!parsed) continue
+    out.countries[code] = [{ name: first.name, lat: first.lat, lng: first.lng, source: `https://en.wikipedia.org/wiki/${encodeURIComponent(t.replace(/ /g, '_'))}`, ...parsed }]
+    ok++
+    console.log(`${code} ${first.name} ← ${t} (${parsed.location ?? ''})`)
+    break
+  }
 }
 
 await writeFile(new URL('../src/data/climate.json', import.meta.url), JSON.stringify(out) + '\n')
