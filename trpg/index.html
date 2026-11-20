@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>잿빛 왕관</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Gowun+Dodum&family=Song+Myung&display=swap">
+<link rel="stylesheet" href="style.css">
+<script type="importmap">{ "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }</script>
+</head>
+<body>
+<!--BODY-->
+<div id="app">
+  <div id="world"></div>
+  <div id="vignette"></div>
+
+  <div id="hud" hidden>
+    <button class="hud-card" id="hud-card" type="button" aria-label="인물 정보 열기">
+      <div class="hud-top">
+        <span class="hud-name" id="hud-name"></span>
+        <span class="hud-cls" id="hud-cls"></span>
+      </div>
+      <div class="bar"><div class="bar-fill" id="hud-hp"></div><span class="bar-text" id="hud-hp-text"></span></div>
+      <div class="hud-row">
+        <span class="hud-gold"><i class="coin"></i><b id="hud-gold">0</b></span>
+        <span class="shards" id="hud-shards"></span>
+        <span class="hud-comps" id="hud-comps"></span>
+      </div>
+    </button>
+    <div class="hud-buttons">
+      <button type="button" class="icon-btn" id="btn-sheet">인물</button>
+      <button type="button" class="icon-btn" id="btn-journal">일지</button>
+      <button type="button" class="icon-btn" id="btn-menu">메뉴</button>
+    </div>
+  </div>
+
+  <div id="place-tag" hidden></div>
+  <div id="chapter" aria-live="polite"></div>
+
+  <section id="story" class="panel" hidden aria-live="polite">
+    <header class="panel-head">
+      <span id="speaker" class="speaker"></span>
+      <button type="button" id="btn-collapse" class="link-btn">둘러보기</button>
+    </header>
+    <div id="story-text" class="story-text"></div>
+    <div id="choices" class="choices"></div>
+  </section>
+  <button type="button" id="story-pill" class="story-pill" hidden>이야기로 돌아가기</button>
+
+  <section id="combat" class="panel combat" hidden>
+    <header class="combat-head">
+      <div class="enemy-name" id="enemy-name"></div>
+      <div class="bar enemy"><div class="bar-fill" id="enemy-hp"></div><span class="bar-text" id="enemy-hp-text"></span></div>
+    </header>
+    <ol id="combat-log" class="combat-log"></ol>
+    <div id="combat-actions" class="combat-actions"></div>
+  </section>
+
+  <div id="dice" class="dice" hidden>
+    <div class="dice-card">
+      <div class="dice-label" id="dice-label"></div>
+      <div class="d20"><svg viewBox="0 0 100 100" aria-hidden="true"><polygon points="50,4 93,28 93,72 50,96 7,72 7,28" /><polygon class="inner" points="50,22 76,66 24,66" /></svg><span id="dice-num">20</span></div>
+      <div class="dice-math" id="dice-math"></div>
+      <div class="dice-result" id="dice-result"></div>
+    </div>
+  </div>
+
+  <div id="toasts" class="toasts"></div>
+  <div id="hurt"></div>
+  <div id="fade"></div>
+
+  <div id="title" class="screen title-screen">
+    <div class="title-inner">
+      <p class="eyebrow">별의 그릇 이야기</p>
+      <h1 class="game-title">잿빛 왕관</h1>
+      <p class="title-sub">부서진 왕관, 얇아진 장막, 그리고 하늘에서 떨어진 당신.<br>당신의 선택이 왕국의 새벽을 정한다.</p>
+      <div class="title-buttons">
+        <button type="button" class="btn primary" id="btn-new">새 모험</button>
+        <button type="button" class="btn" id="btn-continue" hidden>이어하기</button>
+        <button type="button" class="btn ghost" id="btn-endings">엔딩 도감</button>
+      </div>
+      <p class="title-foot">이야기 노드 280여 개 · 엔딩 10종 · 주사위 판정과 턴제 전투</p>
+    </div>
+  </div>
+
+  <div id="create" class="screen create-screen" hidden>
+    <form class="create-inner" id="create-form">
+      <h2 class="screen-title">당신은 누구였는가</h2>
+      <label class="field" for="hero-name">
+        <span>이름</span>
+        <input id="hero-name" name="hero-name" maxlength="10" autocomplete="off" value="세아">
+      </label>
+      <div class="field-label">직업</div>
+      <div class="cards" id="class-cards"></div>
+      <div class="field-label">몸이 기억하는 것</div>
+      <div class="cards small" id="bg-cards"></div>
+      <div class="create-summary" id="create-summary"></div>
+      <div class="create-buttons">
+        <button type="button" class="btn ghost" id="btn-back">뒤로</button>
+        <button type="submit" class="btn primary">눈을 뜬다</button>
+      </div>
+    </form>
+  </div>
+
+  <div id="modal" class="modal" hidden>
+    <div class="modal-card" role="dialog" aria-modal="true">
+      <button type="button" class="modal-close" id="modal-close" aria-label="닫기">닫기</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="ending" class="screen ending-screen" hidden>
+    <div class="ending-inner">
+      <p class="eyebrow" id="ending-kind"></p>
+      <h2 class="ending-title" id="ending-title"></h2>
+      <div class="ending-text" id="ending-text"></div>
+      <p class="ending-count" id="ending-count"></p>
+      <div class="title-buttons">
+        <button type="button" class="btn" id="btn-undo">마지막 선택으로 돌아가기</button>
+        <button type="button" class="btn primary" id="btn-restart">처음부터 다시</button>
+        <button type="button" class="btn ghost" id="btn-endings2">엔딩 도감</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="hint" class="hint" hidden>WASD·방향키로 걷기 · 땅을 눌러 이동 · 끌어서 시점 회전 · 휠로 확대 · 빛나는 표식으로 가면 선택</div>
+  <div id="boot" class="boot">세계를 불러오는 중…</div>
+</div>
+<!--/BODY-->
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
