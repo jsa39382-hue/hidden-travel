@@ -26,4 +26,17 @@ function serviceWorker(): Plugin {
 export default defineConfig(({ command }) => ({
   base: command === 'build' ? (process.env.BASE_PATH ?? '/hidden-travel/') : '/',
   plugins: [react(), tailwindcss(), serviceWorker()],
+  build: {
+    rolldownOptions: {
+      output: {
+        // 잘 안 바뀌는 라이브러리는 따로 묶어, 새 버전을 배포해도 다시 받지 않게 한다
+        codeSplitting: {
+          groups: [
+            { name: 'react', test: /node_modules[\\/](react|react-dom|scheduler)[\\/]/ },
+            { name: 'motion', test: /node_modules[\\/](motion|framer-motion|motion-dom|motion-utils|@number-flow|number-flow|esm-env)[\\/]/ },
+          ],
+        },
+      },
+    },
+  },
 }))

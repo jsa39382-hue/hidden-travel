@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { FACTS, TIPS, plugAdvice, timeDiff, voltageAdvice } from '../lib/survival'
+import { plugAdvice, timeDiff, voltageAdvice } from '../lib/survival'
+import { FACTS, TIPS } from '../lib/survivalData'
 import type { Country, Place } from '../types'
 import { useAsync } from '../lib/useAsync'
 import { getWeather } from '../lib/weather'

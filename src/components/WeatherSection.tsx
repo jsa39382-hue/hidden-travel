@@ -5,6 +5,7 @@ import { errorReasonKo } from '../lib/cache'
 import { FORECAST_DAYS, describeWeather, getWeather, packingTips, type DayWeather } from '../lib/weather'
 import { formatKo, isWithin } from '../lib/dates'
 import { ErrorBox, Loading, Notice } from './Status'
+import { ClimateCard } from './ClimateCard'
 
 const t = (n: number | null) => (n == null ? '-' : `${Math.round(n)}°`)
 
@@ -12,7 +13,13 @@ export function WeatherSection({ place, dates }: { place: Place; dates: TripDate
   const w = useAsync((force) => getWeather(place.lat, place.lng, force), [place.lat, place.lng])
   const [showAll, setShowAll] = useState(false)
 
-  if (w.status === 'error') return <ErrorBox message="날씨를 불러오지 못했어요." detail={errorReasonKo(w.error)} onRetry={w.retry} />
+  if (w.status === 'error')
+    return (
+      <div className="max-w-2xl space-y-4">
+        <ErrorBox message="날씨 예보를 불러오지 못했어요." detail={errorReasonKo(w.error)} onRetry={w.retry} />
+        <ClimateCard place={place} dates={dates} reason="error" />
+      </div>
+    )
   if (w.status !== 'success') return <Loading label={`${place.name} 날씨 불러오는 중…`} />
 
   const { data: weather, stale, savedAt } = w.data
@@ -63,6 +70,7 @@ export function WeatherSection({ place, dates }: { place: Place; dates: TripDate
             : '여행 기간이 이미 지났어요. 아래는 지금부터 7일 예보예요.'}
         </Notice>
       )}
+      {tripAfterRange && <ClimateCard place={place} dates={dates} reason="range" />}
 
       {tips.length > 0 && (
         <ul className="space-y-1.5 border-l-2 border-teal-700 pl-4 text-sm text-stone-700">

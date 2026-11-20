@@ -42,6 +42,8 @@ function tx<T>(mode: IDBTransactionMode, fn: (s: IDBObjectStore) => IDBRequest<T
 
 export const getPhoto = (id: string) => tx<Blob | undefined>('readonly', (s) => s.get(id) as IDBRequest<Blob | undefined>)
 export const deletePhoto = (id: string) => tx('readwrite', (s) => s.delete(id)).catch(() => undefined)
+/** 백업에서 되살릴 때: 원래 아이디 그대로 저장 */
+export const putPhoto = (id: string, blob: Blob) => tx('readwrite', (s) => s.put(blob, id))
 export async function savePhoto(blob: Blob): Promise<string> {
   const id = `p-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`
   await tx('readwrite', (s) => s.put(blob, id))

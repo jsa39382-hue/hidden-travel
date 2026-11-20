@@ -1,5 +1,4 @@
-import tipsRaw from '../data/tips.json'
-import factsRaw from '../data/country-facts.json'
+import { useEffect, useState } from 'react'
 
 export interface Tip {
   lang: string
@@ -26,8 +25,23 @@ export interface Facts {
   tld?: string
 }
 
-export const TIPS = tipsRaw as unknown as Record<string, Tip>
-export const FACTS = factsRaw as unknown as Record<string, Facts>
+export type SurvivalData = typeof import('./survivalData')
+let loading: Promise<SurvivalData> | null = null
+/** 팁·생활 정보 데이터를 처음 필요할 때 불러온다 */
+export const loadSurvival = () => (loading ??= import('./survivalData'))
+
+/** 데이터가 준비되면 반환 (그 전에는 null) */
+export function useSurvival(): SurvivalData | null {
+  const [data, setData] = useState<SurvivalData | null>(null)
+  useEffect(() => {
+    let alive = true
+    loadSurvival().then((d) => alive && setData(d))
+    return () => {
+      alive = false
+    }
+  }, [])
+  return data
+}
 
 /** 한국 콘센트(C·F형, 220V) 기준 비교 */
 export function plugAdvice(f: Facts) {

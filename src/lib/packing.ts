@@ -1,5 +1,5 @@
 import type { DayWeather } from './weather'
-import { FACTS, TIPS } from './survival'
+import type { SurvivalData } from './survival'
 
 export interface PackItem {
   id: string
@@ -9,7 +9,8 @@ export interface PackItem {
 }
 
 /** 날씨·일수·인원·나라 정보로 짐 목록을 만든다 */
-export function makePackingList(opts: { countryCode: string; days: number; people: number; kids: number; weather: DayWeather[] }): PackItem[] {
+export function makePackingList(opts: { countryCode: string; days: number; people: number; kids: number; weather: DayWeather[]; data: Pick<SurvivalData, 'FACTS' | 'TIPS'> }): PackItem[] {
+  const { FACTS, TIPS } = opts.data
   const { countryCode, days, people, kids, weather } = opts
   const f = FACTS[countryCode] ?? {}
   const tip = TIPS[countryCode]

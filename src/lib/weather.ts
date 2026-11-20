@@ -1,5 +1,8 @@
 import { HOUR, HttpError, cachedJson, fetchJson } from './cache'
 
+// 무료 날씨 API는 하루 요청 한도가 있어서(같은 와이파이를 여러 명이 쓰면 금방 찬다) 예보를 3시간 저장한다
+const TTL = 3 * HOUR
+
 // Open-Meteo 응답 (2026-11 실제 호출로 확인)
 // {"timezone":"Asia/Tokyo","current":{"time":"2026-11-19T09:45","temperature_2m":12.4,"weather_code":2,"relative_humidity_2m":59,"wind_speed_10m":8.4},
 //  "daily":{"time":["2026-11-19",...],"weather_code":[2,...],"temperature_2m_max":[13.2,...],"temperature_2m_min":[7.6,...],
@@ -80,9 +83,9 @@ async function load(lat: number, lng: number): Promise<Weather> {
   }
 }
 
-/** 지점의 16일 예보 (1시간 캐시) */
+/** 지점의 16일 예보 (3시간 캐시, 실패하면 저장본) */
 export const getWeather = (lat: number, lng: number, force = false) =>
-  cachedJson(`weather:v3:${lat.toFixed(3)},${lng.toFixed(3)}`, HOUR, () => load(lat, lng), { force })
+  cachedJson(`weather:v3:${lat.toFixed(3)},${lng.toFixed(3)}`, TTL, () => load(lat, lng), { force })
 
 /** WMO 날씨 코드 → [이모지, 한국어] */
 export function describeWeather(code: number | null): [string, string] {
@@ -132,12 +135,12 @@ export function goldenHours(d: DayWeather) {
   return { sunrise: t(d.sunrise)!, sunset: t(d.sunset)!, morning: [t(d.sunrise)!, add(d.sunrise, 60)], evening: [add(d.sunset, -60), t(d.sunset)!] }
 }
 
-/** 여러 지점의 일별 예보를 한 번에 (Open-Meteo는 좌표를 쉼표로 이어 보내면 배열로 돌려준다, 1시간 캐시) */
+/** 여러 지점의 일별 예보를 한 번에 (Open-Meteo는 좌표를 쉼표로 이어 보내면 배열로 돌려준다, 3시간 캐시) */
 export function getWeatherMulti(points: [number, number][], force = false) {
   const key = 'weather-multi:v1:' + points.map(([a, b]) => `${a.toFixed(2)},${b.toFixed(2)}`).join(';')
   return cachedJson(
     key,
-    HOUR,
+    TTL,
     async () => {
       const url =
         'https://api.open-meteo.com/v1/forecast?' +

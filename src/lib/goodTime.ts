@@ -1,5 +1,6 @@
 import { HOUR, DAY, cachedJson, fetchJson } from './cache'
 import { getWeather, getWeatherMulti, type DayWeather } from './weather'
+import { climateForTrip } from './climate'
 import { getHolidaysForYears, type Holiday } from './holidays'
 import { getFestivals, overlapWithTrip } from './festivals'
 import { addDays, isWithin } from './dates'
@@ -75,6 +76,15 @@ export function weatherPart(days: DayWeather[] | undefined, dates: TripDates): P
   return { score: s, note: `낮 평균 ${avgMax}°${rainy ? ` · 비 올 확률 높은 날 ${rainy}일` : ' · 비 소식 적음'}` }
 }
 
+/** 예보가 없거나(막힘·16일 밖) 못 받았으면 위키백과 평년 기후로 점수를 낸다 */
+async function withClimate(p: Part, place: { lat: number; lng: number }, dates: TripDates): Promise<Part> {
+  if (p.score != null) return p
+  const c = await climateForTrip(place.lat, place.lng, dates).catch(() => null)
+  if (!c) return p
+  const cp = weatherPart(c.days, dates)
+  return cp.score == null ? p : { score: cp.score, note: `평년 기후(${c.city.name}) 기준 ${cp.note}` }
+}
+
 export function holidayPart(holidays: Holiday[] | undefined, dates: TripDates): Part {
   if (!holidays) return { score: null, note: '공휴일 정보를 불러오지 못했어요' }
   const off = [...new Set(holidays.filter((h) => h.dayOff && isWithin(h.date, dates.start, dates.end)).map((h) => h.date))]
@@ -107,7 +117,7 @@ export async function getGoodTime(country: Country, place: Place, dates: TripDat
     getFestivals(country.code),
   ])
   const fxP = country.currency === 'KRW' ? { score: null, note: '원화를 쓰는 나라예요' } : fxPart(fx.status === 'fulfilled' ? fx.value.data[country.currency] : undefined)
-  const wP = weatherPart(w.status === 'fulfilled' ? w.value.data.days : undefined, dates)
+  const wP = await withClimate(weatherPart(w.status === 'fulfilled' ? w.value.data.days : undefined, dates), place, dates)
   const hP = holidayPart(h.status === 'fulfilled' ? h.value.holidays : undefined, dates)
   const festivals = f.status === 'fulfilled' ? f.value.filter((x) => overlapWithTrip(x, dates.start, dates.end) === 'date').map((x) => x.name).slice(0, 3) : []
   return {
@@ -136,15 +146,16 @@ export async function rankCountries(list: { country: Country; place: Place }[], 
   const years = [...new Set([Number(dates.start.slice(0, 4)), Number(dates.end.slice(0, 4))])]
   const [fx, w] = await Promise.allSettled([getFxHistory(list.map((x) => x.country.currency)), getWeatherMulti(list.map((x) => [x.place.lat, x.place.lng]))])
   const hol = await Promise.allSettled(list.map((x) => getHolidaysForYears(x.country.code, years)))
-  return list
-    .map(({ country }, i) => {
+  const rows = await Promise.all(
+    list.map(async ({ country, place }, i) => {
       const fxP = fxPart(fx.status === 'fulfilled' ? fx.value.data[country.currency] : undefined)
-      const wP = weatherPart(w.status === 'fulfilled' ? w.value.data[i] : undefined, dates)
+      const wP = await withClimate(weatherPart(w.status === 'fulfilled' ? w.value.data[i] : undefined, dates), place, dates)
       const h = hol[i]
       const hP = holidayPart(h.status === 'fulfilled' ? h.value.holidays : undefined, dates)
       return { country, fx: fxP, weather: wP, holiday: hP, total: combine([{ part: fxP, weight: 40 }, { part: wP, weight: 35 }, { part: hP, weight: 25 }]) }
-    })
-    .sort((a, b) => (b.total ?? -1) - (a.total ?? -1))
+    }),
+  )
+  return rows.sort((a, b) => (b.total ?? -1) - (a.total ?? -1))
 }
 
 export { DAY }

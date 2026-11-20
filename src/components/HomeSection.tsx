@@ -4,7 +4,8 @@ import type { Country, Place, TripDates } from '../types'
 import { useAsync } from '../lib/useAsync'
 import { getGoodTime, grade, rankCountries, type Part } from '../lib/goodTime'
 import { getWeather, goldenHours } from '../lib/weather'
-import { FACTS, TIPS, plugAdvice, timeDiff, voltageAdvice } from '../lib/survival'
+import { plugAdvice, timeDiff, useSurvival, voltageAdvice, type SurvivalData } from '../lib/survival'
+import { climateForTrip } from '../lib/climate'
 import { makePackingList, type PackItem } from '../lib/packing'
 import { useStored } from '../lib/stored'
 import { COUNTRIES, POPULAR_CODES } from '../lib/countries'
@@ -84,9 +85,9 @@ function GoodTimeCard({ country, place, dates }: { country: Country; place: Plac
 
 // ---------------- 현지 생존 카드 ----------------
 
-function survivalRows(country: Country, offsetSec?: number) {
-  const f = FACTS[country.code] ?? {}
-  const tip = TIPS[country.code]
+function survivalRows(country: Country, offsetSec: number | undefined, sv: SurvivalData | null) {
+  const f = sv?.FACTS[country.code] ?? {}
+  const tip = sv?.TIPS[country.code]
   const td = timeDiff(offsetSec)
   return [
     ['시차', td?.value ?? '–'],
@@ -102,7 +103,8 @@ function survivalRows(country: Country, offsetSec?: number) {
 
 function SurvivalCard({ country, place }: { country: Country; place: Place }) {
   const w = useAsync(() => getWeather(place.lat, place.lng), [place.lat, place.lng])
-  const rows = survivalRows(country, w.status === 'success' ? w.data.data.utcOffsetSec : undefined)
+  const sv = useSurvival()
+  const rows = survivalRows(country, w.status === 'success' ? w.data.data.utcOffsetSec : undefined, sv)
   const [saving, setSaving] = useState(false)
   const save = async () => {
     setSaving(true)
@@ -267,8 +269,12 @@ function Packing({ country, place, dates }: { country: Country; place: Place; da
   const people = Math.max(1, party.party?.adults ?? 2)
   const kids = party.party?.kids ?? 0
   const days = Math.max(1, diffDays(dates.start, dates.end) + 1)
-  const weather = w.status === 'success' ? w.data.data.days.filter((d) => isWithin(d.date, dates.start, dates.end)) : []
-  const items = useMemo(() => makePackingList({ countryCode: country.code, days, people, kids, weather }), [country.code, days, people, kids, weather])
+  const forecast = useMemo(() => (w.status === 'success' ? w.data.data.days.filter((d) => isWithin(d.date, dates.start, dates.end)) : []), [w, dates.start, dates.end])
+  // 예보가 없으면(막힘·16일 밖) 평년 기후로 옷차림을 정한다
+  const climate = useAsync(() => climateForTrip(place.lat, place.lng, dates), [place.lat, place.lng, dates.start, dates.end])
+  const weather = forecast.length ? forecast : climate.status === 'success' && climate.data ? climate.data.days : forecast
+  const sv = useSurvival()
+  const items = useMemo(() => makePackingList({ countryCode: country.code, days, people, kids, weather, data: sv ?? { FACTS: {}, TIPS: {} } }), [country.code, days, people, kids, weather, sv])
   const [checked, setChecked] = useStored<string[]>(`hidden-travel:pack:${country.code}:${dates.start}`, [], Array.isArray)
   const [open, setOpen] = useState(false)
   const done = items.filter((i) => checked.includes(i.id)).length

@@ -8,7 +8,7 @@ import { getCountry } from '../lib/countries'
 import { readCache } from '../lib/cache'
 import { estimateAll } from '../lib/budgetFinder'
 import { Flag } from './Flag'
-import { countVisited, drawRetro } from './RetroSection'
+import { countVisited, drawRetro, readSpent } from './RetroSection'
 import { shareOrDownload } from './HomeSection'
 
 const GAP = 16
@@ -202,6 +202,8 @@ function SummaryCard({ list, onPick }: { list: TripMemory[]; onPick: (i: number)
   const t = today()
   const past = list.filter((m) => m.start <= t)
   const totalDays = past.reduce((a, m) => a + Math.max(1, diffDays(m.start, m.end) + 1), 0)
+  const compared = past.map(compareSpent).filter((c): c is NonNullable<typeof c> => !!c)
+  const avgDiff = compared.length ? compared.reduce((a, c) => a + c.diff, 0) / compared.length : null
   return (
     <div className="flex h-[30rem] flex-col rounded-3xl border border-stone-200 bg-white p-5">
       <p className="text-xs font-medium uppercase tracking-wider text-teal-700">나의 여행</p>
@@ -209,6 +211,15 @@ function SummaryCard({ list, onPick }: { list: TripMemory[]; onPick: (i: number)
         다녀온 나라 {countVisited(list, null)}개국
         <br />총 {totalDays}일
       </p>
+      {avgDiff != null && (
+        <p className="mt-2 text-sm text-stone-600">
+          비교한 여행 {compared.length}번, 예상보다 평균{' '}
+          <b className={avgDiff > 0 ? 'text-rose-600' : 'text-teal-700'}>
+            {Math.abs(Math.round(avgDiff * 100))}% {avgDiff > 0 ? '더' : '덜'}
+          </b>{' '}
+          썼어요
+        </p>
+      )}
       <ul className="no-scrollbar mt-5 flex-1 touch-pan-y space-y-1 overflow-y-auto">
         {list.map((m, i) => (
           <li key={m.id}>
@@ -252,12 +263,65 @@ function usePhotoUrl(id: string | undefined) {
   return url
 }
 
-/** 예정 여행의 예상 경비 (2명·보통, 저장된 USD 환율로 계산, 없으면 null) */
-function expectedCost(m: TripMemory) {
+/** 경비 탭에서 고른 인원·예산 스타일 (없으면 2명·보통) */
+function budgetPrefs(): { adults: number; tier: 0 | 1 | 2 } {
+  try {
+    const v = JSON.parse(localStorage.getItem('hidden-travel:budget') ?? '{}') as { party?: { type?: string; adults?: number }; tier?: number }
+    const p = v.party ?? {}
+    const adults = p.type === 'solo' ? 1 : p.type === 'couple' ? 2 : Math.max(1, p.adults ?? 2)
+    return { adults, tier: v.tier === 0 || v.tier === 2 ? v.tier : 1 }
+  } catch {
+    return { adults: 2, tier: 1 }
+  }
+}
+
+/** 예상 경비 (경비 탭 인원·스타일, 저장된 USD 환율로 계산, 없으면 null). local은 항공권을 뺀 현지 경비 */
+function estimateFor(m: TripMemory): { total: number; local: number; adults: number } | null {
   const usd = readCache<{ rates: Record<string, number> }>('rates:frankfurter:KRW', Infinity)?.data.rates.USD
   if (!usd) return null
   const days = Math.max(1, diffDays(m.start, m.end) + 1)
-  return estimateAll({ days, adults: 2, tier: 1, startDate: m.start, usdKrw: 1 / usd }).find((a) => a.country.code === m.code)?.total ?? null
+  const { adults, tier } = budgetPrefs()
+  const row = estimateAll({ days, adults, tier, startDate: m.start, usdKrw: 1 / usd }).find((a) => a.country.code === m.code)
+  return row ? { total: row.total, local: row.local, adults } : null
+}
+
+/** 실제로 쓴 돈: 정산 탭 기록을 매번 다시 읽는다 (카드를 만든 뒤에 추가한 지출도 반영) */
+const spentOf = (m: TripMemory) => readSpent(m.code, m.start) || m.spent || 0
+const man = (krw: number) => `${Math.round(krw / 10000).toLocaleString('ko-KR')}만 원`
+
+/** 예상 현지 경비와 실제 지출 비교 */
+function compareSpent(m: TripMemory) {
+  const spent = spentOf(m)
+  const est = estimateFor(m)
+  if (!spent || !est || est.local <= 0) return null
+  const diff = (spent - est.local) / est.local
+  return { spent, expected: est.local, adults: est.adults, diff }
+}
+
+function SpentCompare({ c }: { c: NonNullable<ReturnType<typeof compareSpent>> }) {
+  const max = Math.max(c.spent, c.expected)
+  const pct = Math.round(Math.abs(c.diff) * 100)
+  const verdict = pct < 5 ? '예상과 거의 같게 썼어요' : c.diff > 0 ? `예상보다 ${pct}% 더 썼어요` : `예상보다 ${pct}% 덜 썼어요`
+  return (
+    <div className="mt-1 space-y-1 text-xs" aria-label={`실제 ${man(c.spent)}, 예상 ${man(c.expected)}, ${verdict}`}>
+      <p className="text-sm">
+        <span className="text-xs text-stone-500">쓴 돈 </span>
+        <b>{man(c.spent)}</b> <span className={pct < 5 ? 'text-stone-500' : c.diff > 0 ? 'text-rose-600' : 'text-teal-700'}>· {verdict}</span>
+      </p>
+      {[
+        ['실제', c.spent, 'bg-stone-900'],
+        ['예상', c.expected, 'bg-stone-400'],
+      ].map(([label, v, color]) => (
+        <div key={label as string} className="flex items-center gap-2">
+          <span className="w-7 text-stone-500">{label}</span>
+          <span className="h-1.5 flex-1 overflow-hidden rounded-full bg-stone-100">
+            <span className={`block h-full rounded-full ${color}`} style={{ width: `${((v as number) / max) * 100}%` }} />
+          </span>
+        </div>
+      ))}
+      <p className="text-[10px] text-stone-400">예상은 항공권을 뺀 현지 경비({c.adults}명, 경비 탭 설정 기준), 실제는 정산 탭 기록이에요</p>
+    </div>
+  )
 }
 
 function TripCard({ m, all, canPhoto, onUpdate, onDelete }: { m: TripMemory; all: TripMemory[]; canPhoto: boolean; onUpdate: (id: string, p: Partial<TripMemory>) => void; onDelete: (m: TripMemory) => void }) {
@@ -270,14 +334,16 @@ function TripCard({ m, all, canPhoto, onUpdate, onDelete }: { m: TripMemory; all
   const [msg, setMsg] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
   const days = Math.max(1, diffDays(m.start, m.end) + 1)
-  const expected = planned ? expectedCost(m) : null
+  const expected = planned ? (estimateFor(m)?.total ?? null) : null
+  const compare = planned ? null : compareSpent(m)
+  const spent = planned ? 0 : spentOf(m)
   const country = getCountry(m.code)
 
   const share = async () => {
     setBusy('share')
     try {
       const first = m.photoIds[0] ? await getPhoto(m.photoIds[0]).catch(() => undefined) : undefined
-      const blob = await drawRetro(m, { countries: countVisited(all, null), photo: first ?? null, planned, expected })
+      const blob = await drawRetro({ ...m, spent: planned ? m.spent : spentOf(m) || null }, { countries: countVisited(all, null), photo: first ?? null, planned, expected })
       await shareOrDownload(blob, `숨은여행-${m.name}-${m.start}.png`)
     } finally {
       setBusy(null)
@@ -373,10 +439,15 @@ function TripCard({ m, all, canPhoto, onUpdate, onDelete }: { m: TripMemory; all
             </button>
           )}
         </div>
-        <p className="mt-1 text-sm">
-          <span className="text-xs text-stone-500">{planned ? '예상 경비 ' : '쓴 돈 '}</span>
-          <b>{planned ? (expected ? `약 ${Math.round(expected / 10000).toLocaleString('ko-KR')}만 원` : '환율을 불러오면 계산돼요') : m.spent ? `${Math.round(m.spent).toLocaleString('ko-KR')}원` : '기록 없음'}</b>
-        </p>
+        {compare ? (
+          <SpentCompare c={compare} />
+        ) : (
+          <p className="mt-1 text-sm">
+            <span className="text-xs text-stone-500">{planned ? '예상 경비 ' : '쓴 돈 '}</span>
+            <b>{planned ? (expected ? `약 ${man(expected)}` : '환율을 불러오면 계산돼요') : spent ? `${Math.round(spent).toLocaleString('ko-KR')}원` : '기록 없음'}</b>
+            {!planned && !spent && <span className="block text-[11px] text-stone-400">정산 탭에 지출을 적으면 예상 경비와 비교해 드려요</span>}
+          </p>
+        )}
         {msg && <p className="mt-1 text-[11px] text-amber-700">{msg}</p>}
         <div className="mt-3 flex flex-wrap gap-1.5 text-xs">
           <button type="button" onClick={share} disabled={busy !== null} className="rounded-full bg-stone-900 px-3 py-1.5 font-semibold text-stone-50 disabled:opacity-50">

@@ -17,6 +17,7 @@ import { diffDays, formatKo } from './lib/dates'
 import type { Country, Place, TripDates } from './types'
 
 // 처음 화면(홈) 밖의 화면은 처음 열 때 불러온다 (첫 로딩을 가볍게)
+const BackupPanel = lazy(() => import('./components/BackupPanel'))
 const ExchangeCalculator = lazy(() => import('./components/ExchangeCalculator').then((m) => ({ default: m.ExchangeCalculator })))
 const CalendarSection = lazy(() => import('./components/CalendarSection').then((m) => ({ default: m.CalendarSection })))
 const BudgetCalculator = lazy(() => import('./components/BudgetCalculator').then((m) => ({ default: m.BudgetCalculator })))
@@ -386,8 +387,19 @@ function Brand({ onClick }: { onClick: () => void }) {
 
 function Footer({ compact }: { compact?: boolean }) {
   const [kb, setKb] = useState(cacheSizeKb)
+  const [backup, setBackup] = useState(false)
   return (
     <footer className={`space-y-2 text-[11px] leading-relaxed text-stone-400 ${compact ? '' : 'text-center'}`}>
+      <p>
+        <button type="button" aria-expanded={backup} onClick={() => setBackup((v) => !v)} className="rounded-full border border-stone-300 px-3 py-1.5 text-xs font-medium text-stone-700">
+          {backup ? '백업 닫기' : '내 기록 백업·옮기기'}
+        </button>
+      </p>
+      {backup && (
+        <Suspense fallback={<p>불러오는 중…</p>}>
+          <BackupPanel />
+        </Suspense>
+      )}
       <p>
         API 응답을 이 기기에 저장해 다시 써요 (약 {kb}KB).{' '}
         <button
