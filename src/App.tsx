@@ -7,7 +7,7 @@ import { PlacePicker } from './components/PlacePicker'
 import { HomeSection } from './components/HomeSection'
 import { Onboarding } from './components/Onboarding'
 import { SectionBoundary } from './components/SectionBoundary'
-import { OfflineBanner } from './components/OfflineBanner'
+import { PwaStatus } from './components/PwaStatus'
 import { Diagnostics } from './components/Diagnostics'
 import { Icon } from './components/Icon'
 import { Loading } from './components/Status'
@@ -67,7 +67,7 @@ export default function App() {
       ) : (
         <Onboarding dates={trip.dates} setCountry={trip.setCountry} setDates={trip.setDates} footer={<Footer />} />
       )}
-      <OfflineBanner />
+      <PwaStatus />
     </div>
   )
 }
