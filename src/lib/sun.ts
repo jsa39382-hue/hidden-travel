@@ -90,3 +90,36 @@ export function sunTimes(date: string, lat: number, lng: number): { sunrise: Dat
 export function localHHMM(d: Date, timeZone: string) {
   return new Intl.DateTimeFormat('en-GB', { timeZone, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(d)
 }
+
+/**
+ * 해의 방위각(북쪽 0°, 시계 방향)과 고도(°). 사진 방향 안내용이라 1° 안팎 오차는 괜찮다.
+ * 계산: 태양 적위·시간각으로 구하는 표준 천문식 (SunCalc와 같은 방식)
+ */
+export function sunPosition(at: Date, lat: number, lng: number): { azimuth: number; altitude: number } {
+  const d = at.getTime() / 86400000 + J1970 - J2000
+  const M = (357.5291 + 0.98560028 * d) * rad
+  const C = (1.9148 * Math.sin(M) + 0.02 * Math.sin(2 * M) + 0.0003 * Math.sin(3 * M)) * rad
+  const L = M + C + (102.9372 + 180) * rad
+  const e = 23.4397 * rad
+  const dec = Math.asin(Math.sin(e) * Math.sin(L))
+  const ra = Math.atan2(Math.sin(L) * Math.cos(e), Math.cos(L))
+  const sidereal = (280.16 + 360.9856235 * d) * rad + lng * rad
+  const H = sidereal - ra
+  const phi = lat * rad
+  const az = Math.atan2(Math.sin(H), Math.cos(H) * Math.sin(phi) - Math.tan(dec) * Math.cos(phi)) // 남쪽 기준
+  const alt = Math.asin(Math.sin(phi) * Math.sin(dec) + Math.cos(phi) * Math.cos(dec) * Math.cos(H))
+  return { azimuth: ((az / rad + 180) % 360 + 360) % 360, altitude: alt / rad }
+}
+
+const DIRS = ['북', '북북동', '북동', '동북동', '동', '동남동', '남동', '남남동', '남', '남남서', '남서', '서남서', '서', '서북서', '북서', '북북서']
+/** 방위각 → "서남서" */
+export const compassKo = (deg: number) => DIRS[Math.round((((deg % 360) + 360) % 360) / 22.5) % 16]
+
+/** 그날 골든아워 한가운데(일출 30분 뒤·일몰 30분 전)의 해 방향 */
+export function goldenSun(date: string, lat: number, lng: number) {
+  const s = sunTimes(date, lat, lng)
+  if (!s) return null
+  const morningAt = new Date(s.sunrise.getTime() + 30 * 60000)
+  const eveningAt = new Date(s.sunset.getTime() - 30 * 60000)
+  return { sunrise: s.sunrise, sunset: s.sunset, morning: sunPosition(morningAt, lat, lng), evening: sunPosition(eveningAt, lat, lng) }
+}

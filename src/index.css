@@ -161,3 +161,6 @@ body { @apply bg-stone-50 text-stone-900 antialiased; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
 }
+/* 산책 코스 번호 (지도 위 숫자) */
+.leaflet-tooltip.route-num { background: transparent; border: 0; box-shadow: none; color: #0a0a0a; font-weight: 800; font-size: 12px; padding: 0; }
+.leaflet-tooltip.route-num::before { display: none; }

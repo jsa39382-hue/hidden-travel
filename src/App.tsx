@@ -279,7 +279,7 @@ function View({ id, country, dates, place, active, onPickCountry }: { id: string
     case 'plan':
       return <PlannerSection country={country} place={place} dates={dates} />
     case 'spots':
-      return <SpotsSection country={country} place={place} active={active} />
+      return <SpotsSection country={country} place={place} dates={dates} active={active} />
     case 'budget':
       return <BudgetCalculator country={country} dates={dates} place={place} />
     case 'exchange':

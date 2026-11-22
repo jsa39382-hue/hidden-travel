@@ -1,5 +1,7 @@
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react'
-import type { Country, Place } from '../types'
+import type { Country, Place, TripDates } from '../types'
+import { WalkCourse, type WalkView } from './WalkCourse'
+import { compassKo, goldenSun } from '../lib/sun'
 import { useAsync } from '../lib/useAsync'
 import { errorReasonKo } from '../lib/cache'
 import { getSummary, photoUrl, splitSpots, useSpots, type Spot } from '../lib/spots'
@@ -26,8 +28,9 @@ interface LodgingCenter {
   lng: number
 }
 
-export function SpotsSection({ country, place, active = true }: { country: Country; place: Place; active?: boolean }) {
-  const [view, setView] = useState<'spots' | 'nearby'>('spots')
+export function SpotsSection({ country, place, dates, active = true }: { country: Country; place: Place; dates: TripDates; active?: boolean }) {
+  const [view, setView] = useState<'spots' | 'nearby' | 'walk'>('spots')
+  const [walk, setWalk] = useState<WalkView | null>(null)
   const [radius, setRadius] = useState<(typeof RADII)[number]>(10)
   const [tab, setTab] = useState<'hidden' | 'famous' | 'saved'>('hidden')
   const [shown, setShown] = useState(PAGE)
@@ -58,6 +61,10 @@ export function SpotsSection({ country, place, active = true }: { country: Count
     return wl.wish.liked.map((x) => byId.get(x.id) ?? ({ ...x, hiddenScore: 0, interest: 0, distKm: NaN, category: 'other' } as unknown as Spot))
   }, [wl.wish.liked, sp.spots])
   const list = tab === 'saved' ? saved : split[tab]
+  // 사진 가이드: 여행 첫날 골든아워의 해 방향 (도시 안에서는 거의 같다)
+  const sunInfo = useMemo(() => goldenSun(dates.start, place.lat, place.lng), [dates.start, place.lat, place.lng])
+  const selectedSpot = view === 'spots' && selected ? list.find((s) => s.id === selected) : undefined
+  const selSun = selectedSpot && sunInfo ? { from: [selectedSpot.lat, selectedSpot.lng] as [number, number], azimuth: sunInfo.evening.azimuth, label: `☀ 저녁 해 · ${compassKo(sunInfo.evening.azimuth)}` } : null
   const visible = list.slice(0, shown)
   const near = nearby.status === 'success' ? nearby.data.data : null
   const lodgings = near && view === 'nearby' && nearTab === 'lodging' ? near.lodgings.slice(0, 30) : []
@@ -104,10 +111,11 @@ export function SpotsSection({ country, place, active = true }: { country: Count
           onChange={(v) => (setView(v), setSelected(undefined), setFocus(null))}
           options={[
             ['spots', '명소'],
+            ['walk', '산책 코스'],
             ['nearby', '숙소·식당'],
           ]}
         />
-        {view === 'spots' ? (
+        {view !== 'nearby' ? (
           <div className="flex items-center gap-1 text-xs" role="group" aria-label="검색 반경">
             <span className="mr-1 text-stone-500">반경</span>
             {RADII.map((r) => (
@@ -139,6 +147,8 @@ export function SpotsSection({ country, place, active = true }: { country: Count
               center={mapCenter}
               radiusKm={view === 'nearby' ? 1.5 : radius}
               spots={view === 'spots' ? visible : []}
+              route={view === 'walk' ? walk?.course.stops.map((st) => st.spot) : undefined}
+              sun={view === 'walk' ? walk?.sun : selSun}
               spotColor={COLORS[tab]}
               lodgings={lodgings}
               eateries={eateries}
@@ -151,7 +161,12 @@ export function SpotsSection({ country, place, active = true }: { country: Count
             />
           </Suspense>
           <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-stone-500">
-            {view === 'spots' ? (
+            {view === 'walk' ? (
+              <>
+                <Legend color="#2dd4bf" label="코스 순서" />
+                <Legend color="#fbbf24" label="골든아워 도착지·해 방향" />
+              </>
+            ) : view === 'spots' ? (
               <>
                 <Legend color={COLORS[tab]} label={tab === 'hidden' ? '숨은 명소' : tab === 'famous' ? '유명 명소' : '관심 목록'} />
                 {tab !== 'saved' && likedIds.size > 0 && <Legend color={COLORS.saved} label="관심 목록" />}
@@ -167,7 +182,9 @@ export function SpotsSection({ country, place, active = true }: { country: Count
 
         {/* 목록 */}
         <div ref={listRef} className="min-w-0 lg:order-1">
-          {view === 'spots' ? (
+          {view === 'walk' ? (
+            <WalkCourse country={country} place={place} dates={dates} spots={sp.spots} likedIds={likedIds} onChange={setWalk} onShowOnMap={showOnMap} />
+          ) : view === 'spots' ? (
             <>
               <Underline
                 value={tab}
@@ -217,7 +234,7 @@ export function SpotsSection({ country, place, active = true }: { country: Count
                     ) : (
                       <ul className="space-y-3">
                         {visible.map((s) => (
-                          <SpotCard key={s.id} spot={s} countryCode={country.code} selected={s.id === selected} onMap={() => showOnMap(s)} onLodging={() => nearbyOf(s)} liked={likedIds.has(s.id)} onToggleLike={() => wl.toggle(s)} />
+                          <SpotCard key={s.id} spot={s} countryCode={country.code} selected={s.id === selected} onMap={() => showOnMap(s)} onLodging={() => nearbyOf(s)} liked={likedIds.has(s.id)} onToggleLike={() => wl.toggle(s)} sun={sunInfo} />
                         ))}
                       </ul>
                     )}
@@ -335,7 +352,7 @@ function fameLabel(s: Spot) {
   }
 }
 
-function SpotCard({ spot, selected, onMap, onLodging, countryCode, liked, onToggleLike }: { spot: Spot; selected: boolean; onMap: () => void; onLodging: () => void; countryCode: string; liked: boolean; onToggleLike: () => void }) {
+function SpotCard({ spot, selected, onMap, onLodging, countryCode, liked, onToggleLike, sun }: { spot: Spot; selected: boolean; onMap: () => void; onLodging: () => void; countryCode: string; liked: boolean; onToggleLike: () => void; sun?: ReturnType<typeof goldenSun> }) {
   const [open, setOpen] = useState(false)
   const hasWiki = !!(spot.koTitle || spot.enTitle || (spot.wiki && ['ko', 'en'].includes(spot.wiki.lang)))
   const sum = useAsync(hasWiki ? () => getSummary(spot) : null, [spot.id])
@@ -396,6 +413,11 @@ function SpotCard({ spot, selected, onMap, onLodging, countryCode, liked, onTogg
 
       {open && (
         <div className="space-y-3 border-t border-stone-200 px-4 py-3 text-sm">
+          {sun && (
+            <p className="rounded-xl bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-800">
+              📷 골든아워 해 방향 — 아침 <b>{compassKo(sun.morning.azimuth)}</b>, 저녁 <b>{compassKo(sun.evening.azimuth)}</b>. 해를 등지면 밝고 또렷하게, 해를 바라보면 실루엣으로 찍혀요. 지도의 노란 화살표가 저녁 해 쪽이에요.
+            </p>
+          )}
           {details.status === 'loading' && <p className="text-xs text-stone-400">자세한 정보 불러오는 중…</p>}
           {details.status === 'error' && (
             <p className="text-xs text-stone-400">

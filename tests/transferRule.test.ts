@@ -107,3 +107,21 @@ test('일출·일몰 계산: 알려진 값과 2분 안', async () => {
     assert.ok(Math.abs(min(localHHMM(s.sunset, tz)) - min(set)) <= 2, `${code} 일몰 ${localHHMM(s.sunset, tz)}`)
   }
 })
+
+test('숨은 산책 코스: 걸을 만한 거리로 잇고, 마지막 도착을 골든아워에 맞춤', async () => {
+  const { planWalk, scheduleWalk, explorerLevel } = await import('../src/lib/walk.ts')
+  // 예시 명소 (도쿄역 주변 가상의 좌표·점수)
+  const S = (id: string, lat: number, lng: number, hiddenScore: number) => ({ id, name: id, kind: '명소', lat, lng, hiddenScore })
+  const spots = [S('a', 35.681, 139.767, 80), S('b', 35.684, 139.771, 70), S('c', 35.687, 139.774, 75), S('d', 35.69, 139.78, 60), S('far', 35.75, 139.9, 99)]
+  const route = planWalk(spots, [35.681, 139.767], { stops: 4 })
+  assert.equal(route[0].id, 'a') // 중심 근처에서 가장 숨은 곳부터
+  assert.ok(!route.some((s) => s.id === 'far')) // 너무 먼 곳은 빼기
+  const c = scheduleWalk(route, 16 * 60 + 20)!
+  assert.equal(c.end, 16 * 60 + 20)
+  assert.equal(c.stops[c.stops.length - 1].arrive, 16 * 60 + 20) // 마지막 도착 = 골든아워
+  assert.ok(c.totalKm < 6)
+  // 관심 목록 가산점으로 다른 곳이 먼저 뽑힘
+  assert.equal(planWalk(spots, [35.681, 139.767], { liked: new Set(['c']) })[0].id, 'c')
+  assert.deepEqual(explorerLevel([80, 82]), { level: 5, title: '전설의 숨은 탐험가', avg: 81 })
+  assert.equal(explorerLevel([]), null)
+})
