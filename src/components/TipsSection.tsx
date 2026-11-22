@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { plugAdvice, timeDiff, voltageAdvice } from '../lib/survival'
 import { FACTS, TIPS } from '../lib/survivalData'
 import { timeZoneFor, tzOffsetSec } from '../lib/sun'
+import { Phrases } from './Phrases'
 import type { Country, Place } from '../types'
 import { useAsync } from '../lib/useAsync'
 import { getWeather } from '../lib/weather'
@@ -31,17 +32,6 @@ function areaNote(km2: number) {
   return r >= 1.2 ? `한국의 약 ${r >= 10 ? Math.round(r) : r.toFixed(1)}배` : r <= 0.8 ? `한국의 약 ${Math.round(r * 100)}%` : '한국과 비슷해요'
 }
 
-function speak(text: string, lang: string) {
-  try {
-    const u = new SpeechSynthesisUtterance(text)
-    u.lang = lang
-    u.rate = 0.85
-    speechSynthesis.cancel()
-    speechSynthesis.speak(u)
-  } catch {
-    /* 음성 읽기를 지원하지 않는 브라우저 */
-  }
-}
 
 export function TipsSection({ country, place }: { country: Country; place: Place }) {
   const tip = TIPS[country.code]
@@ -151,28 +141,7 @@ export function TipsSection({ country, place }: { country: Country; place: Place
           </div>
 
           <div>
-            <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-stone-500">기본 표현</h3>
-            <ul className="divide-y divide-stone-200 rounded-2xl border border-stone-200">
-              {tip.phrases.map((p) => (
-                <li key={p.ko} className="flex items-center gap-3 px-4 py-3">
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs text-stone-500">{p.ko}</p>
-                    <p className="mt-0.5 font-semibold">{p.say}</p>
-                    <p className="truncate text-sm text-stone-500">{p.local}</p>
-                  </div>
-                  {canSpeak && (
-                    <button
-                      type="button"
-                      onClick={() => speak(p.local.split(' / ')[0], tip.lang)}
-                      aria-label={`${p.ko} 발음 듣기`}
-                      className="shrink-0 rounded-full border border-stone-300 px-3 py-1.5 text-xs text-stone-700 active:bg-stone-100"
-                    >
-                      듣기
-                    </button>
-                  )}
-                </li>
-              ))}
-            </ul>
+            <Phrases phrases={tip.phrases} lang={tip.lang} title="기본 표현 (듣기·크게 보여 주기)" />
             {canSpeak && <p className="mt-2 text-[11px] text-stone-400">'듣기'는 기기에 설치된 음성으로 읽어요. 해당 언어 음성이 없으면 소리가 나지 않을 수 있어요.</p>}
           </div>
         </>

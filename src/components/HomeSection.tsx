@@ -6,6 +6,7 @@ import { getGoodTime, grade, rankCountries, type Part } from '../lib/goodTime'
 import { getWeather } from '../lib/weather'
 import { plugAdvice, timeDiff, useSurvival, voltageAdvice, type SurvivalData } from '../lib/survival'
 import { climateForTrip } from '../lib/climate'
+import { Phrases } from './Phrases'
 import { partyNumbers, usePartyPrefs } from '../lib/party'
 import { localHHMM, sunTimes, timeZoneFor, tzOffsetSec } from '../lib/sun'
 import { makePackingList, type PackItem } from '../lib/packing'
@@ -140,6 +141,12 @@ function SurvivalCard({ country, place }: { country: Country; place: Place }) {
           </div>
         ))}
       </dl>
+      {/* 택시·식당에서 바로 쓰는 문장: 듣기 + 크게 보여 주기 */}
+      {sv?.TIPS[country.code]?.phrases?.length ? (
+        <div className="mt-5">
+          <Phrases phrases={sv.TIPS[country.code].phrases} lang={sv.TIPS[country.code].lang} />
+        </div>
+      ) : null}
     </div>
   )
 }
