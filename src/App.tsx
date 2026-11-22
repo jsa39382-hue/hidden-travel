@@ -9,6 +9,7 @@ import { Onboarding } from './components/Onboarding'
 import { SectionBoundary } from './components/SectionBoundary'
 import { PwaStatus } from './components/PwaStatus'
 import { PartyChip } from './components/PartyControls'
+import { SharedWishImport, ShareTrip } from './components/ShareTrip'
 import { Diagnostics } from './components/Diagnostics'
 import { Icon } from './components/Icon'
 import { Loading } from './components/Status'
@@ -117,6 +118,7 @@ function Shell({ country, dates, place, setCountry, setDates, setPlace }: ShellP
 
   return (
     <div className="xl:grid xl:grid-cols-[340px_minmax(0,1fr)]">
+      <SharedWishImport place={place} />
       {/* 컴퓨터: 왼쪽 고정 사이드바 */}
       <aside className="hidden xl:sticky xl:top-0 xl:flex xl:h-dvh xl:flex-col xl:overflow-y-auto xl:border-r xl:border-stone-200 xl:px-6 xl:py-7">
         <Brand onClick={() => setCountry(null)} />
@@ -139,7 +141,10 @@ function Shell({ country, dates, place, setCountry, setDates, setPlace }: ShellP
           <p className="mb-4 text-[11px] font-medium uppercase tracking-wider text-stone-400">여행 설정</p>
           <div className="mb-5">
             <p className="mb-1.5 text-sm text-stone-600">인원·예산</p>
-            <PartyChip align="left" />
+            <div className="flex items-center gap-2">
+              <PartyChip align="left" />
+              <ShareTrip country={country} place={place} dates={dates} />
+            </div>
           </div>
           {setup}
         </div>
@@ -164,6 +169,7 @@ function Shell({ country, dates, place, setCountry, setDates, setPlace }: ShellP
               </span>
             </button>
             <PartyChip />
+            <ShareTrip country={country} place={place} dates={dates} />
             <button type="button" onClick={() => setEditing(true)} aria-label="나라·도시·날짜 변경" className="flex h-9 items-center gap-1.5 rounded-full border border-stone-300 px-2.5 text-xs font-medium text-stone-700 sm:px-3">
               <Icon name="edit" className="size-3.5" />
               <span className="hidden sm:inline">변경</span>
