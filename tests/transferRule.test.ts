@@ -125,3 +125,19 @@ test('숨은 산책 코스: 걸을 만한 거리로 잇고, 마지막 도착을 
   assert.deepEqual(explorerLevel([80, 82]), { level: 5, title: '전설의 숨은 탐험가', avg: 81 })
   assert.equal(explorerLevel([]), null)
 })
+
+test('캘린더(.ics): 현지 시각을 UTC로, 일정마다 VEVENT', async () => {
+  const { planToIcs, localToUtcStamp } = await import('../src/lib/ics.ts')
+  assert.equal(localToUtcStamp('2026-12-10', '09:30', 'Asia/Tokyo'), '20261210T003000Z') // 도쿄 UTC+9
+  assert.equal(localToUtcStamp('2026-07-04', '09:00', 'America/New_York'), '20260704T130000Z') // 뉴욕 서머타임 UTC-4
+  const plan = { recommended: [], warnings: [], days: [{ date: '2026-12-10', dayIndex: 0, notes: [], items: [
+    { time: '09:30', kind: 'spot', title: '숨은 신사, 작은 정원', detail: '신사 · 약 1시간', lat: 35.68, lng: 139.77 },
+    { time: '10:40', kind: 'move', title: '이동' },
+    { time: '11:00', kind: 'lunch', title: '라멘집' },
+  ] }] }
+  const ics = planToIcs(plan as never, { placeName: '도쿄', countryName: '일본', timeZone: 'Asia/Tokyo' })
+  assert.equal((ics.match(/BEGIN:VEVENT/g) ?? []).length, 2) // 이동은 빼기
+  assert.ok(ics.includes('DTSTART:20261210T003000Z') && ics.includes('DTEND:20261210T020000Z'))
+  assert.ok(ics.includes('숨은 신사\\, 작은 정원')) // 쉼표 이스케이프
+  assert.ok(ics.split('\r\n').every((l) => new TextEncoder().encode(l).length <= 75)) // 줄 길이 제한
+})

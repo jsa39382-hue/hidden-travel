@@ -7,6 +7,8 @@ import { getWeather } from '../lib/weather'
 import { getHolidaysForYears } from '../lib/holidays'
 import { getFestivals } from '../lib/festivals'
 import { STYLE_CHIPS, makePlan, parseStyle, planToText, type PlanDay } from '../lib/planner'
+import { planToIcs } from '../lib/ics'
+import { timeZoneFor } from '../lib/sun'
 import { placeKeyOf, useWishlist } from '../lib/wishlist'
 import { splitSpots } from '../lib/spots'
 import { SwipeDeck } from './SwipeDeck'
@@ -212,6 +214,31 @@ function PlanResult({
     }
   }
 
+  // 캘린더 파일(.ics): 휴대폰은 공유 시트(캘린더 앱으로 열기), 안 되면 내려받기
+  const tz = timeZoneFor(country.code, place.lat, place.lng)
+  const toCalendar = async () => {
+    if (!tz) return
+    const ics = planToIcs(plan, { placeName: place.name, countryName: country.nameKo, timeZone: tz })
+    const name = `hidden-travel-${country.code}-${dates.start}.ics`
+    const file = new File([ics], name, { type: 'text/calendar' })
+    try {
+      if (navigator.canShare?.({ files: [file] })) {
+        await navigator.share({ files: [file], title: '숨은여행 일정' })
+        return
+      }
+    } catch (e) {
+      if ((e as Error).name === 'AbortError') return
+    }
+    const url = URL.createObjectURL(file)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = name
+    document.body.append(a)
+    a.click()
+    a.remove()
+    setTimeout(() => URL.revokeObjectURL(url), 5000)
+  }
+
   return (
     <div className="space-y-5">
       {sp.famePending && <p className="text-xs text-stone-500">위키 조회수 확인이 끝나면 숨은 정도가 반영돼 계획이 조금 바뀔 수 있어요.</p>}
@@ -239,9 +266,16 @@ function PlanResult({
       <div>
         <div className="mb-2 flex items-center justify-between">
           <h3 className="text-sm font-semibold uppercase tracking-wider text-stone-500">일정표</h3>
-          <button type="button" onClick={copy} className="rounded-full bg-stone-100 px-3 py-1.5 text-xs font-medium active:bg-stone-200">
-            {copied ? '복사했어요' : '일정 복사·공유'}
-          </button>
+          <span className="flex gap-1.5">
+            {tz && (
+              <button type="button" onClick={toCalendar} className="rounded-full bg-stone-100 px-3 py-1.5 text-xs font-medium active:bg-stone-200" aria-label="일정을 캘린더 파일(.ics)로 저장">
+                📅 캘린더에 추가
+              </button>
+            )}
+            <button type="button" onClick={copy} className="rounded-full bg-stone-100 px-3 py-1.5 text-xs font-medium active:bg-stone-200">
+              {copied ? '복사했어요' : '일정 복사·공유'}
+            </button>
+          </span>
         </div>
         <div className="space-y-3">
           {plan.days.map((d) => (
