@@ -15,6 +15,8 @@ export interface TripMemory {
   memo: string
   photoIds: string[]
   updatedAt: number
+  /** 숨은 탐험가 등급 (관심 목록의 평균 숨은 정도) */
+  explorer?: { level: number; title: string; avg: number } | null
 }
 
 export const MEMORY_KEY = 'hidden-travel:memories'

@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react'
 import { motion } from 'motion/react'
 import type { Country, Place, TripDates } from '../types'
 import { placeKeyOf, useWishlist } from '../lib/wishlist'
+import { explorerLevel } from '../lib/walk'
+import { ExplorerBadge } from './ExplorerBadge'
 import { useMemories, type TripMemory } from '../lib/memories'
 import { MemoryCarousel } from './MemoryCarousel'
 import { commonsDirectThumb } from '../lib/md5'
@@ -32,7 +34,8 @@ export function RetroSection({ country, place, dates }: { country: Country; plac
     try {
       // 명소: 관심 목록(명소 카드의 하트 + 일정 탭 카드 넘기기의 '가고 싶다'는 같은 목록)
       const spots = wish.liked.slice(0, 4).map((s) => ({ id: s.id, name: s.name, ...(s.image ? { image: s.image } : {}) }))
-      const data = { code: country.code, name: country.nameKo, place: { name: place.name, lat: place.lat, lng: place.lng }, start: dates.start, end: dates.end, spots, spent: spent || null }
+      const explorer = explorerLevel(wish.liked.map((s) => s.hiddenScore).filter((v): v is number => typeof v === 'number'))
+      const data = { code: country.code, name: country.nameKo, place: { name: place.name, lat: place.lat, lng: place.lng }, start: dates.start, end: dates.end, spots, spent: spent || null, explorer }
       memories.upsert(data)
       const memory: TripMemory = { id: existing?.id ?? 'new', memo: existing?.memo ?? '', photoIds: existing?.photoIds ?? [], updatedAt: Date.now(), ...data }
       const b = await drawRetro(memory, { countries })
@@ -59,6 +62,7 @@ export function RetroSection({ country, place, dates }: { country: Country; plac
             <Stat label="이번 여행" value={days} suffix="일" />
             <Stat label="관심 목록" value={wish.liked.length} suffix="곳" />
           </div>
+          <ExplorerBadge scores={wish.liked.map((s) => s.hiddenScore).filter((v): v is number => typeof v === 'number')} />
           <div className="rounded-2xl border border-stone-200 p-4 text-sm text-stone-600">
             <p>
               카드에 들어가는 것: 나라·도시·날짜, <b className="text-stone-800">관심 목록(♥)에 넣은 명소</b>(최대 4곳),{' '}
@@ -167,6 +171,18 @@ export async function drawRetro(m: TripMemory, opts: { countries: number; photo?
   x.fillStyle = '#5eead4'
   x.font = '600 36px system-ui, sans-serif'
   x.fillText(`HIDDEN TRAVEL · ${opts.planned ? '여행 예정' : '여행 회고'}`, 90, 150)
+  // 숨은 탐험가 등급 (오른쪽 위 배지)
+  if (m.explorer) {
+    const text = `Lv.${m.explorer.level} ${m.explorer.title}`
+    x.font = '700 34px system-ui, sans-serif'
+    const tw = x.measureText(text).width
+    const bx = W - 90 - tw - 56
+    x.fillStyle = '#fbbf24'
+    roundRect(x, bx, 104, tw + 56, 64, 32)
+    x.fill()
+    x.fillStyle = '#0a0a0a'
+    x.fillText(text, bx + 28, 148)
+  }
   x.fillStyle = '#fafafa'
   x.font = '800 132px system-ui, sans-serif'
   x.fillText(clip(x, m.name, W - 180), 90, 310)

@@ -1,6 +1,7 @@
 import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react'
 import type { Country, Place, TripDates } from '../types'
 import { WalkCourse, type WalkView } from './WalkCourse'
+import { ExplorerBadge } from './ExplorerBadge'
 import { compassKo, goldenSun } from '../lib/sun'
 import { useAsync } from '../lib/useAsync'
 import { errorReasonKo } from '../lib/cache'
@@ -764,6 +765,9 @@ function SavedList({
   return (
     <>
       <p className="mb-3 text-xs text-stone-500">{items.length}곳 · 일정 탭의 '가고 싶다'와 같은 목록이에요</p>
+      <div className="mb-3">
+        <ExplorerBadge scores={items.map((s) => s.hiddenScore).filter((v) => typeof v === 'number' && v > 0)} />
+      </div>
       <ul className="space-y-3">
         {items.map((s) =>
           full.has(s.id) ? (

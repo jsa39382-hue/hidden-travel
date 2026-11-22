@@ -389,6 +389,11 @@ function TripCard({ m, all, canPhoto, onUpdate, onDelete }: { m: TripMemory; all
         <p className="mt-0.5 text-xs text-stone-500">
           {formatKo(m.start)} – {formatKo(m.end)} · {days}일
         </p>
+        {m.explorer && (
+          <p className="mt-1.5 inline-flex w-fit items-center gap-1 rounded-full bg-amber-400 px-2.5 py-0.5 text-[11px] font-bold" style={{ color: '#0a0a0a' }}>
+            Lv.{m.explorer.level} {m.explorer.title}
+          </p>
+        )}
         {m.spots.length > 0 && (
           <div className="mt-2 flex flex-wrap gap-1">
             {m.spots.map((s) => (
