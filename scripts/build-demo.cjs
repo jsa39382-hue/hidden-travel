@@ -6,7 +6,7 @@ const TRIPS = [
   'c=JP&from=2026-12-10&to=2026-12-14&place=%EB%8F%84%EC%BF%84&lat=35.6812&lng=139.7671&f=1.15',
   'c=FR&from=2026-12-10&to=2026-12-14&place=%ED%8C%8C%EB%A6%AC&lat=48.8566&lng=2.3522&f=1.2',
 ];
-const TABS = ['home', 'plan', 'spots', 'budget', 'exchange', 'weather', 'calendar', 'transport', 'tips', 'retro', 'settle'];
+const TABS = ['home', 'plan', 'spots', 'budget', 'exchange', 'weather', 'safety', 'calendar', 'transport', 'tips', 'retro', 'settle'];
 (async () => {
   const b = await chromium.launch(); const ctx = await b.newContext({ ...devices['iPhone 13'] }); const p = await ctx.newPage();
   for (const q of TRIPS) for (const t of TABS) {
