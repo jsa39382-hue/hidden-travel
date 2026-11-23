@@ -441,8 +441,9 @@ function Footer({ compact }: { compact?: boolean }) {
         </button>
       </p>
       <p>
-        데이터: Wikidata · OpenStreetMap 기여자 · Nominatim · 위키백과·위키미디어 공용 · Frankfurter · ExchangeRate-API · Nager.Date · Open-Meteo · MyMemory · 국기 flagcdn.com
+        데이터: Wikidata · OpenStreetMap 기여자 · Nominatim · OSRM · 위키백과·위키보이저·위키미디어 공용 · 영국 외무부(FCDO) 여행 경보 · Frankfurter · ExchangeRate-API · Nager.Date · Open-Meteo · MyMemory · 국기 flagcdn.com
       </p>
+      <p>위키백과·위키보이저 글은 CC BY-SA, 영국 외무부 여행 경보는 Open Government Licence v3.0을 따라 출처를 밝혀 썼어요.</p>
     </footer>
   )
 }
