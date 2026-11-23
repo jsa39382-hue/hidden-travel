@@ -794,6 +794,19 @@
      "options": [
       {
        "mode": "rail",
+       "name": "자기부상열차 (푸둥공항 → 룽양루역)",
+       "minutes": null,
+       "price": [
+        50,
+        60
+       ],
+       "firstLast": null,
+       "where": "푸둥공항역",
+       "note": "편도 60위안, 당일 항공권·교통카드가 있으면 50위안. 룽양루역에서 지하철로 갈아타요",
+       "transfers": 1
+      },
+      {
+       "mode": "rail",
        "name": "상하이 지하철 2호선 (푸둥공항 → 시내)",
        "minutes": null,
        "price": null,
@@ -816,10 +829,13 @@
        "mode": "taxi",
        "name": "택시",
        "minutes": null,
-       "price": null,
+       "price": [
+        200,
+        500
+       ],
        "firstLast": null,
        "where": "택시 승강장",
-       "note": "거리로 계산해요",
+       "note": "시내까지 약 200위안, 짐이 많으면 200~500위안 정도",
        "transfers": 0
       }
      ]
@@ -837,7 +853,10 @@
        "mode": "rail",
        "name": "서우두공항 익스프레스 (공항 → 둥즈먼·베이신차오)",
        "minutes": 20,
-       "price": null,
+       "price": [
+        25,
+        25
+       ],
        "firstLast": null,
        "where": null,
        "note": "약 16~20분, 6~23시 10분 간격(그 밖 30분)",
@@ -866,15 +885,43 @@
      ]
     }
    ],
-   "cityTransit": [],
+   "cityTransit": [
+    {
+     "city": "상하이",
+     "card": "상하이 교통카드 (보증금 20위안)",
+     "cardPrice": 20,
+     "passes": [
+      {
+       "name": "지하철 1일권",
+       "price": 18,
+       "days": 1
+      }
+     ],
+     "single": null
+    },
+    {
+     "city": "베이징",
+     "card": "이카퉁 (보증금 20위안)",
+     "cardPrice": 20,
+     "passes": [],
+     "single": [
+      3,
+      10
+     ]
+    }
+   ],
    "taxi": null,
-   "rideApps": [],
+   "rideApps": [
+    "DiDi"
+   ],
    "intercity": [],
    "sources": [
     "https://en.wikipedia.org/wiki/Shanghai_Pudong_International_Airport",
     "https://en.wikipedia.org/wiki/Beijing_Capital_International_Airport",
     "https://www.wikidata.org/wiki/Q36420",
-    "https://www.wikidata.org/wiki/Q32190"
+    "https://www.wikidata.org/wiki/Q32190",
+    "https://en.wikivoyage.org/wiki/Shanghai",
+    "https://en.wikivoyage.org/wiki/Beijing"
    ]
   },
   "MO": {
@@ -905,32 +952,60 @@
        "mode": "bus",
        "name": "AP1 버스 (공항 ↔ 관문 보더게이트)",
        "minutes": null,
-       "price": null,
+       "price": [
+        4.2,
+        4.2
+       ],
        "firstLast": null,
        "where": null,
-       "note": null,
+       "note": "짐 1개당 3파타카 추가",
        "transfers": 0
       },
       {
        "mode": "taxi",
        "name": "택시",
-       "minutes": null,
-       "price": null,
+       "minutes": 20,
+       "price": [
+        40,
+        50
+       ],
        "firstLast": null,
        "where": "택시 승강장",
-       "note": "거리로 계산해요",
+       "note": "시내까지 15~20분, 공항 5·다리 2·짐 1개당 3파타카 추가",
        "transfers": 0
       }
      ]
     }
    ],
-   "cityTransit": [],
-   "taxi": null,
+   "cityTransit": [
+    {
+     "city": "마카오",
+     "card": "마카오 패스 (카드 값 30파타카)",
+     "cardPrice": 30,
+     "passes": [],
+     "single": [
+      6,
+      12
+     ]
+    }
+   ],
+   "taxi": {
+    "city": "마카오",
+    "base": null,
+    "includedKm": null,
+    "perKm": null,
+    "afterAmount": null,
+    "perKmAfter": null,
+    "nightMultiplier": null,
+    "nightHours": null,
+    "note": "Uber·Grab 같은 차량 호출 앱은 마카오에서 쓸 수 없어요"
+   },
    "rideApps": [],
    "intercity": [],
    "sources": [
     "https://en.wikipedia.org/wiki/Macau_International_Airport",
-    "https://www.wikidata.org/wiki/Q525486"
+    "https://www.wikidata.org/wiki/Q525486",
+    "https://en.wikivoyage.org/wiki/Macau"
    ]
   },
   "TW": {
@@ -951,42 +1026,82 @@
        "mode": "rail",
        "name": "타오위안공항 MRT 직통 (공항 → 타이베이역)",
        "minutes": 38,
-       "price": null,
-       "firstLast": null,
+       "price": [
+        150,
+        160
+       ],
+       "firstLast": "06:00-23:00",
        "where": "A12(1터미널)·A13(2터미널)역",
-       "note": "직통열차 약 38분",
+       "note": "직통열차 약 38분, 15분 간격. 이지카드로 내면 150대만달러",
        "transfers": null
       },
       {
        "mode": "bus",
        "name": "공항버스 (공항 → 타이베이)",
-       "minutes": null,
-       "price": null,
+       "minutes": 70,
+       "price": [
+        120,
+        150
+       ],
        "firstLast": null,
        "where": null,
-       "note": null,
+       "note": "버스 회사에 따라 요금이 달라요, 50~70분",
        "transfers": 0
       },
       {
        "mode": "taxi",
        "name": "택시",
        "minutes": null,
-       "price": null,
+       "price": [
+        1000,
+        1200
+       ],
        "firstLast": null,
        "where": "택시 승강장",
-       "note": "거리로 계산해요",
+       "note": "타이베이 시내까지",
        "transfers": 0
       }
      ]
     }
    ],
-   "cityTransit": [],
-   "taxi": null,
-   "rideApps": [],
+   "cityTransit": [
+    {
+     "city": "타이베이",
+     "card": "이지카드 EasyCard (카드 값 100대만달러)",
+     "cardPrice": 100,
+     "passes": [
+      {
+       "name": "지하철 1일권",
+       "price": 200,
+       "days": 1
+      }
+     ],
+     "single": [
+      20,
+      65
+     ]
+    }
+   ],
+   "taxi": {
+    "city": "타이베이",
+    "base": 80,
+    "includedKm": null,
+    "perKm": null,
+    "afterAmount": null,
+    "perKmAfter": null,
+    "nightMultiplier": null,
+    "nightHours": null,
+    "note": "기본요금 80대만달러, 밤에는 20대만달러 더해요 (km당 요금은 확인 필요)"
+   },
+   "rideApps": [
+    "Uber",
+    "Bolt"
+   ],
    "intercity": [],
    "sources": [
     "https://en.wikipedia.org/wiki/Taoyuan_International_Airport",
-    "https://www.wikidata.org/wiki/Q44856"
+    "https://www.wikidata.org/wiki/Q44856",
+    "https://en.wikivoyage.org/wiki/Taipei"
    ]
   },
   "MN": {
@@ -1004,35 +1119,65 @@
      ],
      "options": [
       {
-       "mode": "shuttle",
-       "name": "공항 셔틀버스 (공항 → 울란바토르)",
-       "minutes": null,
-       "price": null,
+       "mode": "bus",
+       "name": "X:19 공항버스 (공항 → 수흐바타르 광장)",
+       "minutes": 90,
+       "price": [
+        15000,
+        15000
+       ],
        "firstLast": null,
        "where": null,
-       "note": "시내까지 약 50km",
+       "note": "어린이 7,000투그릭, 약 1시간 30분",
+       "transfers": 0
+      },
+      {
+       "mode": "bus",
+       "name": "X:20 공항버스 (공항 → 5샤르)",
+       "minutes": 60,
+       "price": [
+        10000,
+        10000
+       ],
+       "firstLast": null,
+       "where": null,
+       "note": "어린이 5,000투그릭, 약 1시간",
        "transfers": 0
       },
       {
        "mode": "taxi",
        "name": "택시",
-       "minutes": null,
-       "price": null,
+       "minutes": 100,
+       "price": [
+        85000,
+        120000
+       ],
        "firstLast": null,
        "where": "택시 승강장",
-       "note": "거리로 계산해요",
+       "note": "시내까지 50~100분",
        "transfers": 0
       }
      ]
     }
    ],
    "cityTransit": [],
-   "taxi": null,
+   "taxi": {
+    "city": "울란바토르",
+    "base": null,
+    "includedKm": null,
+    "perKm": null,
+    "afterAmount": null,
+    "perKmAfter": null,
+    "nightMultiplier": null,
+    "nightHours": null,
+    "note": "km당 약 1,000투그릭 (기본요금은 확인 필요)"
+   },
    "rideApps": [],
    "intercity": [],
    "sources": [
     "https://en.wikipedia.org/wiki/Chinggis_Khaan_International_Airport",
-    "https://www.wikidata.org/wiki/Q14697701"
+    "https://www.wikidata.org/wiki/Q14697701",
+    "https://en.wikivoyage.org/wiki/Ulaanbaatar"
    ]
   },
   "VN": {
@@ -1051,12 +1196,28 @@
      "options": [
       {
        "mode": "bus",
-       "name": "109·152번 버스 (공항 → 시내)",
+       "name": "152번 버스 (공항 → 시내)",
        "minutes": null,
-       "price": null,
+       "price": [
+        5000,
+        5000
+       ],
        "firstLast": null,
        "where": "국제선 터미널 앞 버스 정류장",
-       "note": null,
+       "note": "짐이 있으면 5,000동 추가, 15분 간격. 2026년 하반기 호찌민 시내버스 임시 무료(카드는 찍어야 해요)",
+       "transfers": 0
+      },
+      {
+       "mode": "bus",
+       "name": "109번 급행버스 (공항 → 시내)",
+       "minutes": null,
+       "price": [
+        15000,
+        15000
+       ],
+       "firstLast": null,
+       "where": "3터미널 19번 기둥",
+       "note": "45분 간격, 카드로 내요",
        "transfers": 0
       },
       {
@@ -1083,14 +1244,27 @@
       {
        "mode": "bus",
        "name": "86번 버스 (공항 → 구시가지·하노이역)",
-       "minutes": null,
+       "minutes": 45,
        "price": [
-        45000,
-        45000
+        50000,
+        50000
+       ],
+       "firstLast": "06:20-22:00",
+       "where": "1·2터미널",
+       "note": "25분 간격, 롱비엔(구시가지)까지 약 45분 (2026년 10월 기준 50,000동)",
+       "transfers": 0
+      },
+      {
+       "mode": "bus",
+       "name": "7번 시내버스 (공항 → 시내)",
+       "minutes": 90,
+       "price": [
+        8000,
+        8000
        ],
        "firstLast": null,
-       "where": "1·2터미널",
-       "note": "주황색 버스, 45,000동",
+       "where": null,
+       "note": "60~90분, 싸지만 느려요",
        "transfers": 0
       },
       {
@@ -1108,13 +1282,18 @@
    ],
    "cityTransit": [],
    "taxi": null,
-   "rideApps": [],
+   "rideApps": [
+    "Grab",
+    "Xanh SM"
+   ],
    "intercity": [],
    "sources": [
     "https://en.wikipedia.org/wiki/Tan_Son_Nhat_International_Airport",
     "https://en.wikipedia.org/wiki/Noi_Bai_International_Airport",
     "https://www.wikidata.org/wiki/Q478595",
-    "https://www.wikidata.org/wiki/Q844098"
+    "https://www.wikidata.org/wiki/Q844098",
+    "https://en.wikivoyage.org/wiki/Ho_Chi_Minh_City",
+    "https://en.wikivoyage.org/wiki/Hanoi"
    ]
   },
   "PH": {
@@ -1133,13 +1312,16 @@
      "options": [
       {
        "mode": "bus",
-       "name": "UBE Express 버스 (공항 → 마닐라·마카티 등)",
+       "name": "UBE Express 43번 버스 (3터미널 ↔ PITX)",
        "minutes": null,
-       "price": null,
+       "price": [
+        150,
+        150
+       ],
        "firstLast": null,
        "where": "3터미널 등",
-       "note": null,
-       "transfers": 0
+       "note": "PITX에서 LRT 1호선으로 갈아타요",
+       "transfers": 1
       },
       {
        "mode": "taxi",
@@ -1154,13 +1336,34 @@
      ]
     }
    ],
-   "cityTransit": [],
-   "taxi": null,
-   "rideApps": [],
+   "cityTransit": [
+    {
+     "city": "마닐라",
+     "card": "Beep 카드",
+     "cardPrice": null,
+     "passes": [],
+     "single": null
+    }
+   ],
+   "taxi": {
+    "city": "마닐라",
+    "base": 40,
+    "includedKm": 0,
+    "perKm": 13.5,
+    "afterAmount": null,
+    "perKmAfter": null,
+    "nightMultiplier": null,
+    "nightHours": null,
+    "note": "여기에 1분당 2페소가 더해져요 (2022년 11월 기준, 계산기에는 빠져 있어요). LRT·MRT는 15페소부터"
+   },
+   "rideApps": [
+    "Grab"
+   ],
    "intercity": [],
    "sources": [
     "https://en.wikipedia.org/wiki/Ninoy_Aquino_International_Airport",
-    "https://www.wikidata.org/wiki/Q86446"
+    "https://www.wikidata.org/wiki/Q86446",
+    "https://en.wikivoyage.org/wiki/Metro_Manila"
    ]
   },
   "SG": {
@@ -1180,11 +1383,14 @@
       {
        "mode": "rail",
        "name": "MRT 동서선 (창이공항역 → 타나메라 환승 → 시내)",
-       "minutes": null,
-       "price": null,
-       "firstLast": null,
+       "minutes": 45,
+       "price": [
+        2.3,
+        2.3
+       ],
+       "firstLast": "05:30-23:15",
        "where": "2·3터미널 사이 지하",
-       "note": null,
+       "note": "타나메라역에서 갈아타요, 시청(City Hall)역까지 약 45분",
        "transfers": 1
       },
       {
@@ -1201,22 +1407,56 @@
        "mode": "taxi",
        "name": "택시",
        "minutes": null,
-       "price": null,
+       "price": [
+        20,
+        30
+       ],
        "firstLast": null,
        "where": "택시 승강장",
-       "note": "거리로 계산해요",
+       "note": "공항 할증 5싱가포르달러(한산할 때 3) 포함, 새벽 1~6시는 50% 더해요",
        "transfers": 0
       }
      ]
     }
    ],
-   "cityTransit": [],
+   "cityTransit": [
+    {
+     "city": "싱가포르",
+     "card": "교통카드 또는 해외 카드 터치 (해외 카드는 하루 0.6싱가포르달러 수수료)",
+     "cardPrice": null,
+     "passes": [
+      {
+       "name": "싱가포르 투어리스트 패스 1일",
+       "price": 17,
+       "days": 1
+      },
+      {
+       "name": "투어리스트 패스 2일",
+       "price": 24,
+       "days": 2
+      },
+      {
+       "name": "투어리스트 패스 3일",
+       "price": 29,
+       "days": 3
+      }
+     ],
+     "single": [
+      1,
+      2.5
+     ]
+    }
+   ],
    "taxi": null,
-   "rideApps": [],
+   "rideApps": [
+    "Grab",
+    "Gojek"
+   ],
    "intercity": [],
    "sources": [
     "https://en.wikipedia.org/wiki/Changi_Airport",
-    "https://www.wikidata.org/wiki/Q32159"
+    "https://www.wikidata.org/wiki/Q32159",
+    "https://en.wikivoyage.org/wiki/Singapore"
    ]
   },
   "MY": {
@@ -1236,11 +1476,14 @@
       {
        "mode": "rail",
        "name": "KLIA Ekspres (공항 → KL Sentral)",
-       "minutes": null,
-       "price": null,
+       "minutes": 28,
+       "price": [
+        55,
+        55
+       ],
        "firstLast": null,
        "where": "KLIA·KLIA2 역",
-       "note": null,
+       "note": "KL 센트럴까지 논스톱 28분",
        "transfers": null
       },
       {
@@ -1260,19 +1503,40 @@
        "price": null,
        "firstLast": null,
        "where": "택시 승강장",
-       "note": "거리로 계산해요",
+       "note": "공항은 선불 쿠폰 택시를 써요",
        "transfers": 0
       }
      ]
     }
    ],
-   "cityTransit": [],
-   "taxi": null,
-   "rideApps": [],
+   "cityTransit": [
+    {
+     "city": "쿠알라룸푸르",
+     "card": "터치 앤 고 Touch 'n Go (카드 값 10링깃)",
+     "cardPrice": 10,
+     "passes": [],
+     "single": null
+    }
+   ],
+   "taxi": {
+    "city": "쿠알라룸푸르",
+    "base": 3,
+    "includedKm": 2,
+    "perKm": 0.9,
+    "afterAmount": null,
+    "perKmAfter": null,
+    "nightMultiplier": null,
+    "nightHours": null,
+    "note": "빨강·흰색 택시 기준, 자정이 지나면 50% 더해요, 짐 1개당 1링깃"
+   },
+   "rideApps": [
+    "Grab"
+   ],
    "intercity": [],
    "sources": [
     "https://en.wikipedia.org/wiki/Kuala_Lumpur_International_Airport",
-    "https://www.wikidata.org/wiki/Q500253"
+    "https://www.wikidata.org/wiki/Q500253",
+    "https://en.wikivoyage.org/wiki/Kuala_Lumpur"
    ]
   },
   "ID": {
@@ -1293,10 +1557,13 @@
        "mode": "bus",
        "name": "BRT 버스 (공항 정류장)",
        "minutes": null,
-       "price": null,
+       "price": [
+        4400,
+        4400
+       ],
        "firstLast": null,
        "where": null,
-       "note": "2026년 1월 기준 공항을 지나는 BRT 1개 노선",
+       "note": "트랜스 사르바기타 버스, 큰길만 다녀요",
        "transfers": 0
       },
       {
@@ -1306,19 +1573,32 @@
        "price": null,
        "firstLast": null,
        "where": "택시 승강장",
-       "note": "거리로 계산해요",
+       "note": "Grab은 공항 Grab 라운지에서 타요 (사누르까지 20만 루피아 아래, 2026년 중반)",
        "transfers": 0
       }
      ]
     }
    ],
    "cityTransit": [],
-   "taxi": null,
-   "rideApps": [],
+   "taxi": {
+    "city": "발리",
+    "base": 5000,
+    "includedKm": 2,
+    "perKm": 5000,
+    "afterAmount": null,
+    "perKmAfter": null,
+    "nightMultiplier": null,
+    "nightHours": null,
+    "note": "미터 택시 기준, 남부 밖으로 가면 30% 더해요. 입국 때 관광세 15만 루피아"
+   },
+   "rideApps": [
+    "Grab"
+   ],
    "intercity": [],
    "sources": [
     "https://en.wikipedia.org/wiki/Ngurah_Rai_International_Airport",
-    "https://www.wikidata.org/wiki/Q1061846"
+    "https://www.wikidata.org/wiki/Q1061846",
+    "https://en.wikivoyage.org/wiki/Bali"
    ]
   },
   "IN": {
@@ -1849,6 +2129,77 @@
    "sources": [
     "https://en.wikipedia.org/wiki/Athens_International_Airport",
     "https://www.wikidata.org/wiki/Q211734"
+   ]
+  },
+  "KH": {
+   "basis": "reference",
+   "currency": "KHR",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "KTI",
+     "name": "테초 국제공항",
+     "lat": 11.3629,
+     "lng": 104.9166,
+     "cities": [
+      "프놈펜"
+     ],
+     "options": [
+      {
+       "mode": "bus",
+       "name": "공항 급행버스 AEB (공항 → 꾸치까농 로터리)",
+       "minutes": 60,
+       "price": [
+        1500,
+        1500
+       ],
+       "firstLast": "05:30-23:30",
+       "where": "도착층에서 주차장을 가로질러 약 500m",
+       "note": "10분 간격, 거스름돈이 없으니 딱 맞게 내요",
+       "transfers": 0
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "달러로 낼 땐 찢어지지 않은 작은 지폐를 준비하세요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": {
+    "city": "프놈펜",
+    "base": null,
+    "includedKm": null,
+    "perKm": null,
+    "afterAmount": null,
+    "perKmAfter": null,
+    "nightMultiplier": null,
+    "nightHours": null,
+    "note": "툭툭은 시내 한 번에 2~3달러. 시엠레아프 모토돕은 시내 0.5달러(2,000리엘), 밤·비 오는 날은 두 배"
+   },
+   "rideApps": [
+    "Grab",
+    "PassApp"
+   ],
+   "intercity": [
+    {
+     "route": "프놈펜 → 시엠레아프",
+     "mode": "버스",
+     "minutes": 420,
+     "price": null,
+     "booking": "BookMeBus · 12Go.Asia (요금 약 10달러, 6~8시간)"
+    }
+   ],
+   "sources": [
+    "https://en.wikivoyage.org/wiki/Phnom_Penh",
+    "https://en.wikivoyage.org/wiki/Siem_Reap",
+    "https://www.wikidata.org/wiki/Q106616277"
    ]
   }
  }
