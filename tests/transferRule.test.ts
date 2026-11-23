@@ -141,3 +141,19 @@ test('캘린더(.ics): 현지 시각을 UTC로, 일정마다 VEVENT', async () =
   assert.ok(ics.includes('숨은 신사\\, 작은 정원')) // 쉼표 이스케이프
   assert.ok(ics.split('\r\n').every((l) => new TextEncoder().encode(l).length <= 75)) // 줄 길이 제한
 })
+
+test('여행 판단: 안전 우선, 확인 못 하면 추천하지 않음', async () => {
+  const { travelVerdict, safetyOf } = await import('../src/lib/verdict.ts')
+  assert.equal(safetyOf([]), 'ok')
+  assert.equal(safetyOf(['avoid_all_but_essential_travel_to_parts']), 'parts')
+  assert.equal(safetyOf(['avoid_all_travel_to_whole_country', 'avoid_all_travel_to_parts']), 'whole')
+  assert.equal(safetyOf(null), 'unknown')
+  assert.equal(safetyOf([], false), 'na')
+  const good = { weatherScore: 85, holidayScore: 100 }
+  assert.equal(travelVerdict({ safety: 'ok', ...good }).level, 'recommend')
+  assert.equal(travelVerdict({ safety: 'whole', ...good }).level, 'avoid') // 날씨가 좋아도 비추천
+  assert.equal(travelVerdict({ safety: 'parts', ...good }).level, 'caution')
+  assert.equal(travelVerdict({ safety: 'unknown', ...good }).level, 'normal') // 모르면 추천 안 함
+  assert.equal(travelVerdict({ safety: 'ok', weatherScore: 30, holidayScore: 100 }).level, 'normal')
+  assert.equal(travelVerdict({ safety: 'ok', weatherScore: 80, holidayScore: 34 }).level, 'normal')
+})

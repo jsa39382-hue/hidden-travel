@@ -7,6 +7,7 @@ import { getWeather } from '../lib/weather'
 import { plugAdvice, timeDiff, useSurvival, voltageAdvice, type SurvivalData } from '../lib/survival'
 import { climateForTrip } from '../lib/climate'
 import { Phrases } from './Phrases'
+import { VerdictCard } from './VerdictCard'
 import { partyNumbers, usePartyPrefs } from '../lib/party'
 import { localHHMM, sunTimes, timeZoneFor, tzOffsetSec } from '../lib/sun'
 import { makePackingList, type PackItem } from '../lib/packing'
@@ -22,6 +23,7 @@ import { Flag } from './Flag'
 export function HomeSection({ country, place, dates, onPickCountry }: { country: Country; place: Place; dates: TripDates; onPickCountry: (code: string) => void }) {
   return (
     <div className="space-y-8">
+      <VerdictCard country={country} place={place} dates={dates} />
       <div className="grid gap-4 lg:grid-cols-2">
         <GoodTimeCard country={country} place={place} dates={dates} />
         <SurvivalCard country={country} place={place} />

@@ -14,7 +14,8 @@
     "build": "tsc -b && vite build",
     "lint": "oxlint",
     "preview": "vite preview",
-    "build:climate": "node scripts/build-climate.mjs"
+    "build:climate": "node scripts/build-climate.mjs",
+    "build:advisories": "node --experimental-strip-types --no-warnings scripts/build-advisories.mjs"
   },
   "dependencies": {
     "@number-flow/react": "0.6.2",

@@ -1,0 +1,168 @@
+{
+ "_설명": "영국 외무부(FCDO) 여행 경보 사본. 화면은 먼저 실시간으로 받고, 못 받으면 이 사본을 쓴다. npm run build:advisories로 갱신한다.",
+ "fetchedAt": "2026-11-23T12:52:58.228Z",
+ "countries": {
+  "JP": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:45:59Z",
+   "areas": null
+  },
+  "CN": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:30:13Z",
+   "areas": null
+  },
+  "HK": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:41:12Z",
+   "areas": null
+  },
+  "MO": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:05:03Z",
+   "areas": null
+  },
+  "TW": {
+   "status": [],
+   "updatedAt": "2026-11-18T15:21:27Z",
+   "areas": null
+  },
+  "MN": {
+   "status": [],
+   "updatedAt": "2026-11-03T11:04:08Z",
+   "areas": null
+  },
+  "VN": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:40:14Z",
+   "areas": null
+  },
+  "TH": {
+   "status": [
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-17T15:11:32Z",
+   "areas": "Thailand-Malaysia border\nFCDO advises against all but essential travel to parts of the south, near the Thailand-Malaysia border:\n · Pattani Province\n · Yala Province\n · Narathiwat Province\n · The districts of Chana, Thepa, Na Thawi and Saba Yoi in southern Songkhla Province\nFCDO also advises against all but essential travel on the Hat Yai to Padang Besar train line that runs through these provinces.\nThis is due to regular attacks in the provinces by the border with Malaysia. See Safety and security .\nThailand-Cambodia border\nFCDO advises against all but essential travel to areas within 20km of the land border with Cambodia.\nFighting occurred along parts of the border in July 2025, and further clashes took place in early December, involving rocket and artillery fire. Land borders and crossings between Thailand and Cambodia remain suspended. Tourist sites close to the border, including …"
+  },
+  "PH": {
+   "status": [
+    "avoid_all_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-07T11:19:22Z",
+   "areas": "Mindanao and the Sulu archipelago\nFCDO advises against all travel to western and central Mindanao and the Sulu archipelago.\nFCDO also advises against all but essential travel to the remainder of Mindanao, except for:\n · Camiguin Island\n · Dinagat Island\n · Siargao Island\nThis advice is due to terrorist activity and clashes between the military and insurgent groups in south Philippines."
+  },
+  "SG": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:26:38Z",
+   "areas": null
+  },
+  "MY": {
+   "status": [
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-19T10:47:10Z",
+   "areas": "Areas where FCDO advises against all but essential travel\nEastern Sabah coastal islands\nFCDO advises against all but essential travel to all islands and dive sites off the coast of eastern Sabah from Sandakan to Tawau, including Lankayan Island, due to the threat of kidnapping. This does not apply to the mainland of Sabah."
+  },
+  "ID": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:44:39Z",
+   "areas": null
+  },
+  "KH": {
+   "status": [
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-19T14:01:50Z",
+   "areas": "FCDO advises against all but essential travel to within 20km from the land border with Thailand.\nHeavy fighting along parts of the Thailand and Cambodia border, including the use of airstrikes, rocket and artillery fire, took place in 2025. A ceasefire was signed on 27 December, but the situation remains tense. \nLand borders and crossings between Cambodia and Thailand continue to be suspended. Some tourist destinations in border areas such as the Preah Vihear/Khao Phra Wihan temple, the Ta Krabey/Ta Kwai temple and the Tamone Thom/Ta Muen Thom temple are closed.  \nThere are also unexploded ordnance, including landmines, in the border area."
+  },
+  "IN": {
+   "status": [
+    "avoid_all_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-27T15:17:30Z",
+   "areas": "India-Pakistan border area\nFCDO advises against all travel within 10km of the India-Pakistan border, except for Wagah-Attari border crossing. While The Wagah-Attari border crossing is currently closed, visitors can still access and attend the daily border retreat ceremony.\nUnion Territory of Jammu and Kashmir\nFCDO advises against all travel to the Union Territory of Jammu and Kashmir (including Pahalgam, Gulmarg, Sonamarg, the city of Srinagar and the Jammu-Srinagar national highway), except for:\n · travel by air to and from the city of Jammu\n · travel within the city of Jammu\nManipur\nFCDO advises against all but essential travel to the state of Manipur including the capital, Imphal. Curfews and restrictions continue in parts of Manipur following ongoing ethnic violence since May 2023."
+  },
+  "AE": {
+   "status": [],
+   "updatedAt": "2026-11-18T16:33:03Z",
+   "areas": null
+  },
+  "TR": {
+   "status": [
+    "avoid_all_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-18T16:36:28Z",
+   "areas": "Turkey-Syria border\nFCDO advises against all travel to within 10km of the border with Syria due to fighting and a heightened risk of terrorism. If you are in Syria, follow FCDO Travel Advice for Syria. The FCDO cannot facilitate entry for British nationals into Turkey from Syria."
+  },
+  "US": {
+   "status": [],
+   "updatedAt": "2026-11-20T19:57:12Z",
+   "areas": null
+  },
+  "CA": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:01:35Z",
+   "areas": null
+  },
+  "GU": {
+   "status": [],
+   "updatedAt": "2026-11-20T19:57:12Z",
+   "areas": null
+  },
+  "AU": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:24:13Z",
+   "areas": null
+  },
+  "NZ": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:16:51Z",
+   "areas": null
+  },
+  "FR": {
+   "status": [],
+   "updatedAt": "2026-10-22T16:57:33Z",
+   "areas": null
+  },
+  "IT": {
+   "status": [],
+   "updatedAt": "2026-11-03T11:56:35Z",
+   "areas": null
+  },
+  "ES": {
+   "status": [],
+   "updatedAt": "2026-11-10T15:29:19Z",
+   "areas": null
+  },
+  "DE": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:56:20Z",
+   "areas": null
+  },
+  "CH": {
+   "status": [],
+   "updatedAt": "2026-10-07T12:54:14Z",
+   "areas": null
+  },
+  "AT": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:43:33Z",
+   "areas": null
+  },
+  "CZ": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:51:15Z",
+   "areas": null
+  },
+  "PT": {
+   "status": [],
+   "updatedAt": "2026-11-12T11:00:21Z",
+   "areas": null
+  },
+  "GR": {
+   "status": [],
+   "updatedAt": "2026-11-03T11:18:20Z",
+   "areas": null
+  }
+ }
+}
