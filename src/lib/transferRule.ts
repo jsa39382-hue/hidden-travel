@@ -1,5 +1,6 @@
+import { josa } from 'es-hangul'
 /**
- * 교통수단 추천 규칙 (순수 함수만, 다른 모듈을 가져오지 않음 → 단위 테스트하기 쉽게).
+ * 교통수단 추천 규칙 (순수 함수만, 가져오는 것은 한글 조사 처리(es-hangul)뿐 → 단위 테스트하기 쉽게).
  * 금액은 모두 현지 통화.
  */
 
@@ -133,7 +134,7 @@ export function recommendTransfer(input: TransferInput): TransferResult {
   // 이유 문장 다듬기 (가장 구체적인 것 하나)
   const cheapestPublic = priced.filter((e) => !isVehicle(e.option.mode)).sort((a, b) => mid(a.perPerson!) - mid(b.perPerson!))[0]
   if (isVehicle(pick.option.mode) && people >= 3 && pick.perPerson && cheapestPublic?.perPerson && mid(pick.perPerson) < mid(cheapestPublic.perPerson)) {
-    reason = `${people}명이면 ${pick.option.mode === 'taxi' ? '택시' : '차량 호출'}가 1인당 더 싸요`
+    reason = `${people}명이면 ${josa(pick.option.mode === 'taxi' ? '택시' : '차량 호출', '이/가')} 1인당 더 싸요`
   } else if (afterLast && excluded.some((e) => !isVehicle(e.option.mode))) {
     reason = `막차가 끊긴 시간이라 운행하는 수단 중에서 골랐어요 · ${reason}`
   } else if (burden && pick.option.transfers === 0 && running.some((e) => e.option.transfers > 0)) {

@@ -1,5 +1,6 @@
 import raw from '../data/countries.json'
 import type { Country } from '../types'
+import { getChoseong } from 'es-hangul'
 
 export const COUNTRIES = raw as Country[]
 
@@ -15,14 +16,6 @@ export const flagUrl = (code: string, width: 40 | 80 | 160 = 40) =>
   `https://flagcdn.com/w${width}/${code.toLowerCase()}.png`
 
 // 한글 초성 검색 지원
-const CHO = 'ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ'
-const toChosung = (s: string) =>
-  [...s]
-    .map((ch) => {
-      const c = ch.charCodeAt(0) - 0xac00
-      return c >= 0 && c < 11172 ? CHO[Math.floor(c / 588)] : ch
-    })
-    .join('')
 const isChosungOnly = (s: string) => /^[ㄱ-ㅎ]+$/.test(s)
 
 export function searchCountries(query: string): Country[] {
@@ -36,8 +29,8 @@ export function searchCountries(query: string): Country[] {
     let score = -1
     if (ko.startsWith(q) || en.startsWith(q) || c.code.toLowerCase() === q) score = 0
     else if (ko.includes(q) || en.includes(q)) score = 1
-    else if (isChosungOnly(q) && toChosung(ko).startsWith(q)) score = 2
-    else if (cap.includes(q) || c.currency.toLowerCase() === q) score = 3
+    else if (isChosungOnly(q) && getChoseong(ko).startsWith(q)) score = 2
+    else if (cap.includes(q) || c.currency.toLowerCase() === q || (isChosungOnly(q) && q.length >= 2 && getChoseong(cap).startsWith(q))) score = 3
     if (score >= 0) scored.push([score, c])
   }
   return scored.sort((a, b) => a[0] - b[0]).map(([, c]) => c)

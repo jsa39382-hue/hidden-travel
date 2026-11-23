@@ -7,6 +7,7 @@ import { COUNTRIES } from '../lib/countries'
 import { translateToKo } from '../lib/translate'
 import { Flag } from './Flag'
 import { Loading } from './Status'
+import { josa } from 'es-hangul'
 import { KnownRisks } from './KnownRisks'
 import { QuakeCard } from './QuakeCard'
 
@@ -115,7 +116,7 @@ export function SafetySection({ country, place, onPickCountry }: { country: Coun
                   </div>
                 </div>
                 {code !== country.code && COUNTRIES.some((c) => c.code === code) && (
-                  <button type="button" onClick={() => onPickCountry(code)} className="shrink-0 text-xs text-teal-700 underline underline-offset-2" aria-label={`${name}로 바꿔 보기`}>
+                  <button type="button" onClick={() => onPickCountry(code)} className="shrink-0 text-xs text-teal-700 underline underline-offset-2" aria-label={`${josa(name, '으로/로')} 바꿔 보기`}>
                     보기
                   </button>
                 )}
@@ -154,7 +155,7 @@ function HereCard({ country, a, failed, onRetry }: { country: Country; a?: Advis
   if (a === null)
     return (
       <p className="rounded-2xl border border-stone-200 bg-white p-4 text-sm text-stone-600">
-        {country.nameKo}은(는) 영국 외무부 경보 대상이 아니에요. 외교부 해외안전여행에서 확인해 주세요.
+        {josa(country.nameKo, '은/는')} 영국 외무부 경보 대상이 아니에요. 외교부 해외안전여행에서 확인해 주세요.
       </p>
     )
   if (!a)

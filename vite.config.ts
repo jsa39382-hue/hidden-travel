@@ -11,7 +11,8 @@ function serviceWorker(): Plugin {
     apply: 'build',
     enforce: 'post',
     generateBundle(_, bundle) {
-      const files = Object.keys(bundle).filter((f) => !f.endsWith('.map') && f !== 'sw.js')
+      // 글꼴 조각(.woff2)은 쓰는 것만 그때 받아 저장한다 (sw.js의 fonts 캐시)
+      const files = Object.keys(bundle).filter((f) => !f.endsWith('.map') && !f.endsWith('.woff2') && f !== 'sw.js')
       const statics = ['favicon.svg', 'manifest.webmanifest', 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png']
       const list = ['./', ...new Set([...files, ...statics])]
       const version = createHash('sha256').update(list.join('|')).digest('hex').slice(0, 12)

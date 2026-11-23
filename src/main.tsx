@@ -1,5 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+// 글꼴: Pretendard Variable (SIL OFL 1.1) · 글자 범위별 조각이라 화면에 쓰인 부분만 받는다
+import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css'
 import './index.css'
 import { MotionConfig } from 'motion/react'
 import App from './App.tsx'

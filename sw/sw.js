@@ -3,8 +3,8 @@
 const VERSION = '__VERSION__'
 const PRECACHE = __PRECACHE__
 const SHELL = `shell-${VERSION}`
-const RUNTIME = { tiles: 'tiles-v1', images: 'images-v1' }
-const LIMIT = { [RUNTIME.tiles]: 400, [RUNTIME.images]: 250 }
+const RUNTIME = { tiles: 'tiles-v1', images: 'images-v1', fonts: 'fonts-v1' }
+const LIMIT = { [RUNTIME.tiles]: 400, [RUNTIME.images]: 250, [RUNTIME.fonts]: 100 }
 const scope = new URL(self.registration.scope)
 const INDEX = new URL('index.html', scope).href
 
@@ -64,6 +64,8 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return
   const url = new URL(req.url)
   if (req.mode === 'navigate' && url.href.startsWith(scope.href)) return e.respondWith(page(req))
+  // 글꼴(Pretendard)은 글자 범위별로 나뉜 파일 92개라 미리 받지 않고, 화면에 쓰인 것만 받아 저장해 둔다
+  if (url.origin === scope.origin && url.pathname.endsWith('.woff2')) return e.respondWith(cacheFirst(req, RUNTIME.fonts))
   if (url.origin === scope.origin && url.pathname.startsWith(scope.pathname)) {
     // 이름에 해시가 붙은 빌드 파일은 바뀌지 않으므로 저장본 우선
     return e.respondWith(caches.match(req).then((hit) => hit ?? fetch(req)))

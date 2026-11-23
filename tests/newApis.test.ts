@@ -84,3 +84,22 @@ test('Photon: 고른 나라 결과만, 한글 판별', () => {
   assert.equal(hasHangul('교토'), true)
   assert.equal(hasHangul('Kyoto 京都'), false)
 })
+
+test('공유 링크: lz-string 압축(z)이 예전(w)보다 짧고, 둘 다 그대로 읽힌다', async () => {
+  const { decodeLiked, encodeLiked, encodeLikedZ } = await import('../src/lib/share.ts')
+  const liked = [
+    { id: 'node/123456789', name: '간다묘진', kind: '신사', lat: 35.702141, lng: 139.767912, hiddenScore: 62 },
+    { id: 'way/98765432', name: '구 이와사키 저택 정원', kind: '정원', lat: 35.70988, lng: 139.76988, hiddenScore: 66 },
+    { id: 'node/2222222', name: '미쓰비시 1호관 미술관', kind: '미술관', lat: 35.67811, lng: 139.76311 },
+  ]
+  const z = encodeLikedZ(liked as never)
+  const w = encodeLiked(liked as never)
+  assert.ok(z.length < w.length, `z ${z.length} < w ${w.length}`)
+  const back = decodeLiked(z, 'z')
+  assert.equal(back.length, 3)
+  assert.equal(back[0].name, '간다묘진')
+  assert.equal(back[0].lat, 35.70214)
+  assert.equal(back[2].hiddenScore, undefined)
+  assert.deepEqual(decodeLiked(w, 'w'), back)
+  assert.deepEqual(decodeLiked('망가진값', 'z'), [])
+})

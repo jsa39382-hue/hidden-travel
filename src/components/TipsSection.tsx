@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { josa } from 'es-hangul'
 import { plugAdvice, timeDiff, voltageAdvice } from '../lib/survival'
 import { FACTS, TIPS } from '../lib/survivalData'
 import { timeZoneFor, tzOffsetSec } from '../lib/sun'
@@ -74,7 +75,7 @@ export function TipsSection({ country, place }: { country: Country; place: Place
               <FoodCard key={f.id} food={f} />
             ))}
           </ul>
-          <p className="mt-2 text-[11px] text-stone-400">원산지가 {country.nameKo}로 등록된 음식 중 널리 알려진 순서예요. 사진·정보: Wikidata·위키미디어 공용</p>
+          <p className="mt-2 text-[11px] text-stone-400">원산지가 {josa(country.nameKo, '으로/로')} 등록된 음식 중 널리 알려진 순서예요. 사진·정보: Wikidata·위키미디어 공용</p>
         </div>
       )}
 

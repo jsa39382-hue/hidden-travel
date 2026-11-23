@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { josa } from 'es-hangul'
 import { motion } from 'motion/react'
 import type { Country, Place } from '../types'
 import { useAsync } from '../lib/useAsync'
@@ -216,7 +217,7 @@ function Transfer({
     <div>
       <p className="mb-3 text-xs text-stone-500">
         차로 약 {Math.round(r.km)}km · {r.minutes}분{r.estimated && ' · 직선거리로 추정'}
-        {far && ` · ${airport.name}은(는) ${place.name}에서 멀어요. 다른 공항을 골라 보세요`}
+        {far && ` · ${josa(airport.name, '은/는')} ${place.name}에서 멀어요. 다른 공항을 골라 보세요`}
       </p>
       {!result.recommended && <p className="rounded-2xl border border-stone-200 p-4 text-sm text-stone-600">{result.reason}</p>}
       <ul className="grid gap-3 lg:grid-cols-2">
@@ -351,7 +352,7 @@ function CityTransitBlock({ t, rides, setRides, krwPer }: { t: TransportCountry;
             </div>
             <p className="mt-2 text-sm">
               {advice?.pick === 'pass' && advice.pass
-                ? `하루 ${rides}번 타면 ${advice.pass.name}이(가) 더 싸요 (하루 ${formatNumber(Math.round(advice.perDay!), 0)} ${t.currency})`
+                ? `하루 ${rides}번 타면 ${josa(advice.pass.name, '이/가')} 더 싸요 (하루 ${formatNumber(Math.round(advice.perDay!), 0)} ${t.currency})`
                 : advice?.pick === 'single'
                   ? `하루 ${rides}번이면 그때그때 내는 게 더 싸요 (하루 약 ${formatNumber(Math.round(advice.perDay!), 0)} ${t.currency})`
                   : '요금 정보가 채워지면 패스와 1회 요금 중 싼 쪽을 알려 드려요.'}

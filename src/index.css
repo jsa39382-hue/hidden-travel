@@ -8,7 +8,7 @@
  *  - teal 등 색상: 50↔950, 100↔900 … 으로 뒤집어 옅은 배경은 어두운 색조, 진한 글자는 밝은 색조가 된다
  */
 @theme {
-  --font-sans: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
+  --font-sans: "Pretendard Variable", "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", system-ui, sans-serif;
   --color-white: #141414;
   --color-black: #fafafa;
   --color-stone-50: #0a0a0a;
