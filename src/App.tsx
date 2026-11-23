@@ -295,7 +295,7 @@ function View({ id, country, dates, place, active, onPickCountry }: { id: string
     case 'settle':
       return <SettleSection country={country} dates={dates} />
     case 'weather':
-      return <WeatherSection place={place} dates={dates} />
+      return <WeatherSection country={country} place={place} dates={dates} />
     case 'calendar':
       return <CalendarSection country={country} dates={dates} />
     case 'safety':

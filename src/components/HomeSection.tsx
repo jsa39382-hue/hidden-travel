@@ -6,15 +6,14 @@ import { getGoodTime, grade, rankCountries, type Part } from '../lib/goodTime'
 import { getWeather } from '../lib/weather'
 import { plugAdvice, timeDiff, useSurvival, voltageAdvice, type SurvivalData } from '../lib/survival'
 import { climateForTrip } from '../lib/climate'
-import { Phrases } from './Phrases'
 import { VerdictCard } from './VerdictCard'
 import { partyNumbers, usePartyPrefs } from '../lib/party'
-import { localHHMM, sunTimes, timeZoneFor, tzOffsetSec } from '../lib/sun'
+import { timeZoneFor, tzOffsetSec } from '../lib/sun'
 import { makePackingList, type PackItem } from '../lib/packing'
 import { useStored } from '../lib/stored'
 import { COUNTRIES, POPULAR_CODES } from '../lib/countries'
 import { defaultPlace } from '../lib/places'
-import { diffDays, formatKo, isWithin } from '../lib/dates'
+import { diffDays, isWithin } from '../lib/dates'
 import { errorReasonKo } from '../lib/cache'
 import { Num } from './ui/Num'
 import { ErrorBox, Loading } from './Status'
@@ -28,10 +27,7 @@ export function HomeSection({ country, place, dates, onPickCountry }: { country:
         <GoodTimeCard country={country} place={place} dates={dates} />
         <SurvivalCard country={country} place={place} />
       </div>
-      <div className="grid gap-4 lg:grid-cols-2">
-        <GoldenHour country={country} place={place} dates={dates} />
-        <Packing country={country} place={place} dates={dates} />
-      </div>
+      <Packing country={country} place={place} dates={dates} />
       <Compare dates={dates} current={country.code} onPick={onPickCountry} />
     </div>
   )
@@ -106,6 +102,9 @@ function survivalRows(country: Country, offsetSec: number | undefined, sv: Survi
   ] as [string, string][]
 }
 
+/** 홈에는 꼭 필요한 4가지만 (나머지·생존 문장은 정보 › 음식·팁). 이미지 저장에는 8가지 모두 넣는다 */
+const KEY_FACTS = ['시차', '콘센트', '긴급', '물']
+
 function SurvivalCard({ country, place }: { country: Country; place: Place }) {
   const tz = timeZoneFor(country.code, place.lat, place.lng)
   const w = useAsync(() => (tz ? Promise.resolve(null) : getWeather(place.lat, place.lng)), [tz, place.lat, place.lng])
@@ -136,19 +135,16 @@ function SurvivalCard({ country, place }: { country: Country; place: Place }) {
         <p className="font-semibold">{country.nameKo}</p>
       </div>
       <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3">
-        {rows.map(([k, v]) => (
+        {rows.filter(([k]) => KEY_FACTS.includes(k)).map(([k, v]) => (
           <div key={k} className="min-w-0">
             <dt className="text-[11px] text-stone-500">{k}</dt>
             <dd className="text-sm font-semibold leading-snug">{v}</dd>
           </div>
         ))}
       </dl>
-      {/* 택시·식당에서 바로 쓰는 문장: 듣기 + 크게 보여 주기 */}
-      {sv?.TIPS[country.code]?.phrases?.length ? (
-        <div className="mt-5">
-          <Phrases phrases={sv.TIPS[country.code].phrases} lang={sv.TIPS[country.code].lang} />
-        </div>
-      ) : null}
+      <a href="#tips" className="mt-4 inline-block text-xs font-medium text-teal-700 underline underline-offset-2">
+        전압·운전·팁·물, 현지 생존 문장(듣기) 모두 보기
+      </a>
     </div>
   )
 }
@@ -220,54 +216,6 @@ export async function shareOrDownload(blob: Blob, name: string) {
   a.download = name
   a.click()
   setTimeout(() => URL.revokeObjectURL(a.href), 5000)
-}
-
-// ---------------- 골든아워 ----------------
-
-function GoldenHour({ country, place, dates }: { country: Country; place: Place; dates: TripDates }) {
-  // 일출·일몰은 날짜와 좌표로 직접 계산한다 (인터넷 없이, 16일 예보 밖 날짜도)
-  const tz = timeZoneFor(country.code, place.lat, place.lng)
-  const list = useMemo(() => {
-    if (!tz) return []
-    const out: { date: string; morning: [string, string]; evening: [string, string] }[] = []
-    const d = new Date(`${dates.start}T00:00:00Z`)
-    for (let i = 0; i < 4 && d.toISOString().slice(0, 10) <= dates.end; i++, d.setUTCDate(d.getUTCDate() + 1)) {
-      const date = d.toISOString().slice(0, 10)
-      const s = sunTimes(date, place.lat, place.lng)
-      if (!s) continue
-      const hm = (t: Date) => localHHMM(t, tz)
-      out.push({ date, morning: [hm(s.sunrise), hm(new Date(s.sunrise.getTime() + 3600000))], evening: [hm(new Date(s.sunset.getTime() - 3600000)), hm(s.sunset)] })
-    }
-    return out
-  }, [tz, dates.start, dates.end, place.lat, place.lng])
-  return (
-    <div className="rounded-3xl border border-stone-200 bg-white p-5">
-      <p className="text-xs font-medium uppercase tracking-wider text-stone-500">사진 찍기 좋은 골든아워</p>
-      {!list.length ? (
-        <p className="mt-2 text-sm text-stone-500">이 지역은 일출·일몰을 계산하지 못했어요.</p>
-      ) : (
-        <>
-          <ul className="mt-3 divide-y divide-stone-200">
-            {list.map((g) => (
-              <li key={g.date} className="flex items-center justify-between gap-3 py-2.5 text-sm">
-                <span className="w-24 shrink-0 text-stone-500">{formatKo(g.date)}</span>
-                <span className="flex-1 text-right tabular-nums">
-                  <span className="text-amber-700">
-                    ☀ {g.morning[0]}–{g.morning[1]}
-                  </span>
-                  <span className="mx-2 text-stone-300">·</span>
-                  <span className="text-amber-700">
-                    {g.evening[0]}–{g.evening[1]} ☾
-                  </span>
-                </span>
-              </li>
-            ))}
-          </ul>
-          <p className="mt-2 text-[11px] text-stone-400">{place.name} 현지 시각 · 일출 직후·일몰 직전 약 1시간 (날짜와 좌표로 계산, 오차 1~2분)</p>
-        </>
-      )}
-    </div>
-  )
 }
 
 // ---------------- 짐 체크리스트 ----------------

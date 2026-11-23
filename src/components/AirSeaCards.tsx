@@ -40,7 +40,7 @@ export function AirCard({ place, dates }: { place: Place; dates: TripDates }) {
       <ul className="mt-3 divide-y divide-stone-100">
         {list.map((d) => (
           <li key={d.date} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2 text-sm">
-            <span className="w-20 shrink-0">{formatKo(d.date)}</span>
+            <span className="w-28 shrink-0 whitespace-nowrap">{formatKo(d.date)}</span>
             {d.pm25 != null && (
               <Chip g={gradePm25(d.pm25)}>
                 초미세 {gradePm25(d.pm25).label} {Math.round(d.pm25)}
@@ -97,7 +97,7 @@ export function SeaCard({ place, dates }: { place: Place; dates: TripDates }) {
           const st = d.wave != null ? seaState(d.wave) : null
           return (
             <li key={d.date} className="flex flex-wrap items-center gap-x-3 gap-y-1 py-2 text-sm">
-              <span className="w-20 shrink-0">{formatKo(d.date)}</span>
+              <span className="w-28 shrink-0 whitespace-nowrap">{formatKo(d.date)}</span>
               {st && (
                 <span className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${TONE[st.tone]}`}>
                   파도 {d.wave!.toFixed(1)}m · {st.label} · {st.swim}

@@ -43,6 +43,9 @@ export function SafetySection({ country, place, onPickCountry }: { country: Coun
   const world = useAsync(() => worldAdvisories(), [])
   const [filter, setFilter] = useState<'risk' | 'high' | 'all'>('risk')
   const [q, setQ] = useState('')
+  // 처음엔 위험도 높은 순 10개만 (검색 중이면 전부)
+  const [expanded, setExpanded] = useState(false)
+  const FIRST = 10
 
   const rows = useMemo(() => {
     if (world.status !== 'success') return []
@@ -87,7 +90,7 @@ export function SafetySection({ country, place, onPickCountry }: { country: Coun
               key={id}
               type="button"
               aria-pressed={filter === id}
-              onClick={() => setFilter(id)}
+              onClick={() => (setFilter(id), setExpanded(false))}
               className={`rounded-full px-3 py-1.5 text-xs ${filter === id ? 'bg-stone-900 font-semibold text-stone-50' : 'border border-stone-300 text-stone-600'}`}
             >
               {label}
@@ -101,7 +104,7 @@ export function SafetySection({ country, place, onPickCountry }: { country: Coun
           <p className="py-4 text-sm text-stone-500">조건에 맞는 나라가 없어요.</p>
         ) : (
           <ul className="divide-y divide-stone-200 rounded-2xl border border-stone-200">
-            {rows.map(({ code, name, a }) => (
+            {(expanded || q.trim() ? rows : rows.slice(0, FIRST)).map(({ code, name, a }) => (
               <li key={code} className="flex items-start gap-3 px-4 py-3">
                 <span className="pt-0.5">
                   <Flag code={code} size="sm" />
@@ -123,6 +126,11 @@ export function SafetySection({ country, place, onPickCountry }: { country: Coun
               </li>
             ))}
           </ul>
+        )}
+        {world.status === 'success' && !q.trim() && rows.length > FIRST && (
+          <button type="button" aria-expanded={expanded} onClick={() => setExpanded((v) => !v)} className="mt-3 w-full rounded-xl border border-stone-200 py-3 text-sm text-stone-600 active:bg-stone-100">
+            {expanded ? '접기' : `${rows.length - FIRST}개 나라 더 보기 (모두 ${rows.length}개)`}
+          </button>
         )}
         <p className="mt-3 text-[11px] leading-relaxed text-stone-500">
           위험도는 영국 외무부(FCDO) 여행 경보 단계로 정했고, 위험 요인은 경보 원문에 실제로 적힌 표현만 표시해요. '잘 알려진 주의사항'은 여행자에게 널리 알려진 내용을 직접 정리한 참고용이에요. 한국 외교부의 여행경보·특별여행주의보는 단계와 지역이 다를 수 있으니{' '}
