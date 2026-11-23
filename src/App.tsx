@@ -299,7 +299,7 @@ function View({ id, country, dates, place, active, onPickCountry }: { id: string
     case 'calendar':
       return <CalendarSection country={country} dates={dates} />
     case 'safety':
-      return <SafetySection country={country} onPickCountry={onPickCountry} />
+      return <SafetySection country={country} place={place} onPickCountry={onPickCountry} />
     case 'transport':
       return <TransportSection country={country} place={place} />
     case 'tips':
@@ -441,7 +441,7 @@ function Footer({ compact }: { compact?: boolean }) {
         </button>
       </p>
       <p>
-        데이터: Wikidata · OpenStreetMap 기여자 · Nominatim · OSRM · 위키백과·위키보이저·위키미디어 공용 · 영국 외무부(FCDO) 여행 경보 · Frankfurter · ExchangeRate-API · Nager.Date · Open-Meteo · MyMemory · 국기 flagcdn.com
+        데이터: Wikidata · OpenStreetMap 기여자 · Nominatim · OSRM · 위키백과·위키보이저·위키미디어 공용 · 영국 외무부(FCDO) 여행 경보 · 미국 지질조사국(USGS) 지진 · Frankfurter · ExchangeRate-API · Nager.Date · Open-Meteo(날씨·대기질·바다) · MyMemory · 국기 flagcdn.com
       </p>
       <p>위키백과·위키보이저 글은 CC BY-SA, 영국 외무부 여행 경보는 Open Government Licence v3.0을 따라 출처를 밝혀 썼어요.</p>
     </footer>

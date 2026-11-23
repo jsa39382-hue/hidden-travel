@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import type { Country } from '../types'
+import type { Country, Place } from '../types'
 import { useAsync } from '../lib/useAsync'
 import { MOFA_URL, fcdoPage, getAdvisory, worldAdvisories, type Advisory } from '../lib/advisory'
 import { RISK_FLAGS, RISK_LABEL } from '../lib/advisoryText'
@@ -8,6 +8,7 @@ import { translateToKo } from '../lib/translate'
 import { Flag } from './Flag'
 import { Loading } from './Status'
 import { KnownRisks } from './KnownRisks'
+import { QuakeCard } from './QuakeCard'
 
 const LEVEL_STYLE = [
   'border-stone-300 text-stone-600',
@@ -36,7 +37,7 @@ function Flags({ flags, max = 8 }: { flags: string[]; max?: number }) {
 }
 
 /** 안전: 지금 고른 나라의 위험도와 세계 위험 국가 목록 (근거: 영국 외무부 여행 경보 원문) */
-export function SafetySection({ country, onPickCountry }: { country: Country; onPickCountry: (code: string) => void }) {
+export function SafetySection({ country, place, onPickCountry }: { country: Country; place: Place; onPickCountry: (code: string) => void }) {
   const here = useAsync((force) => getAdvisory(country.code, force), [country.code])
   const world = useAsync(() => worldAdvisories(), [])
   const [filter, setFilter] = useState<'risk' | 'high' | 'all'>('risk')
@@ -61,6 +62,11 @@ export function SafetySection({ country, onPickCountry }: { country: Country; on
         ) : (
           <HereCard country={country} a={here.status === 'success' ? here.data : undefined} failed={here.status === 'error'} onRetry={here.retry} />
         )}
+      </section>
+
+      <section aria-label={`${place.name} 주변 최근 지진`}>
+        <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-stone-500">{place.name} 주변 최근 지진</h3>
+        <QuakeCard place={place} />
       </section>
 
       <section aria-label="세계 위험 국가">

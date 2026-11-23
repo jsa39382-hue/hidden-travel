@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build:countries": "node scripts/build-countries.mjs",
-    "test:transfer": "node --experimental-strip-types --no-warnings --test tests/transferRule.test.ts",
+    "test:transfer": "node --experimental-strip-types --no-warnings --test tests/transferRule.test.ts tests/newApis.test.ts",
     "build:festivals": "node scripts/build-festivals.mjs",
     "build:cities": "node scripts/build-cities.mjs",
     "build:facts": "node scripts/build-country-facts.mjs",

@@ -1,4 +1,4 @@
-import { HttpError } from './cache'
+import { HttpError } from './cache.ts'
 
 /**
  * OpenStreetMap 계열 서버(Overpass, Nominatim)는 사용 정책상 요청을 몰아 보내면 안 된다.

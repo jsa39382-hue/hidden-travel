@@ -6,6 +6,7 @@ import { FORECAST_DAYS, describeWeather, getWeather, packingTips, type DayWeathe
 import { formatKo, isWithin } from '../lib/dates'
 import { ErrorBox, Loading, Notice } from './Status'
 import { ClimateCard } from './ClimateCard'
+import { AirCard, SeaCard } from './AirSeaCards'
 
 const t = (n: number | null) => (n == null ? '-' : `${Math.round(n)}°`)
 
@@ -18,6 +19,9 @@ export function WeatherSection({ place, dates }: { place: Place; dates: TripDate
       <div className="max-w-2xl space-y-4">
         <ErrorBox message="날씨 예보를 불러오지 못했어요." detail={errorReasonKo(w.error)} onRetry={w.retry} />
         <ClimateCard place={place} dates={dates} reason="error" />
+        {/* 대기질·바다는 다른 서버라 날씨 예보가 실패해도 따로 보여 준다 */}
+        <AirCard place={place} dates={dates} />
+        <SeaCard place={place} dates={dates} />
       </div>
     )
   if (w.status !== 'success') return <Loading label={`${place.name} 날씨 불러오는 중…`} />
@@ -88,6 +92,9 @@ export function WeatherSection({ place, dates }: { place: Place; dates: TripDate
       <button type="button" onClick={() => setShowAll((v) => !v)} className="w-full rounded-xl border border-stone-200 py-3 text-sm text-stone-600 active:bg-stone-100">
         {showAll ? '접기' : `${FORECAST_DAYS}일 전체 예보 보기`}
       </button>
+
+      <AirCard place={place} dates={dates} />
+      <SeaCard place={place} dates={dates} />
 
       {stale && <Notice>⚠️ 날씨 서버에 연결할 수 없어 전에 저장해 둔 예보를 보여 주고 있어요.</Notice>}
       <p className="text-xs text-stone-500">

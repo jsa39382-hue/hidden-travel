@@ -54,6 +54,8 @@ export function SpotsSection({ country, place, dates, active = true }: { country
   const nearby = useAsync((force, signal) => getNearby(lodgingAt.lat, lodgingAt.lng, force, signal), [lodgingAt.lat, lodgingAt.lng])
 
   const split = useMemo(() => (sp.spots ? splitSpots(sp.spots) : { hidden: [], famous: [] }), [sp.spots])
+  // 비교 기준: 이 반경에서 위키 조회수가 가장 많은 곳 (예: 에펠탑)
+  const top = useMemo(() => topByViews(sp.spots ?? []), [sp.spots])
   // 관심 목록: 하트를 누른 명소 (지금 검색 반경 밖이어도 저장한 정보로 보여 준다)
   const wl = useWishlist(placeKeyOf(place))
   const likedIds = useMemo(() => new Set(wl.wish.liked.map((x) => x.id)), [wl.wish.liked])
@@ -235,7 +237,7 @@ export function SpotsSection({ country, place, dates, active = true }: { country
                     ) : (
                       <ul className="space-y-3">
                         {visible.map((s) => (
-                          <SpotCard key={s.id} spot={s} countryCode={country.code} selected={s.id === selected} onMap={() => showOnMap(s)} onLodging={() => nearbyOf(s)} liked={likedIds.has(s.id)} onToggleLike={() => wl.toggle(s)} sun={sunInfo} />
+                          <SpotCard key={s.id} spot={s} countryCode={country.code} selected={s.id === selected} onMap={() => showOnMap(s)} onLodging={() => nearbyOf(s)} liked={likedIds.has(s.id)} onToggleLike={() => wl.toggle(s)} sun={sunInfo} top={top} />
                         ))}
                       </ul>
                     )}
@@ -341,6 +343,22 @@ function Legend({ color, label, border }: { color: string; label: string; border
   )
 }
 
+/** 조회수가 가장 많은 명소 (조회수를 확인한 곳 중) */
+function topByViews(spots: Spot[]): Spot | null {
+  let best: Spot | null = null
+  for (const s of spots) if (typeof s.views === 'number' && (!best || s.views > (best.views as number))) best = s
+  return best && (best.views as number) >= 100 ? best : null
+}
+
+/** "가장 유명한 에펠탑보다 120배 덜 알려졌어요" (2배 이상 차이 날 때만) */
+function compareToTop(s: Spot, top?: Spot | null) {
+  if (!top || top.id === s.id || typeof s.views !== 'number' || typeof top.views !== 'number') return null
+  const ratio = top.views / Math.max(1, s.views)
+  if (ratio < 2) return null
+  const n = ratio >= 100 ? Math.round(ratio).toLocaleString('ko-KR') : ratio >= 10 ? String(Math.round(ratio)) : ratio.toFixed(1).replace(/\.0$/, '')
+  return `🔍 이 근처 가장 유명한 ${top.name}보다 ${n}배 덜 알려졌어요`
+}
+
 function fameLabel(s: Spot) {
   if (s.views === undefined && s.sitelinks)
     return { text: `한국어·영어 위키 없음 · 다른 언어 위키 ${s.sitelinks}곳`, cls: s.hiddenScore >= 50 ? 'bg-teal-50 text-teal-800' : 'bg-violet-50 text-violet-800' }
@@ -353,7 +371,7 @@ function fameLabel(s: Spot) {
   }
 }
 
-function SpotCard({ spot, selected, onMap, onLodging, countryCode, liked, onToggleLike, sun }: { spot: Spot; selected: boolean; onMap: () => void; onLodging: () => void; countryCode: string; liked: boolean; onToggleLike: () => void; sun?: ReturnType<typeof goldenSun> }) {
+function SpotCard({ spot, selected, onMap, onLodging, countryCode, liked, onToggleLike, sun, top }: { spot: Spot; selected: boolean; onMap: () => void; onLodging: () => void; countryCode: string; liked: boolean; onToggleLike: () => void; sun?: ReturnType<typeof goldenSun>; top?: Spot | null }) {
   const [open, setOpen] = useState(false)
   const hasWiki = !!(spot.koTitle || spot.enTitle || (spot.wiki && ['ko', 'en'].includes(spot.wiki.lang)))
   const sum = useAsync(hasWiki ? () => getSummary(spot) : null, [spot.id])
@@ -387,6 +405,10 @@ function SpotCard({ spot, selected, onMap, onLodging, countryCode, liked, onTogg
           <span className={`mt-1.5 inline-block rounded-full px-2 py-0.5 text-[11px] font-medium ${fame.cls}`}>
             {fame.text} · 숨은 정도 {spot.hiddenScore}
           </span>
+          {(() => {
+            const c = compareToTop(spot, top)
+            return c ? <p className="mt-1 text-[11px] font-medium text-teal-800">{c}</p> : null
+          })()}
         </div>
         <HeartButton name={spot.name} liked={liked} onToggle={onToggleLike} />
       </div>
