@@ -7,6 +7,7 @@ import { formatKo, isWithin } from '../lib/dates'
 import { ErrorBox, Loading, Notice } from './Status'
 import { ClimateCard } from './ClimateCard'
 import { AirCard, SeaCard } from './AirSeaCards'
+import { LastYearCard } from './LastYearCard'
 
 const t = (n: number | null) => (n == null ? '-' : `${Math.round(n)}°`)
 
@@ -19,6 +20,7 @@ export function WeatherSection({ place, dates }: { place: Place; dates: TripDate
       <div className="max-w-2xl space-y-4">
         <ErrorBox message="날씨 예보를 불러오지 못했어요." detail={errorReasonKo(w.error)} onRetry={w.retry} />
         <ClimateCard place={place} dates={dates} reason="error" />
+        <LastYearCard place={place} dates={dates} />
         {/* 대기질·바다는 다른 서버라 날씨 예보가 실패해도 따로 보여 준다 */}
         <AirCard place={place} dates={dates} />
         <SeaCard place={place} dates={dates} />
@@ -75,6 +77,7 @@ export function WeatherSection({ place, dates }: { place: Place; dates: TripDate
         </Notice>
       )}
       {tripAfterRange && <ClimateCard place={place} dates={dates} reason="range" />}
+      {tripAfterRange && <LastYearCard place={place} dates={dates} />}
 
       {tips.length > 0 && (
         <ul className="space-y-1.5 border-l-2 border-teal-700 pl-4 text-sm text-stone-700">

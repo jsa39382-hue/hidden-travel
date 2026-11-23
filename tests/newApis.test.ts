@@ -5,6 +5,8 @@ import { readFileSync } from 'node:fs'
 import { airTips, gradePm10, gradePm25, gradeUv, toAirDays } from '../src/lib/airQuality.ts'
 import { seaState, toSea, waterFeel } from '../src/lib/marine.ts'
 import { magKo, toQuakes } from '../src/lib/quakes.ts'
+import { lastYearRange, summarize, toPastDays, yearsBefore } from '../src/lib/history.ts'
+import { hasHangul, toHits } from '../src/lib/photon.ts'
 
 const load = (f: string) => JSON.parse(readFileSync(new URL(`./fixtures/${f}`, import.meta.url), 'utf8'))
 
@@ -58,4 +60,27 @@ test('지진: 규모·거리·최신순', () => {
     assert.ok(q.url?.startsWith('https://earthquake.usgs.gov/'))
   }
   assert.equal(magKo(5.2), '중간 지진')
+})
+
+test('과거 날씨: 작년 같은 기간 날짜 계산과 요약', () => {
+  assert.equal(yearsBefore('2026-12-10'), '2025-12-10')
+  assert.equal(yearsBefore('2028-02-29'), '2027-02-28')
+  assert.deepEqual(lastYearRange('2026-12-10', '2026-12-14'), ['2025-12-10', '2025-12-14'])
+  assert.deepEqual(lastYearRange('2026-07-01', '2026-08-30'), ['2025-07-01', '2025-07-16']) // 최대 16일
+  const days = toPastDays(load('past-paris.json'))
+  assert.equal(days.length, 5)
+  assert.equal(days[0].date, '2025-12-10')
+  const s = summarize(days)
+  assert.ok(s.avgMax != null && s.avgMin != null && s.avgMax > s.avgMin)
+  assert.equal(s.known, 5)
+})
+
+test('Photon: 고른 나라 결과만, 한글 판별', () => {
+  const jp = toHits(load('photon-kyto.json'), 'JP')
+  assert.ok(jp.length > 0)
+  assert.ok(jp.some((h) => h.name === 'Kyoto'))
+  assert.ok(jp.every((h) => Number.isFinite(h.lat) && Number.isFinite(h.lng)))
+  assert.equal(toHits(load('photon-kyto.json'), 'KR').length, 0)
+  assert.equal(hasHangul('교토'), true)
+  assert.equal(hasHangul('Kyoto 京都'), false)
 })

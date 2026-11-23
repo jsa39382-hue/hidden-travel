@@ -78,6 +78,8 @@ const OTHER = [
   },
   { name: '미세먼지·자외선', server: 'air-quality-api.open-meteo.com', run: () => probeUrl('https://air-quality-api.open-meteo.com/v1/air-quality?latitude=35.01&longitude=135.77&hourly=pm2_5&forecast_days=1') },
   { name: '바다 파고·수온', server: 'marine-api.open-meteo.com', run: () => probeUrl('https://marine-api.open-meteo.com/v1/marine?latitude=-8.72&longitude=115.17&daily=wave_height_max&forecast_days=1') },
+  { name: '작년 같은 날 날씨', server: 'archive-api.open-meteo.com', run: () => probeUrl('https://archive-api.open-meteo.com/v1/archive?latitude=35.01&longitude=135.77&start_date=2025-12-10&end_date=2025-12-10&daily=temperature_2m_max') },
+  { name: '장소 검색(입력하는 대로)', server: 'photon.komoot.io', run: () => probeUrl('https://photon.komoot.io/api/?q=Kyoto&limit=1') },
   { name: '지진 기록', server: 'earthquake.usgs.gov', run: () => probeUrl('https://earthquake.usgs.gov/fdsnws/event/1/query?format=geojson&latitude=35.01&longitude=135.77&maxradiuskm=100&minmagnitude=6&limit=1') },
   { name: '위키 조회수', server: 'wikimedia.org', run: () => probeUrl('https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia/all-access/user/Kyoto/monthly/20261001/20261031') },
 ]
