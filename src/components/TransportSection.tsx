@@ -164,7 +164,7 @@ function WithData({ country, place, t }: { country: Country; place: Place; t: Tr
       <footer className="space-y-1 text-[11px] leading-relaxed text-stone-400">
         <p>
           {TRANSPORT_UPDATED ?? '작성일 미상'} 기준이에요. 실제 요금·시간은 달라질 수 있어요.{' '}
-          {t.basis === 'reference' ? "위키백과 같은 공개 자료를 참고한 값이라 공식 값이 아니에요. '확인 필요'는 자료에 없던 항목이에요." : "'확인 필요'는 아직 공식 값을 넣지 않은 항목이에요."}
+          {t.basis === 'reference' ? "위키백과·위키보이저 같은 공개 자료를 참고한 값이라 공식 값이 아니에요. '확인 필요'는 자료에 없던 항목이에요." : "'확인 필요'는 아직 공식 값을 넣지 않은 항목이에요."}
         </p>
         {t.sources.length > 0 && (
           <p className="flex flex-wrap gap-x-3">
@@ -417,7 +417,7 @@ function BasisBadge({ basis }: { basis: TransportCountry['basis'] }) {
   ) : (
     <p className="flex items-start gap-2 rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs leading-relaxed text-amber-800">
       <span className="shrink-0 rounded-full border border-amber-500 px-2.5 py-0.5 font-semibold">참고</span>
-      공식 사이트에서 확인하지 못해 위키백과 공항 문서를 참고했어요. 수단과 소요 시간 위주이고, 요금은 대부분 비어 있어요. 떠나기 전에 공식 사이트에서 꼭 확인해 주세요.
+      공식 사이트에서 확인하지 못해 위키백과·위키보이저(여행 위키) 같은 공개 자료를 참고했어요. 요금은 자료에 적힌 값만 넣었고, 없는 칸은 비워 뒀어요. 떠나기 전에 공식 사이트에서 꼭 확인해 주세요.
     </p>
   )
 }

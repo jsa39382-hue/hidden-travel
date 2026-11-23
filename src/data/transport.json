@@ -1638,13 +1638,50 @@
      ]
     }
    ],
-   "cityTransit": [],
-   "taxi": null,
-   "rideApps": [],
+   "cityTransit": [
+    {
+     "city": "델리",
+     "card": "메트로 스마트카드 (200루피: 충전 150 + 보증금 50, 10% 할인)",
+     "cardPrice": 200,
+     "passes": [
+      {
+       "name": "투어리스트 카드 1일",
+       "price": 150,
+       "days": 1
+      },
+      {
+       "name": "투어리스트 카드 3일",
+       "price": 500,
+       "days": 3
+      }
+     ],
+     "single": [
+      10,
+      60
+     ]
+    }
+   ],
+   "taxi": {
+    "city": "델리",
+    "base": 20,
+    "includedKm": 1,
+    "perKm": 20,
+    "afterAmount": null,
+    "perKmAfter": null,
+    "nightMultiplier": 1.25,
+    "nightHours": "23:00-05:00",
+    "note": "라디오 택시(콜택시) 기준. 길에서 잡는 택시는 미터 조작이 잦아 값을 먼저 정하세요"
+   },
+   "rideApps": [
+    "Uber",
+    "Ola",
+    "Rapido"
+   ],
    "intercity": [],
    "sources": [
     "https://en.wikipedia.org/wiki/Indira_Gandhi_International_Airport",
-    "https://www.wikidata.org/wiki/Q821275"
+    "https://www.wikidata.org/wiki/Q821275",
+    "https://en.wikivoyage.org/wiki/Delhi"
    ]
   },
   "AE": {
@@ -1730,33 +1767,42 @@
       {
        "mode": "bus",
        "name": "Havaist 공항버스 (공항 → 시내 각 지역)",
-       "minutes": null,
+       "minutes": 90,
        "price": null,
        "firstLast": null,
-       "where": null,
-       "note": null,
+       "where": "공항 지하 2층 버스 정류장",
+       "note": "악사라이 등 환승역까지 약 90분, 25~30분 간격. 2024년 10월 기준 약 5.42유로. 술탄아흐메트 직행은 없어요",
        "transfers": 0
       },
       {
        "mode": "taxi",
        "name": "택시",
-       "minutes": null,
+       "minutes": 50,
        "price": null,
        "firstLast": null,
        "where": "도착·출발층 밖 택시 승강장 (24시간)",
-       "note": "거리로 계산해요",
+       "note": "술탄아흐메트까지 약 50km·50분, 2024년 10월 공항 안내 기준 약 27.92유로. 미터를 꼭 켜 달라고 하세요",
        "transfers": 0
       }
      ]
     }
    ],
-   "cityTransit": [],
+   "cityTransit": [
+    {
+     "city": "이스탄불",
+     "card": "이스탄불카드 (지하철·트램·버스·배 공용, 한 장으로 여러 명 결제 가능)",
+     "cardPrice": null,
+     "passes": [],
+     "single": null
+    }
+   ],
    "taxi": null,
    "rideApps": [],
    "intercity": [],
    "sources": [
     "https://en.wikipedia.org/wiki/Istanbul_Airport",
-    "https://www.wikidata.org/wiki/Q3661908"
+    "https://www.wikidata.org/wiki/Q3661908",
+    "https://en.wikivoyage.org/wiki/Istanbul"
    ]
   },
   "GB": {
@@ -1780,7 +1826,7 @@
        "price": null,
        "firstLast": null,
        "where": "히스로 센트럴(2·3터미널) · 5터미널역",
-       "note": "논스톱, 15분 간격 · 5터미널에서는 21분",
+       "note": "논스톱, 15분 간격 · 5터미널에서는 21분. 현장 요금은 엘리자베스 라인의 약 두 배",
        "transfers": 0
       },
       {
@@ -1800,7 +1846,7 @@
        "price": null,
        "firstLast": null,
        "where": null,
-       "note": "보통 40~50분",
+       "note": "보통 40~50분, 10분 간격 (오이스터·컨택리스 가능)",
        "transfers": null
       },
       {
@@ -1816,13 +1862,32 @@
      ]
     }
    ],
-   "cityTransit": [],
-   "taxi": null,
+   "cityTransit": [
+    {
+     "city": "런던",
+     "card": "오이스터 카드 (카드 값 10파운드, 환불 안 됨) · 컨택리스 카드도 같은 요금, 하루 상한 있음",
+     "cardPrice": 10,
+     "passes": [],
+     "single": null
+    }
+   ],
+   "taxi": {
+    "city": "런던",
+    "base": null,
+    "includedKm": null,
+    "perKm": null,
+    "afterAmount": null,
+    "perKmAfter": null,
+    "nightMultiplier": null,
+    "nightHours": null,
+    "note": "버스는 1회 1.85파운드 (2026년 11월). 블랙캡은 길에서 잡거나 승강장에서 타요"
+   },
    "rideApps": [],
    "intercity": [],
    "sources": [
     "https://en.wikipedia.org/wiki/Heathrow_Airport",
-    "https://www.wikidata.org/wiki/Q8691"
+    "https://www.wikidata.org/wiki/Q8691",
+    "https://en.wikivoyage.org/wiki/London"
    ]
   },
   "FR": {
@@ -1843,32 +1908,66 @@
        "mode": "rail",
        "name": "RER B (공항 → 파리 북역·샤틀레)",
        "minutes": null,
-       "price": null,
+       "price": [
+        14,
+        14
+       ],
        "firstLast": null,
        "where": "공항 RER역",
-       "note": null,
+       "note": "공항 티켓 14유로, 10분 간격. 밤 0시 30분 이후엔 N140·N143 심야버스(30분 간격)",
        "transfers": null
       },
       {
        "mode": "taxi",
        "name": "택시",
        "minutes": null,
-       "price": null,
+       "price": [
+        50,
+        55
+       ],
        "firstLast": null,
        "where": "택시 승강장",
-       "note": "거리로 계산해요",
+       "note": "샤를드골 ↔ 파리 정액 요금: 센강 오른쪽 50유로, 왼쪽 55유로",
        "transfers": 0
       }
      ]
     }
    ],
-   "cityTransit": [],
-   "taxi": null,
+   "cityTransit": [
+    {
+     "city": "파리",
+     "card": "나비고 이지 (카드 값 2유로) · 스마트폰 나비고는 무료",
+     "cardPrice": 2,
+     "passes": [
+      {
+       "name": "1일권 (공항 제외)",
+       "price": 12.3,
+       "days": 1
+      }
+     ],
+     "single": [
+      2.55,
+      2.55
+     ]
+    }
+   ],
+   "taxi": {
+    "city": "파리",
+    "base": 2.4,
+    "includedKm": null,
+    "perKm": 1.1,
+    "afterAmount": null,
+    "perKmAfter": null,
+    "nightMultiplier": null,
+    "nightHours": null,
+    "note": "막히면 1분당 약 0.5유로가 더해지고, 요일·시간·지역에 따라 요금이 달라요"
+   },
    "rideApps": [],
    "intercity": [],
    "sources": [
     "https://en.wikipedia.org/wiki/Charles_de_Gaulle_Airport",
-    "https://www.wikidata.org/wiki/Q46280"
+    "https://www.wikidata.org/wiki/Q46280",
+    "https://en.wikivoyage.org/wiki/Paris"
    ]
   },
   "DE": {
@@ -1889,11 +1988,24 @@
        "mode": "rail",
        "name": "S-Bahn S8·S9 (공항 → 프랑크푸르트 중앙역)",
        "minutes": 12,
-       "price": null,
+       "price": [
+        6.6,
+        6.6
+       ],
        "firstLast": null,
        "where": "1터미널 B콘코스 지역 열차역",
-       "note": "10~12분, 낮에는 15분 간격",
+       "note": "10~12분, 낮에는 15분 간격. 어른 6.60·어린이 2.90유로(2026년 4월), 타기 전에 발권기에서 표를 사요",
        "transfers": null
+      },
+      {
+       "mode": "bus",
+       "name": "61번 버스 (공항 → 남역)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": "프랑크푸르트 남역(Südbahnhof)까지",
+       "transfers": 0
       },
       {
        "mode": "taxi",
@@ -1908,13 +2020,41 @@
      ]
     }
    ],
-   "cityTransit": [],
+   "cityTransit": [
+    {
+     "city": "프랑크푸르트",
+     "card": null,
+     "cardPrice": null,
+     "passes": [
+      {
+       "name": "1일권 (시내 구역)",
+       "price": 7.75,
+       "days": 1
+      },
+      {
+       "name": "프랑크푸르트 카드 2일 (공항 포함)",
+       "price": 21,
+       "days": 2
+      },
+      {
+       "name": "프랑크푸르트 카드 3일 (공항 포함)",
+       "price": 28,
+       "days": 3
+      }
+     ],
+     "single": [
+      3.8,
+      3.8
+     ]
+    }
+   ],
    "taxi": null,
    "rideApps": [],
    "intercity": [],
    "sources": [
     "https://en.wikipedia.org/wiki/Frankfurt_Airport",
-    "https://www.wikidata.org/wiki/Q46033"
+    "https://www.wikidata.org/wiki/Q46033",
+    "https://en.wikivoyage.org/wiki/Frankfurt"
    ]
   },
   "CH": {
@@ -1935,10 +2075,13 @@
        "mode": "rail",
        "name": "기차 (공항 → 취리히 중앙역)",
        "minutes": 13,
-       "price": null,
+       "price": [
+        6.8,
+        6.8
+       ],
        "firstLast": null,
        "where": "공항역",
-       "note": "9~13분, 시간당 약 13편",
+       "note": "9~13분, 낮에는 10~15분 간격 (취리히 중앙역까지 6.80프랑)",
        "transfers": null
       },
       {
@@ -1970,7 +2113,8 @@
    "intercity": [],
    "sources": [
     "https://en.wikipedia.org/wiki/Zurich_Airport",
-    "https://www.wikidata.org/wiki/Q15114"
+    "https://www.wikidata.org/wiki/Q15114",
+    "https://en.wikivoyage.org/wiki/Zürich"
    ]
   },
   "AT": {
@@ -1991,21 +2135,40 @@
        "mode": "rail",
        "name": "CAT 시티 에어포트 트레인 (공항 → 빈 미테)",
        "minutes": 16,
-       "price": null,
+       "price": [
+        11,
+        11
+       ],
        "firstLast": null,
        "where": null,
-       "note": "직통 16분, S7보다 비싸요",
+       "note": "직통 16분, 11유로부터",
        "transfers": 0
       },
       {
        "mode": "rail",
        "name": "S7 (공항 → 시내)",
-       "minutes": 25,
-       "price": null,
+       "minutes": 24,
+       "price": [
+        4.6,
+        4.6
+       ],
        "firstLast": null,
        "where": null,
-       "note": "약 25분",
+       "note": "빈 미테까지 약 24분",
        "transfers": null
+      },
+      {
+       "mode": "rail",
+       "name": "장거리 열차 (공항 → 빈 중앙역)",
+       "minutes": 15,
+       "price": [
+        4.2,
+        4.2
+       ],
+       "firstLast": null,
+       "where": null,
+       "note": "30분 간격",
+       "transfers": 0
       },
       {
        "mode": "taxi",
@@ -2026,7 +2189,8 @@
    "intercity": [],
    "sources": [
     "https://en.wikipedia.org/wiki/Vienna_International_Airport",
-    "https://www.wikidata.org/wiki/Q32999"
+    "https://www.wikidata.org/wiki/Q32999",
+    "https://en.wikivoyage.org/wiki/Vienna"
    ]
   },
   "PT": {
@@ -2046,33 +2210,73 @@
       {
        "mode": "rail",
        "name": "리스본 지하철 빨간선 (공항 → 시내)",
-       "minutes": null,
-       "price": null,
+       "minutes": 16,
+       "price": [
+        1.75,
+        1.75
+       ],
        "firstLast": null,
        "where": null,
-       "note": "교통카드(7 Colinas/Viva Viagem) 또는 컨택리스",
+       "note": "살다냐역까지 약 16분. 나베간트 카드 충전식(재핑)으로 내면 1.75유로",
        "transfers": null
       },
       {
        "mode": "taxi",
        "name": "택시",
        "minutes": 15,
-       "price": null,
+       "price": [
+        16,
+        16
+       ],
        "firstLast": null,
        "where": "택시 승강장",
-       "note": "시내까지 약 15분 · 거리로 계산해요",
+       "note": "시내까지 약 16유로(2024년 2월), 짐 1개당 1.20유로",
+       "transfers": 0
+      },
+      {
+       "mode": "ride",
+       "name": "Uber·Bolt (차량 호출)",
+       "minutes": null,
+       "price": [
+        13,
+        13
+       ],
+       "firstLast": null,
+       "where": "사전 예약 차량 구역",
+       "note": "시내까지 약 13유로 (2024년 2월)",
        "transfers": 0
       }
      ]
     }
    ],
-   "cityTransit": [],
+   "cityTransit": [
+    {
+     "city": "리스본",
+     "card": "나베간트 카드 (카드 값 0.50유로)",
+     "cardPrice": 0.5,
+     "passes": [
+      {
+       "name": "24시간권 (지하철·버스·트램)",
+       "price": 7,
+       "days": 1
+      }
+     ],
+     "single": [
+      1.66,
+      1.66
+     ]
+    }
+   ],
    "taxi": null,
-   "rideApps": [],
+   "rideApps": [
+    "Uber",
+    "Bolt"
+   ],
    "intercity": [],
    "sources": [
     "https://en.wikipedia.org/wiki/Lisbon_Airport",
-    "https://www.wikidata.org/wiki/Q403671"
+    "https://www.wikidata.org/wiki/Q403671",
+    "https://en.wikivoyage.org/wiki/Lisbon"
    ]
   },
   "GR": {
@@ -2093,10 +2297,13 @@
        "mode": "rail",
        "name": "지하철 3호선 (공항 → 시내)",
        "minutes": null,
-       "price": null,
+       "price": [
+        9,
+        9
+       ],
        "firstLast": null,
        "where": null,
-       "note": null,
+       "note": "공항 요금 편도 9유로 (아테네 대중교통 어디까지든 포함)",
        "transfers": null
       },
       {
@@ -2113,22 +2320,63 @@
        "mode": "taxi",
        "name": "택시",
        "minutes": null,
-       "price": null,
+       "price": [
+        40,
+        60
+       ],
        "firstLast": null,
        "where": "도착층 3번 출구 택시 승강장",
-       "note": "거리로 계산해요",
+       "note": "시내까지 낮 40유로, 밤 60유로",
        "transfers": 0
       }
      ]
     }
    ],
-   "cityTransit": [],
-   "taxi": null,
+   "cityTransit": [
+    {
+     "city": "아테네",
+     "card": "컨택리스 카드·휴대폰 터치 가능 (하루 4.10유로 상한)",
+     "cardPrice": null,
+     "passes": [
+      {
+       "name": "1일권",
+       "price": 4.1,
+       "days": 1
+      },
+      {
+       "name": "3일권 + 공항",
+       "price": 20,
+       "days": 3
+      },
+      {
+       "name": "5일권",
+       "price": 8.2,
+       "days": 5
+      }
+     ],
+     "single": [
+      1.2,
+      1.2
+     ]
+    }
+   ],
+   "taxi": {
+    "city": "아테네",
+    "base": 1.19,
+    "includedKm": null,
+    "perKm": 0.34,
+    "afterAmount": null,
+    "perKmAfter": null,
+    "nightMultiplier": null,
+    "nightHours": null,
+    "note": "자정~05시와 시 밖은 km당 0.64유로, 최저 3.20유로, 공항 오가면 3.20유로 추가"
+   },
    "rideApps": [],
    "intercity": [],
    "sources": [
     "https://en.wikipedia.org/wiki/Athens_International_Airport",
-    "https://www.wikidata.org/wiki/Q211734"
+    "https://www.wikidata.org/wiki/Q211734",
+    "https://en.wikivoyage.org/wiki/Athens"
    ]
   },
   "KH": {
@@ -2169,11 +2417,42 @@
        "transfers": 0
       }
      ]
+    },
+    {
+     "code": "SAI",
+     "name": "시엠레아프 앙코르 국제공항",
+     "lat": 13.3692,
+     "lng": 104.2231,
+     "cities": [
+      "시엠레아프"
+     ],
+     "options": [
+      {
+       "mode": "shuttle",
+       "name": "공항 미니버스 (공항 → 시엠레아프 시내)",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": null,
+       "note": "좌석당 8달러, 개인 미니밴은 40달러. 시내까지 약 50km",
+       "transfers": 0
+      },
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "택시 승강장",
+       "note": "시내까지 약 50km",
+       "transfers": 0
+      }
+     ]
     }
    ],
    "cityTransit": [],
    "taxi": {
-    "city": "프놈펜",
+    "city": "프놈펜·시엠레아프",
     "base": null,
     "includedKm": null,
     "perKm": null,
@@ -2199,7 +2478,56 @@
    "sources": [
     "https://en.wikivoyage.org/wiki/Phnom_Penh",
     "https://en.wikivoyage.org/wiki/Siem_Reap",
-    "https://www.wikidata.org/wiki/Q106616277"
+    "https://www.wikidata.org/wiki/Q106616277",
+    "https://www.wikidata.org/wiki/Q106511570"
+   ]
+  },
+  "GU": {
+   "basis": "reference",
+   "currency": "USD",
+   "childRate": null,
+   "airports": [
+    {
+     "code": "GUM",
+     "name": "안토니오 B. 원 팻 국제공항",
+     "lat": 13.485,
+     "lng": 144.7975,
+     "cities": [
+      "괌"
+     ],
+     "options": [
+      {
+       "mode": "taxi",
+       "name": "택시",
+       "minutes": null,
+       "price": null,
+       "firstLast": null,
+       "where": "공항 택시 승강장",
+       "note": "본토보다 비싼 편이고 미터를 안 켜기도 해요. 타기 전에 요금을 확인하세요",
+       "transfers": 0
+      }
+     ]
+    }
+   ],
+   "cityTransit": [],
+   "taxi": {
+    "city": "괌",
+    "base": null,
+    "includedKm": null,
+    "perKm": null,
+    "afterAmount": null,
+    "perKmAfter": null,
+    "nightMultiplier": null,
+    "nightHours": null,
+    "note": "투몬에선 민간 트롤리 버스가 호텔·쇼핑몰을 돌아요. Uber·Lyft는 사실상 안 되고 렌터카가 편해요"
+   },
+   "rideApps": [
+    "Stroll"
+   ],
+   "intercity": [],
+   "sources": [
+    "https://en.wikivoyage.org/wiki/Guam",
+    "https://www.wikidata.org/wiki/Q1136355"
    ]
   }
  }
