@@ -4,7 +4,7 @@
 //   { details: { alert_status: ['avoid_all_but_essential_travel_to_parts'], updated_at, reviewed_at, parts: [{ slug: 'warnings-and-insurance', body: '<html>' }] } }
 // 실행: npm run build:advisories
 import { readFile, writeFile } from 'node:fs/promises'
-import { extractAreas } from '../src/lib/advisoryText.ts'
+import { extractAreas, htmlText, riskFlags, riskLevel } from '../src/lib/advisoryText.ts'
 
 const src = await readFile(new URL('../src/lib/advisorySlugs.ts', import.meta.url), 'utf8')
 const slugs = Object.fromEntries([...src.matchAll(/([A-Z]{2}): (null|'[^']+')/g)].map(([, c, s]) => [c, s === 'null' ? null : s.slice(1, -1)]))
@@ -22,10 +22,21 @@ for (const [code, slug] of Object.entries(slugs)) {
       if (!res.ok) throw new Error('HTTP ' + res.status)
       const j = await res.json()
       if (!Array.isArray(j.details?.alert_status)) throw new Error('형식이 달라요')
-      const body = j.details.parts?.find((p) => p.slug === 'warnings-and-insurance')?.body ?? ''
-      d = { status: j.details.alert_status, updatedAt: j.details.updated_at ?? j.public_updated_at, areas: extractAreas(body) }
+      const part = (slug) => j.details.parts?.find((p) => p.slug === slug)?.body ?? ''
+      const flags = riskFlags(htmlText(part('warnings-and-insurance') + ' ' + part('safety-and-security')))
+      const level = riskLevel(j.details.alert_status, flags)
+      d = {
+        status: j.details.alert_status,
+        updatedAt: j.details.updated_at ?? j.public_updated_at,
+        level,
+        flags,
+        change: j.details.change_description ?? null,
+        // 지역 목록은 경보가 있는 나라만 (파일을 가볍게)
+        areas: level >= 2 ? extractAreas(part('warnings-and-insurance')) : null,
+      }
       done.set(slug, d)
-      await new Promise((r) => setTimeout(r, 300))
+      await new Promise((r) => setTimeout(r, 250))
+      if (done.size % 20 === 0) console.log(`  ${done.size}곳…`)
     }
     out.countries[code] = d
     ok++

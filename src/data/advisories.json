@@ -1,71 +1,1144 @@
 {
  "_설명": "영국 외무부(FCDO) 여행 경보 사본. 화면은 먼저 실시간으로 받고, 못 받으면 이 사본을 쓴다. npm run build:advisories로 갱신한다.",
- "fetchedAt": "2026-11-23T12:52:58.228Z",
+ "fetchedAt": "2026-11-23T13:01:15.061Z",
  "countries": {
-  "JP": {
+  "AD": {
    "status": [],
-   "updatedAt": "2026-10-07T10:45:59Z",
+   "updatedAt": "2026-10-07T11:41:24Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
    "areas": null
+  },
+  "AE": {
+   "status": [],
+   "updatedAt": "2026-11-18T16:33:03Z",
+   "level": 0,
+   "flags": [
+    "missile"
+   ],
+   "change": "Updated information about regional tensions (See ‘Warnings and insurance’ page). ",
+   "areas": null
+  },
+  "AF": {
+   "status": [
+    "avoid_all_travel_to_whole_country"
+   ],
+   "updatedAt": "2026-10-07T10:23:54Z",
+   "level": 4,
+   "flags": [
+    "conflict",
+    "terror-high",
+    "kidnap",
+    "crime"
+   ],
+   "change": "Addition of information about UK Government support (see ‘Do not travel to Afghanistan’ on the ‘Warnings and insurance’ page). ",
+   "areas": null
+  },
+  "AG": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:05:13Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "New information that it is illegal to smoke in public places ('Safety and security' page).\r\n\r\n",
+   "areas": null
+  },
+  "AI": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:05:43Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about crime ('Safety and security' page). ",
+   "areas": null
+  },
+  "AL": {
+   "status": [],
+   "updatedAt": "2026-10-15T15:44:54Z",
+   "level": 0,
+   "flags": [
+    "mines"
+   ],
+   "change": "New information about demonstrations in Tirana ('Warnings and insurance' page).",
+   "areas": null
+  },
+  "AM": {
+   "status": [
+    "avoid_all_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-07T11:43:10Z",
+   "level": 2,
+   "flags": [],
+   "change": "New information about entering Armenia across the land border from Iran (‘Entry requirements’ page)",
+   "areas": "Armenia-Azerbaijan border  \nThe border with Azerbaijan remains closed. FCDO advises against all travel to within 5km of the entire eastern border between Armenia and Azerbaijan, due to tensions between the 2 countries.   \nM16/H26 road between Ijevan and Noyemberyan  \nFCDO advises against all travel along the M16/H26 road between the towns of Ijevan and Noyemberyan, due to border tensions."
+  },
+  "AO": {
+   "status": [
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-07T10:37:54Z",
+   "level": 2,
+   "flags": [
+    "kidnap",
+    "mines",
+    "unrest"
+   ],
+   "change": "Addition of information about a declaration of an Ebola outbreak in DRC on 15 May and updated information about road travel ('Safety and security' and 'Health' pages).",
+   "areas": "Areas where FCDO advises against all but essential travel  \nCabinda Province, except Cabinda city \nFCDO advises against all but essential travel to Cabinda Province, except to Cabinda city. This is due to separatist groups carrying out targeted attacks on foreigners and the risk of kidnap. \nBorder areas in Lunda Norte Province \nFCDO advises against all but essential travel to within 1km of the border with the Democratic Republic of the Congo (DRC) in Lunda Norte province, except for official border crossings and their access roads. This is due to poor conditions, insecurity and banditry."
+  },
+  "AR": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:47:50Z",
+   "level": 1,
+   "flags": [
+    "kidnap",
+    "crime"
+   ],
+   "change": "New information about Hantavirus in Argentina (‘Health’ page).",
+   "areas": null
+  },
+  "AS": {
+   "status": [],
+   "updatedAt": "2026-11-20T19:57:12Z",
+   "level": 0,
+   "flags": [
+    "terror-high",
+    "crime"
+   ],
+   "change": "Removal of information about air traffic disruptions across the US",
+   "areas": null
+  },
+  "AT": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:43:33Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information on European Entry-Exit System (EES) (‘Entry requirements’ page).  ",
+   "areas": null
+  },
+  "AU": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:24:13Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about global travel impacts due to escalation in the Middle East (‘Warnings and insurance’ page).",
+   "areas": null
+  },
+  "AW": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:04:53Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "This travel advice was reviewed for accuracy and there are no significant updates.",
+   "areas": null
+  },
+  "AZ": {
+   "status": [
+    "avoid_all_travel_to_parts",
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-23T12:44:51Z",
+   "level": 2,
+   "flags": [
+    "mines"
+   ],
+   "change": "New information about entry requirements for the upcoming FIFA U-15 World Cup and Festival 2026 and travelling on a UK Emergency Travel Document to Azerbaijan. Updated information about visa requirements and entering Azerbaijan across the land border from Iran ('Entry requirements' page).     ",
+   "areas": "Azerbaijan-Armenia border\nThe border with Armenia remains closed. The FCDO advises against all travel to within 5km of the border with Armenia, due to tensions between Azerbaijan and Armenia. Note that this does not include the border of Azerbaijan’s Nakhchivan exclave with Armenia.\nAreas where FCDO advises against all but essential travel \nSouth-western Azerbaijan (those regions affected by conflict in 2020 and 2023) \nThe Foreign, Commonwealth & Development Office (FCDO) advises against all but essential travel to: \n · The districts (‘rayons’) of Kelbajar, Lachin, Qubadli, Zengilan, Jabrayil, Fuzuli, Khojavand, Shusha, Khojali, Khankendi, Aghdam and Tartar\nYou should follow Azerbaijani national government and local authorities’ advice in areas that have not been cleared of mines or unexploded ordnance."
+  },
+  "BA": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:48:47Z",
+   "level": 0,
+   "flags": [
+    "mines"
+   ],
+   "change": "New information on wait times if travelling to and from the Schengen area from Bosnia and Herzegovina. New information that the border crossing at Gradiška has been relocated to a new facility ('Warnings and insurance' page).",
+   "areas": null
+  },
+  "BB": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:04:06Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "Removal of information about flight disruptions ('Warnings and insurance' page). ",
+   "areas": null
+  },
+  "BD": {
+   "status": [
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-22T08:30:24Z",
+   "level": 2,
+   "flags": [
+    "terror-high",
+    "crime"
+   ],
+   "change": "Removal of information about Hindu festival of Durga Puja (‘Warnings and insurance’ page).",
+   "areas": null
+  },
+  "BE": {
+   "status": [],
+   "updatedAt": "2026-10-17T19:49:24Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "Additional information on demonstrations and strikes (Safety and security).",
+   "areas": null
+  },
+  "BF": {
+   "status": [
+    "avoid_all_travel_to_whole_country"
+   ],
+   "updatedAt": "2026-10-26T15:58:48Z",
+   "level": 4,
+   "flags": [
+    "terror-high",
+    "kidnap",
+    "mines",
+    "unrest"
+   ],
+   "change": "New information about the death penalty in Burkina Faso (‘Safety and security’ page).  \r\n\r\n ",
+   "areas": "FCDO advises against all travel to Burkina Faso.\nThis is due to the threat of terrorist attacks and terrorist kidnap, and the unstable political situation in the country."
+  },
+  "BG": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:49:33Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information on European Entry-Exit System (EES) (‘Entry requirements’ page).  ",
+   "areas": null
+  },
+  "BH": {
+   "status": [],
+   "updatedAt": "2026-11-18T16:31:19Z",
+   "level": 0,
+   "flags": [
+    "missile",
+    "unrest"
+   ],
+   "change": "Updated information about regional tensions (See ‘Warnings and insurance’ page). ",
+   "areas": null
+  },
+  "BI": {
+   "status": [
+    "avoid_all_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-07T10:36:28Z",
+   "level": 2,
+   "flags": [
+    "crime"
+   ],
+   "change": "Addition of information about a declaration of an Ebola outbreak in DRC on 15 May (‘Health page’).\r\n\r\n",
+   "areas": "Parts of Bujumbura Province\nFCDO advises against all travel to Mugina, Cibitoke, Bukinyayana, Bubanza and Mpanda communes due to the risk of the presence of a rebel group in the Kibira National Park and possible armed incursions from the Democratic Republic of the Congo (DRC). \nFCDO advises against all travel to parts of Ntahangwa commune, specifically the RN5 road north of Melchior Ndadaye International Airport in Bujumbura towards Cibitoke and west of the Rusizi river towards the border with DRC, including Rusizi National Park (also known as Rusizi Delta Nature Reserve). This is due to possible armed incursions from DRC.\nParts of Butanyerera Province\nFCDO advises against all travel on the main RN6 and RN10 roads running west from Kayanza through the Kibira National Park towards Cibitoke, due to the risk of the presence of a rebel group and possible armed incursions from DRC."
+  },
+  "BJ": {
+   "status": [
+    "avoid_all_travel_to_parts",
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-04T16:27:24Z",
+   "level": 2,
+   "flags": [
+    "terror-high",
+    "kidnap",
+    "crime",
+    "unrest"
+   ],
+   "change": "Updated information about applying for a visa (see 'Visa requirements' on the 'Entry requirements' page).",
+   "areas": "Northern border regions\nFCDO advises against all travel to the Parc du W National Park and the hunting zones of Mékrou and Djona. The park is tri-national, sharing an open border with Burkina Faso and Niger. There is a risk of terrorist attacks and kidnapping throughout the park.\nFCDO also advises against all travel to:\n · the area between the Parc du W and the border with Niger\n · the Pendjari National Park and adjacent hunting grounds\n · all other areas within 5km of the border with Burkina Faso\nEastern Benin\nFCDO advises against all but essential travel to the area between the Interstate Highway (RNIE) 2 from Tchaourou to Malanville and the Benin-Nigeria border, due to increasing criminality.\nAlibori and Atacora \nFCDO advises against all but essential travel to the rest of the Alibori and Atacora departments."
+  },
+  "BL": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:50:31Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about dual nationals returning to the UK (‘ Entry requirements’ page).",
+   "areas": null
+  },
+  "BM": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:03:27Z",
+   "level": 0,
+   "flags": [],
+   "change": "Removal of advisory information on Hurricane Melissa ('Warnings and insurance' page).",
+   "areas": null
+  },
+  "BN": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:28:21Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about global travel impacts due to escalation in the Middle East (‘Warnings and insurance’ page).",
+   "areas": null
+  },
+  "BO": {
+   "status": [
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-07T10:47:19Z",
+   "level": 2,
+   "flags": [
+    "kidnap",
+    "crime",
+    "unrest"
+   ],
+   "change": "Updated information about the State of Emergency ('Warnings and insurance' page). ",
+   "areas": "FCDO advises against all but essential travel to the Chapare region of Cochabamba Department including Villa Tunari and highway routes 4 and 24 that pass through Chapare."
+  },
+  "BQ": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:03:09Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).\r\n \r\n",
+   "areas": null
+  },
+  "BR": {
+   "status": [
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-17T13:27:42Z",
+   "level": 2,
+   "flags": [
+    "kidnap",
+    "crime",
+    "unrest"
+   ],
+   "change": "New information about the risk of extreme weather due to the El Niño climate event (‘Safety and security’ page). ",
+   "areas": "Areas where FCDO advises against all but essential travel   \nAmazonas State\nFCDO advises against all but essential travel to the following river areas towards the west of Amazonas State:  \n · along the Amazonas (Amazon) River and its tributaries west of the town of Codajás and east of the town of Belém do Solimões in Amazonas State\n · along any part of the Itaquaí River in Amazonas State\n · along any part of the Japurá River or its tributaries in Amazonas State\n · along the Rio Negro (Black River) and its tributaries north or west of the town of Barcelos in Amazonas State"
+  },
+  "BS": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:04:29Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "New information about Ebola screening when arriving in country ('Entry requirements' page). ",
+   "areas": null
+  },
+  "BT": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:26:43Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).\r\n \r\n",
+   "areas": null
+  },
+  "BW": {
+   "status": [],
+   "updatedAt": "2026-11-06T14:39:38Z",
+   "level": 1,
+   "flags": [
+    "conflict",
+    "crime"
+   ],
+   "change": "Updated information about the documents needed when travelling with children (see 'Travelling with children' on the 'Entry requirements' page). ",
+   "areas": null
+  },
+  "BY": {
+   "status": [
+    "avoid_all_travel_to_whole_country"
+   ],
+   "updatedAt": "2026-10-07T11:46:40Z",
+   "level": 4,
+   "flags": [],
+   "change": "Updated information on buying flight tickets if the journey is starting in, or within, Russia ('Safety and security’ page)",
+   "areas": null
+  },
+  "BZ": {
+   "status": [],
+   "updatedAt": "2026-11-05T16:48:48Z",
+   "level": 0,
+   "flags": [
+    "crime",
+    "unrest"
+   ],
+   "change": "New information following the Government of Belize announcing a 30-day State of Emergency ('Warnings and insurance' page). ",
+   "areas": null
+  },
+  "CA": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:01:35Z",
+   "level": 0,
+   "flags": [],
+   "change": "Addition of  information about entry requirements for those entering from Ebola-affected regions ('Entry requirements' page). ",
+   "areas": null
+  },
+  "CD": {
+   "status": [
+    "avoid_all_travel_to_parts",
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-08T12:20:38Z",
+   "level": 2,
+   "flags": [
+    "missile",
+    "terror-high",
+    "kidnap",
+    "crime",
+    "unrest"
+   ],
+   "change": "New information and guidance about the ongoing Ebola outbreak in DRC (see 'Warnings and insurance' and 'Health' pages).",
+   "areas": "Areas in Kinshasa Province\nFCDO advises against all but essential travel to:\n · The districts of N’djili and Kimbanseke in Kinshasa city south of the main access road to N’djili airport, in Nsele commune\n · The N1 road in Kinshasa Province, between and including Menkao to the west, Kenge to the east, the border of Mai-Ndombe province to the north, and 10km to the south\nDRC-Central African Republic border\nFCDO advises against all travel to within 50km of the border with the Central African Republic.\nEastern DRC  \nFCDO advises against all travel to the provinces of:\n · Haut-Uélé and Ituri, including the entire DRC-South Sudan border\n · North Kivu\n · South Kivu\n · Maniema\n · Tanganyika\n · Haut-Lomami\nSouth-East DRC\nFCDO advises against all but essential travel to Upemba National Park. If you choose to travel to Upemba National Park against FCDO advise, notify the park authorities about …"
+  },
+  "CF": {
+   "status": [
+    "avoid_all_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-07T10:34:23Z",
+   "level": 2,
+   "flags": [
+    "conflict",
+    "kidnap",
+    "crime"
+   ],
+   "change": "Addition of information about a declaration of an Ebola outbreak in DRC on 15 May (‘Health page’).",
+   "areas": "FCDO advises against all travel to the whole of the Central African Republic, including the areas of Bimbo, Begoua and Coline, except to the capital, Bangui.\nFCDO advises against all but essential travel to Bangui, including Bangui M’Poko International Airport."
+  },
+  "CG": {
+   "status": [
+    "avoid_all_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-27T12:00:20Z",
+   "level": 2,
+   "flags": [
+    "crime"
+   ],
+   "change": "Updated information about vaccine requirements for border control (‘Entry requirements’ page).",
+   "areas": "Republic of Congo-Central African Republic border area in Likouala Region\nFCDO advises against all travel to within 50km of the Republic of Congo-Central African Republic border in Likouala Region."
+  },
+  "CH": {
+   "status": [],
+   "updatedAt": "2026-10-07T12:54:14Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information on European Entry-Exit System (EES) (‘Entry requirements’ page). ",
+   "areas": null
+  },
+  "CI": {
+   "status": [
+    "avoid_all_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-09T16:16:31Z",
+   "level": 2,
+   "flags": [
+    "kidnap",
+    "crime"
+   ],
+   "change": "New information about Ebola screening and health declarations when arriving in country (‘Entry requirements’ page).",
+   "areas": "Borders with Burkina Faso and Mali\nFCDO advises against all travel to:\n · within 40km of the borders with Burkina Faso and Mali\n · Northern Zanzan and Savanes provinces\n · Comoé National Park\nThis is due to an increased risk of terrorist attacks and kidnaps by terrorists based in the Sahel region, which includes Burkina Faso and Mali. \nCôte d’Ivoire-Liberia border \nFCDO advises against all but essential travel to within 20km of the border with Liberia owing to the risk of serious violence by local militias."
+  },
+  "CK": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:35:19Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "CL": {
+   "status": [],
+   "updatedAt": "2026-11-09T12:06:59Z",
+   "level": 0,
+   "flags": [
+    "mines",
+    "crime",
+    "unrest"
+   ],
+   "change": "Removal of information about heavy rain and severe mudslides in eastern Santiago ('Warnings and insurance’ page).",
+   "areas": null
+  },
+  "CM": {
+   "status": [
+    "avoid_all_travel_to_parts",
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-06T16:22:46Z",
+   "level": 2,
+   "flags": [
+    "terror-high",
+    "kidnap",
+    "crime",
+    "unrest"
+   ],
+   "change": "New information about the introduction of health screening on arrival at Nsimalen International Airport and Douala International Airport ('Entry requirements' page).",
+   "areas": "Bakassi Peninsula\nFCDO advises against all travel to Bakassi Peninsula.\nCameroon-Central African Republic border\nFCDO advises against all travel to within 40km of the border with Central African Republic.\nCameroon-Chad border\nFCDO advises against all travel to within 40km of the border with Chad.\nCameroon-Nigeria border\nFCDO advises against all travel to within 40km of the border with Nigeria, except for Garoua in the North Region.\nFar-North Region\nFCDO advises against all travel to the Far-North Region, except for:\n · a 20km radius to the north, east and west of Maroua\n · 30km south of Maroua\nNorth-West Region\nFCDO advises against all travel to the North-West Region.\nSouth-West Region\nFCDO advises against all travel to the South-West Region, including the towns of Buea, Muyuka and Tiko in Fako Division. Except for:\n · Limbé\n · the 35km stretch of the N3 road connecting Limbé to the …"
   },
   "CN": {
    "status": [],
    "updatedAt": "2026-10-07T10:30:13Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "\"Updated information on Warnings and insurance\"",
+   "areas": null
+  },
+  "CO": {
+   "status": [
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-23T10:55:23Z",
+   "level": 2,
+   "flags": [
+    "conflict",
+    "missile",
+    "terror-high",
+    "kidnap",
+    "mines",
+    "crime"
+   ],
+   "change": "Removal of information about the the temporary deployment of security forces in the city of Cucuta (‘Warnings and Insurance’ page).",
+   "areas": "Areas where FCDO advises against all but essential travel  \nColombia-Venezuela border and northern Colombia \nFCDO advises against all but essential travel to: \n · all of Norte de Santander Department, including Cúcuta.\n · all of Arauca Department\n · the municipality of Puerto Carreño in Vichada Department\n · within 5km of the rest of the border with Venezuela.\nFCDO currently advises against all travel to Venezuela’s border regions with Colombia. You should not use any of the Colombia-Venezuela land crossings. \nPacific coast and Colombia-Panama border\nFCDO advises against all but essential travel to: \n · Chocó Department, except for the department capital Quibdó, the towns of Nuquí and Bahía Solano and Capurganá \n · the western part of Valle del Cauca Department, including Buenaventura  \n · the municipality of Jamundí, Valle del Cauca\n · the South Pacific, Sanquianga and Telembi regions …"
+  },
+  "CR": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:01:00Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "Updated information on customs rules; gang-related violence; fines for unauthorised entry into restricted conservation areas and earthquakes and recent volcanic activity ('Entry requirements' and 'Safety and security' pages). \r\n",
+   "areas": null
+  },
+  "CU": {
+   "status": [
+    "avoid_all_but_essential_travel_to_whole_country"
+   ],
+   "updatedAt": "2026-10-07T11:00:41Z",
+   "level": 3,
+   "flags": [
+    "crime"
+   ],
+   "change": "This travel advice has been reviewed for accuracy with changes made throughout, including protests in Cuba, power outages and fuel and water shortages, travel disruption, international card transactions, travel insurance, visa requirements, travelling to the USA from Cuba, taking money into Cuba, crime, money, taxis, emergency medical numbers and healthcare in Cuba (‘Warnings and insurance’, ‘Entry requirements’, ‘Safety and security’ and ‘Health’ pages).",
+   "areas": null
+  },
+  "CV": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:34:40Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about travelling with medication (‘Health’ page).",
+   "areas": null
+  },
+  "CW": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:59:50Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "CX": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:01:35Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about global travel impacts due to escalation in the Middle East (‘Warnings and insurance’ page).",
+   "areas": null
+  },
+  "CY": {
+   "status": [],
+   "updatedAt": "2026-10-27T16:09:08Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about fertility treatment (‘Safety and security’ page).",
+   "areas": null
+  },
+  "CZ": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:51:15Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information on European Entry-Exit System (EES) (‘Entry requirements’ page).  ",
+   "areas": null
+  },
+  "DE": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:56:20Z",
+   "level": 0,
+   "flags": [
+    "terror-high"
+   ],
+   "change": "Updated information on European Entry-Exit System (EES) (‘Entry requirements’ page).  ",
+   "areas": null
+  },
+  "DJ": {
+   "status": [
+    "avoid_all_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-07T10:32:20Z",
+   "level": 2,
+   "flags": [
+    "crime"
+   ],
+   "change": "New information about military activity in the Red Sea area ('Regional risks’ page). ",
+   "areas": "Djibouti-Eritrea border\nFCDO advises against all travel to the Djibouti-Eritrea border.\nBefore you travel\nNo travel can be guaranteed safe. Read all the advice in this guide. You may also find it helpful to: \n · see general advice for women travellers\n · read our guide on disability and travel abroad\n · see general advice for LGBT+ travellers\n · read about safety for solo and independent travel\n · see advice on volunteering and adventure travel abroad\nTravel insurance\nIf you choose to travel, research your destinations and get appropriate travel insurance. Insurance should cover your itinerary, planned activities and expenses in an emergency.\nAbout FCDO travel advice\nFCDO provides advice about risks of travel to help you make informed decisions. Find out more about FCDO travel advice.\nGet travel advice updates\nSign up to get email notifications when this travel advice is updated. …"
+  },
+  "DK": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:52:00Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "Updated information on European Entry-Exit System (EES) (‘Entry requirements’ page).  ",
+   "areas": null
+  },
+  "DM": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:59:32Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "DO": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:59:12Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "Updated information about outdoor activities and adventure tourism (‘Safety and security’ page).",
+   "areas": null
+  },
+  "DZ": {
+   "status": [
+    "avoid_all_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-07T12:57:14Z",
+   "level": 2,
+   "flags": [
+    "kidnap"
+   ],
+   "change": "Updated information about customs rules, terrorism in Algeria, political situation and personal ID (‘Entry requirements’ and ‘Safety and security’ pages).",
+   "areas": "Algeria border areas\nFCDO advises against all travel to within 30km of Algeria’s borders with:\n · Libya\n · Mauritania\n · Mali\n · Niger\n · Tunisia – in the provinces of Illizi and Ouargla and in the Chaambi mountains area\nRest of the Algeria-Tunisia border\nFCDO advises against all but essential travel to within 30km of the rest of Algeria’s border with Tunisia."
+  },
+  "EC": {
+   "status": [
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-20T13:14:04Z",
+   "level": 2,
+   "flags": [
+    "conflict",
+    "kidnap",
+    "crime",
+    "unrest"
+   ],
+   "change": "Updated information following the Ecuadorean government extending the state of emergency for a further 30 days, and updated information about drug-assisted robbery ('Warnings and insurance' and 'Safety and security' pages).",
+   "areas": "Areas where FCDO advises against all but essential travel  \nCoastal Region\nFCDO advises against all but essential travel to the Coastal Region provinces of:\n · Esmeraldas\n · Manabí\n · Santa Elena\n · Guayas\n · El Oro\n · Los Ríos\n · Santo Domingo de los Tsáchilas\nThis does not apply to airside transit within Guayaquil Airport in Guayas province.\nWithin 20km of the Ecuador-Colombia border \nFCDO advises against all but essential travel to areas within 20km of the Ecuador-Colombia border, except for these areas in Carchi province: \n · El Ángel Ecological Reserve \n · Rumichaca border crossing \n · the town of Tulcán \n · the Pan-American Highway"
+  },
+  "EE": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:52:29Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information on European Entry-Exit System (EES) (‘Entry requirements’ page).  ",
+   "areas": null
+  },
+  "EG": {
+   "status": [
+    "avoid_all_travel_to_parts",
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-18T16:31:39Z",
+   "level": 2,
+   "flags": [],
+   "change": "Updated information about Regional tensions (see ‘Warnings and insurance’ page)  ",
+   "areas": "Egypt-Libya border\nFCDO advises against all travel to within 20km of the Egypt-Libya border, except for the town of El Salloum, where we advise against all but essential travel.\nNorth Sinai\nFCDO advises against all travel to the North Sinai Governorate.\nNorthern part of South Sinai\nFCDO advises against all but essential travel to the northern part of the South Sinai Governorate, beyond the St Catherine-Nuweibaa road, except for the coastal areas along the west and east of the peninsula.\nEastern part of Ismailiyah Governorate\nFCDO advises against all but essential travel to the Ismailiyah Governorate east of the Suez Canal.\nWestern Desert\nFCDO advises against all but essential travel to the area west of the Nile Valley and Nile Delta regions, except for:\n · Luxor, Qina, Aswan, Abu Simbel and the Valley of the Kings\n · the Faiyum Governorate\n · the coastal areas between the Nile Delta and …"
+  },
+  "EH": {
+   "status": [
+    "avoid_all_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-07T11:06:32Z",
+   "level": 2,
+   "flags": [
+    "missile"
+   ],
+   "change": "FCDO now advises against all travel to areas in Western Sahara within 40km North and West of 'the Berm' boundary line, including the city of Es Semara ('Warnings and insurance' page). ",
+   "areas": "Areas where FCDO advises against all travel  \nFCDO advises against all travel to: \n · Areas in Western Sahara within 40km North and West of ‘the Berm’ boundary line, including the city of Es Semara\n · Areas in Western Sahara the territory south and east of ‘the Berm’ boundary line\nWestern Sahara is a disputed territory. The Berm is the militarised boundary between Moroccan-controlled Western Sahara and territory to the east controlled by the Polisario Front. Cross border rocket fire has occurred which cannot be ruled out in the future."
+  },
+  "ER": {
+   "status": [
+    "avoid_all_travel_to_parts",
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-09T16:20:13Z",
+   "level": 2,
+   "flags": [
+    "crime"
+   ],
+   "change": "Removal of information about the temporary withdrawal of dependants of British Embassy staff from Eritrea ('Warnings and insurance' page).\r\n\r\n",
+   "areas": "FCDO advises against all travel to within 25km of all of Eritrea’s land borders.\nFCDO advises against all but essential travel to the rest of Eritrea."
+  },
+  "ES": {
+   "status": [],
+   "updatedAt": "2026-11-10T15:29:19Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about a national strike planned for 11 November ('Warnings and insurance' page).\r\n\r\n\r\n",
+   "areas": null
+  },
+  "ET": {
+   "status": [
+    "avoid_all_travel_to_parts",
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-30T21:20:19Z",
+   "level": 2,
+   "flags": [
+    "missile",
+    "terror-high",
+    "kidnap",
+    "mines",
+    "unrest"
+   ],
+   "change": "Update on areas that the FCDO advise against all travel to within 10km of the border with Kenya (Warnings and Insurance page)",
+   "areas": "Border areas\nFCDO advises against all travel to within: \n · 20km of the border with Sudan\n · 10km of the border with South Sudan\n · 100km of the Ethiopian border with Somalia and Kenya in Ethiopia’s Somali region, and within 30km of the Ethiopian border with Somalia in Fafan zone, except the border town and crossing at Wajale, and the principal road between Jijiga and Wajale\n · 10km of the border with Kenya, except the Addis Ababa - Moyale road and Moyale, where we advise against all but essential travel.\n · 20km of the border with Eritrea\nTigray region\nFCDO advises against all travel to Tigray region.\nAmhara region\nFCDO advises against all travel to Amhara region.\nAfar region\nFCDO advises against all travel to within 20km of the border with Eritrea\nFCDO advises against all travel to within 50km of the boundary with Tigray region.\nFCDO advises against all but essential travel to the …"
+  },
+  "FI": {
+   "status": [],
+   "updatedAt": "2026-11-17T13:27:15Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated emergency services contacts to include the 112 Suomi App (‘Getting help’ page). ",
+   "areas": null
+  },
+  "FJ": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:39:06Z",
+   "level": 0,
+   "flags": [],
+   "change": "Removal of information about Tropical Cyclone Vaianu (‘Warnings and Insurance’ page).",
+   "areas": null
+  },
+  "FK": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:42:58Z",
+   "level": 0,
+   "flags": [
+    "mines"
+   ],
+   "change": "Addition of information about unauthorised photography at Mount Pleasant and updated information about money, air travel and healthcare in the Falkland Islands ('Safety and security' and 'Health' pages).\r\n",
+   "areas": null
+  },
+  "FM": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:11:26Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about global travel impacts due to escalation in the Middle East (‘Warnings and insurance’ page). ",
+   "areas": null
+  },
+  "FO": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:52:00Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "Updated information on European Entry-Exit System (EES) (‘Entry requirements’ page).  ",
+   "areas": null
+  },
+  "FR": {
+   "status": [],
+   "updatedAt": "2026-10-22T16:57:33Z",
+   "level": 0,
+   "flags": [
+    "terror-high"
+   ],
+   "change": "Updated information about demonstrations (‘Warnings and insurance’ page).",
+   "areas": null
+  },
+  "GA": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:26:39Z",
+   "level": 0,
+   "flags": [
+    "crime",
+    "unrest"
+   ],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "GD": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:58:25Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "GE": {
+   "status": [
+    "avoid_all_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-12T16:54:23Z",
+   "level": 2,
+   "flags": [],
+   "change": "Updated information about the political situation ('Safety and security' page).",
+   "areas": "South Ossetia and Abkhazia\nFor security reasons, FCDO advises against all travel to the Russian occupied regions of:\n · South Ossetia\n · Abkhazia\nFCDO also advises against all but essential travel to areas immediately next to the administrative boundary lines with South Ossetia and Abkhazia.\nFCDO cannot provide face-to-face support to British nationals travelling in South Ossetia and Abkhazia, as UK government employees are restricted from travelling there."
+  },
+  "GF": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:42:37Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "GH": {
+   "status": [
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-04T17:07:08Z",
+   "level": 2,
+   "flags": [
+    "kidnap",
+    "crime",
+    "unrest"
+   ],
+   "change": "Updated information about Ebola screening in Ghana (‘Entry requirements’ page).",
+   "areas": "Areas where FCDO advises against all but essential travel  \nBawku Municipality\nFCDO advises against all but essential travel to the Bawku Municipal area in the Upper East region of Ghana.\nFind out why FCDO advises against travel to Bawku Municipality.\nBefore you travel\nNo travel can be guaranteed safe. Read all the advice in this guide. You may also find it helpful to: \n · see general advice for women travellers\n · read our guide on disability and travel abroad\n · see general advice for LGBT+ travellers\n · read about safety for solo and independent travel\n · see advice on volunteering and adventure travel abroad\nTravel insurance\nIf you choose to travel, research your destinations and get appropriate travel insurance. Insurance should cover your itinerary, planned activities and expenses in an emergency.\nAbout FCDO travel advice\nFCDO provides advice about risks of travel to help you make …"
+  },
+  "GI": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:57:00Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information that, from 15 July 2026, the UK-EU Agreement in respect of Gibraltar will provisionally apply, including new information about entry requirements for people travelling on a full British citizen passport ('Entry requirements' page).\r\n\r\n",
+   "areas": null
+  },
+  "GL": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:52:00Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "Updated information on European Entry-Exit System (EES) (‘Entry requirements’ page).  ",
+   "areas": null
+  },
+  "GM": {
+   "status": [],
+   "updatedAt": "2026-11-11T16:50:01Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about upcoming presidential elections (‘Warnings and insurance’ page).\r\n\r\n\r\n",
+   "areas": null
+  },
+  "GN": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:24:44Z",
+   "level": 1,
+   "flags": [
+    "kidnap",
+    "crime"
+   ],
+   "change": "Updated information about health risks you’ll face in Guinea (‘Health’ page).",
+   "areas": null
+  },
+  "GP": {
+   "status": [],
+   "updatedAt": "2026-10-22T17:02:17Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about demonstrations (‘Warnings and insurance’ page).",
+   "areas": null
+  },
+  "GQ": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:31:54Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "Updated information on commercial disputes (‘Safety and security’ page).",
+   "areas": null
+  },
+  "GR": {
+   "status": [],
+   "updatedAt": "2026-11-03T11:18:20Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about winter weather in Greece, including flash flooding ('Warnings and insurance' page).",
+   "areas": null
+  },
+  "GS": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:39:29Z",
+   "level": 0,
+   "flags": [
+    "mines"
+   ],
+   "change": "This travel advice was reviewed for accuracy and there are no significant updates.",
+   "areas": null
+  },
+  "GT": {
+   "status": [
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-16T16:17:57Z",
+   "level": 2,
+   "flags": [
+    "kidnap",
+    "crime",
+    "unrest"
+   ],
+   "change": "New information about a State of Emergency in Zacapa and Izabal ('Warnings and insurance' page).",
+   "areas": "Areas where FCDO advises against all but essential travel\nFCDO advises against all but essential travel to: \n · within 5km of the Mexican border from the Pacific Coast up to and including the Gracias a Dios crossing\n · to the towns of Santa Ana Huista, San Antonio Huista and La Democracia in the department of Huehuetenango"
+  },
+  "GU": {
+   "status": [],
+   "updatedAt": "2026-11-20T19:57:12Z",
+   "level": 0,
+   "flags": [
+    "terror-high",
+    "crime"
+   ],
+   "change": "Removal of information about air traffic disruptions across the US",
+   "areas": null
+  },
+  "GW": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:24:23Z",
+   "level": 0,
+   "flags": [
+    "mines",
+    "unrest"
+   ],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "GY": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:40:44Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "Updated information on health risks and healthcare in Guyana (‘Health’ page).",
    "areas": null
   },
   "HK": {
    "status": [],
    "updatedAt": "2026-10-07T10:41:12Z",
-   "areas": null
-  },
-  "MO": {
-   "status": [],
-   "updatedAt": "2026-10-07T11:05:03Z",
-   "areas": null
-  },
-  "TW": {
-   "status": [],
-   "updatedAt": "2026-11-18T15:21:27Z",
-   "areas": null
-  },
-  "MN": {
-   "status": [],
-   "updatedAt": "2026-11-03T11:04:08Z",
-   "areas": null
-  },
-  "VN": {
-   "status": [],
-   "updatedAt": "2026-10-07T11:40:14Z",
-   "areas": null
-  },
-  "TH": {
-   "status": [
-    "avoid_all_but_essential_travel_to_parts"
+   "level": 0,
+   "flags": [
+    "crime",
+    "unrest"
    ],
-   "updatedAt": "2026-11-17T15:11:32Z",
-   "areas": "Thailand-Malaysia border\nFCDO advises against all but essential travel to parts of the south, near the Thailand-Malaysia border:\n · Pattani Province\n · Yala Province\n · Narathiwat Province\n · The districts of Chana, Thepa, Na Thawi and Saba Yoi in southern Songkhla Province\nFCDO also advises against all but essential travel on the Hat Yai to Padang Besar train line that runs through these provinces.\nThis is due to regular attacks in the provinces by the border with Malaysia. See Safety and security .\nThailand-Cambodia border\nFCDO advises against all but essential travel to areas within 20km of the land border with Cambodia.\nFighting occurred along parts of the border in July 2025, and further clashes took place in early December, involving rocket and artillery fire. Land borders and crossings between Thailand and Cambodia remain suspended. Tourist sites close to the border, including …"
-  },
-  "PH": {
-   "status": [
-    "avoid_all_travel_to_parts"
-   ],
-   "updatedAt": "2026-10-07T11:19:22Z",
-   "areas": "Mindanao and the Sulu archipelago\nFCDO advises against all travel to western and central Mindanao and the Sulu archipelago.\nFCDO also advises against all but essential travel to the remainder of Mindanao, except for:\n · Camiguin Island\n · Dinagat Island\n · Siargao Island\nThis advice is due to terrorist activity and clashes between the military and insurgent groups in south Philippines."
-  },
-  "SG": {
-   "status": [],
-   "updatedAt": "2026-10-07T11:26:38Z",
+   "change": "Updated information on dual Chinese-British nationality, E-cigarettes and illegal drugs including CBD (cannabidiol) (‘Warnings and insurance’, ‘Entry requirements’ and ‘Safety and security’ pages). ",
    "areas": null
   },
-  "MY": {
-   "status": [
-    "avoid_all_but_essential_travel_to_parts"
+  "HN": {
+   "status": [],
+   "updatedAt": "2026-11-05T14:10:43Z",
+   "level": 0,
+   "flags": [
+    "crime"
    ],
-   "updatedAt": "2026-11-19T10:47:10Z",
-   "areas": "Areas where FCDO advises against all but essential travel\nEastern Sabah coastal islands\nFCDO advises against all but essential travel to all islands and dive sites off the coast of eastern Sabah from Sandakan to Tawau, including Lankayan Island, due to the threat of kidnapping. This does not apply to the mainland of Sabah."
+   "change": "Updated information about visa requirements, including British citizens now being able to visit Honduras for up to 90 days without a visa ('Entry requirements' page).",
+   "areas": null
+  },
+  "HR": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:50:01Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "Updated information on European Entry-Exit System (EES) (‘Entry requirements’ page).  ",
+   "areas": null
+  },
+  "HT": {
+   "status": [
+    "avoid_all_travel_to_whole_country"
+   ],
+   "updatedAt": "2026-10-07T10:56:44Z",
+   "level": 4,
+   "flags": [
+    "kidnap",
+    "crime"
+   ],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "HU": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:58:18Z",
+   "level": 0,
+   "flags": [],
+   "change": "Removal of information about restrictions to LGBT+ marches and events ('Safety and security' page). ",
+   "areas": null
   },
   "ID": {
    "status": [],
    "updatedAt": "2026-10-07T10:44:39Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "FCDO no longer advises against all travel to volcanoes in Indonesia and will no longer advise against all travel in the event of future volcanic eruptions. FCDO have added new information about volcanoes in Indonesia, including information from the local authorities who enforce exclusion zones on a number of volcanically active sites (See ‘Warnings and insurance’ and ‘Safety and security’ pages).",
+   "areas": null
+  },
+  "IE": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:59:23Z",
+   "level": 0,
+   "flags": [],
+   "change": "Addition of information about ID requirements for travel between the UK and Ireland under the Common Travel Area (‘Entry requirements’ page).\r\n",
+   "areas": null
+  },
+  "IL": {
+   "status": [
+    "avoid_all_travel_to_parts",
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-18T16:31:51Z",
+   "level": 2,
+   "flags": [
+    "conflict",
+    "missile",
+    "terror-high",
+    "kidnap"
+   ],
+   "change": "Updated information about regional tensions (‘Warnings and insurance’ page).",
+   "areas": "Gaza\nFCDO advises against all travel to Gaza\nAreas near Gaza\nFCDO advises against all travel within 500m of the border with Gaza\nThe West Bank\nFCDO advises against all travel to:\n · Tulkarm Governorate, Jenin Governorate, and Tubas Governorate except Route 90\nNorthern Israel and Occupied Golan Heights\nFCDO advises against all travel to:\n · \n Areas north of Route 89 between Nahariyya and Dalton; north of a straight eastward line from Dalton to Route 91; and north of Route 91 across the Golan Heights, excluding routes 89 and 91 themselves\n · \n Within 500m of the Area of Separation in the occupied Golan Heights (the ‘Alpha line’). Do not attempt to enter the occupied Golan Heights through Syria\n · \n Sheba’a Farms and Ghajja\nAreas where FCDO advises against all but essential travel\nWest Bank\nFCDO advises against all but essential travel to:\n · The rest of the West Bank, except for: East …"
+  },
+  "IN": {
+   "status": [
+    "avoid_all_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-27T15:17:30Z",
+   "level": 2,
+   "flags": [
+    "terror-high",
+    "unrest"
+   ],
+   "change": "This travel advice has been reviewed for accuracy, with minor amendments made throughout, including updated information on access permits, scams, trekking in India, air and rail travel, India-Pakistan border area and Western India and healthcare in India (‘Entry requirements’,‘Safety and security’ and ‘Health’ pages).",
+   "areas": "India-Pakistan border area\nFCDO advises against all travel within 10km of the India-Pakistan border, except for Wagah-Attari border crossing. While The Wagah-Attari border crossing is currently closed, visitors can still access and attend the daily border retreat ceremony.\nUnion Territory of Jammu and Kashmir\nFCDO advises against all travel to the Union Territory of Jammu and Kashmir (including Pahalgam, Gulmarg, Sonamarg, the city of Srinagar and the Jammu-Srinagar national highway), except for:\n · travel by air to and from the city of Jammu\n · travel within the city of Jammu\nManipur\nFCDO advises against all but essential travel to the state of Manipur including the capital, Imphal. Curfews and restrictions continue in parts of Manipur following ongoing ethnic violence since May 2023."
+  },
+  "IO": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:27:37Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "This travel advice has been rewritten to make it easier to read and understand. ",
+   "areas": null
+  },
+  "IQ": {
+   "status": [
+    "avoid_all_travel_to_parts",
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-18T16:31:24Z",
+   "level": 2,
+   "flags": [
+    "missile",
+    "terror-high",
+    "kidnap",
+    "crime",
+    "unrest"
+   ],
+   "change": "Updated information about regional tensions (‘Warnings and insurance’ page).",
+   "areas": "Federal Iraq\nFCDO advises against all travel to:\n · The parts of Anbar province which are west of, but not including Ramadi City\n · Diyala province except for Baqubah City\n · Kirkuk province\n · Ninawa province\n · Salah al-Din province\n · Jurf al-Sakr town in Babil province\n · Sadr City, part of Baghdad province\n · Within 5km of areas that border Iran in Wasit, Maysan and Basra provinces\n · Within 5km of Iraq’s borders with Saudi Arabia and Kuwait\nFCDO advises against all but essential travel to:\n · The remainder of Al-Muthanna province\n · Al-Qadasiyah province \n · The remainder of Anbar province\n · Babil province (except Jurf al-Sakr town)\n · Baghdad province (except Sadr City)\n · The remainder of Basra province, including Highways 1 and 8 and the Safwan-Kuwait border crossing\n · Dhi Qar Province\n · Karbala Province\n · The remainder of Maysan province\n · The remainder of Najaf province …"
+  },
+  "IR": {
+   "status": [
+    "avoid_all_travel_to_whole_country"
+   ],
+   "updatedAt": "2026-11-18T16:30:59Z",
+   "level": 4,
+   "flags": [],
+   "change": "Updated information about regional tensions (‘Warnings and insurance’ page).",
+   "areas": null
+  },
+  "IS": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:58:47Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information on European Entry-Exit System (EES) (‘Entry requirements’ page).  ",
+   "areas": null
+  },
+  "IT": {
+   "status": [],
+   "updatedAt": "2026-11-03T11:56:35Z",
+   "level": 0,
+   "flags": [],
+   "change": "Removal of information about national strike. ",
+   "areas": null
+  },
+  "JM": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:55:54Z",
+   "level": 0,
+   "flags": [
+    "crime",
+    "unrest"
+   ],
+   "change": "New information on incidents of sexual assault in tourist areas and advice on personal safety measures ('Safety and security' page).",
+   "areas": null
+  },
+  "JO": {
+   "status": [
+    "avoid_all_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-18T16:31:10Z",
+   "level": 2,
+   "flags": [
+    "missile"
+   ],
+   "change": "Updated information about regional tensions, demonstrations and mass gatherings, and incidents of terrorism (‘Warnings and insurance’ and ‘Safety and security’ pages). ",
+   "areas": "Jordan-Syria border\nFCDO advises against all travel to within 3km of the border with Syria.\n Regional tensions\n The context in the Middle East remains deeply unpredictable and the risk of sudden escalation is high. Since conflict began in early 2026, Iran has stated its intention to target locations associated with the US and Israel, including, but not limited to, organisations, businesses, facilities, and institutions. There have been strikes and retaliatory attacks by Iran and others across the region against civilian and military infrastructure. There remains a risk of further attacks across the region at short notice.\n British nationals in, or planning to travel through, the Middle East should be prepared for possible flight cancellations, airspace closures, and travel disruptions. You should:\n · read If you’re affected by a crisis abroad - GOV.UK. This includes guidance on “how to …"
+  },
+  "JP": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:45:59Z",
+   "level": 0,
+   "flags": [
+    "missile"
+   ],
+   "change": "Addition of information about flooding and heavy rain ('Safety and security' page).",
+   "areas": null
+  },
+  "KE": {
+   "status": [
+    "avoid_all_travel_to_parts",
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-06T17:00:48Z",
+   "level": 2,
+   "flags": [
+    "conflict",
+    "terror-high",
+    "kidnap",
+    "crime"
+   ],
+   "change": "FCDO now advises against all but essential travel to Moyale Town and up to 5km around it, including to the border with Ethiopia. Updated information about the Kenya-Ethiopia border ('Warnings and insurance' and 'Regional risks' pages).",
+   "areas": "Kenya-Somalia border and northern parts of the east coast\nDue to the risk of terrorism from groups based in Somalia, FCDO advises against all travel to:\n · Mandera County\n · Tarbaj and Wajir East constituencies in Wajir County, except for Wajir Town\n · areas of Wajir County within 60km of Kenya’s border with Somalia\n · Garissa County - except for Garissa Town, the constituency of Lagdera and the areas of Balambala constituency which lie north and west of the main road which runs from Saka on the Tana River up to the intersection with the C81 Road\n · Lamu County, except for Lamu Island and Manda Island\nFCDO advises against all but essential travel to:\n · Garissa Town\n · Tana River County north of the Tana River as far as the town of Saka\n · within 15km of the east coast between the Tana River and the Galana (Athi-Galana-Sabaki) River\n · Moyale Town and up to 5km around it, including to …"
+  },
+  "KG": {
+   "status": [],
+   "updatedAt": "2026-09-14T10:23:33Z",
+   "level": 0,
+   "flags": [],
+   "change": "Removal of information about the World Nomad Games ('Warnings and insurance' page).",
    "areas": null
   },
   "KH": {
@@ -73,18 +1146,1110 @@
     "avoid_all_but_essential_travel_to_parts"
    ],
    "updatedAt": "2026-11-19T14:01:50Z",
+   "level": 2,
+   "flags": [
+    "conflict",
+    "missile",
+    "scam-job",
+    "mines"
+   ],
+   "change": "New information about cannabis and drug offences (‘Warnings and insurance’ page). ",
    "areas": "FCDO advises against all but essential travel to within 20km from the land border with Thailand.\nHeavy fighting along parts of the Thailand and Cambodia border, including the use of airstrikes, rocket and artillery fire, took place in 2025. A ceasefire was signed on 27 December, but the situation remains tense. \nLand borders and crossings between Cambodia and Thailand continue to be suspended. Some tourist destinations in border areas such as the Preah Vihear/Khao Phra Wihan temple, the Ta Krabey/Ta Kwai temple and the Tamone Thom/Ta Muen Thom temple are closed.  \nThere are also unexploded ordnance, including landmines, in the border area."
   },
-  "IN": {
+  "KI": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:01:35Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about global travel impacts due to escalation in the Middle East (‘Warnings and insurance’ page).",
+   "areas": null
+  },
+  "KM": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:34:23Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "KN": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:51:51Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "Addition of information that all visitors to St Kitts and Nevis must obtain an Electronic Travel Authorisation before travel (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "KP": {
+   "status": [
+    "avoid_all_but_essential_travel_to_whole_country"
+   ],
+   "updatedAt": "2026-10-07T11:17:17Z",
+   "level": 3,
+   "flags": [
+    "conflict",
+    "missile"
+   ],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "KR": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:30:40Z",
+   "level": 0,
+   "flags": [
+    "missile"
+   ],
+   "change": "Updated information about submitting e-Arrivals cards when arriving in Korea (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "KW": {
+   "status": [],
+   "updatedAt": "2026-11-18T16:31:45Z",
+   "level": 0,
+   "flags": [
+    "missile",
+    "mines",
+    "crime"
+   ],
+   "change": "Updated information about regional tensions (See ‘Warnings and insurance’ page).",
+   "areas": null
+  },
+  "KY": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:01:16Z",
+   "level": 0,
+   "flags": [],
+   "change": "Removal of information about Hurricane Melissa ('Warnings and insurance' page).",
+   "areas": null
+  },
+  "KZ": {
+   "status": [],
+   "updatedAt": "2026-10-30T14:52:10Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "Updated information about Electronic Travel Authorisation (ETA) ('Entry requirements' page).",
+   "areas": null
+  },
+  "LA": {
+   "status": [
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-19T14:37:32Z",
+   "level": 2,
+   "flags": [
+    "missile",
+    "mines"
+   ],
+   "change": "Updated information about the Laos legal system and the consequences of illegal drugs in Laos (See ‘Legal system’ and ‘Illegal drugs and the death penalty’ on the ‘Safety and security’ page).",
+   "areas": "Areas where FCDO advises against all but essential travel\nXaisomboun Province\nFCDO advises against all but essential travel to Xaisomboun Province. There are intermittent attacks on infrastructure and armed clashes with anti-government groups."
+  },
+  "LB": {
+   "status": [
+    "avoid_all_travel_to_parts",
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-07T11:10:42Z",
+   "level": 2,
+   "flags": [
+    "conflict",
+    "missile",
+    "kidnap",
+    "mines",
+    "crime"
+   ],
+   "change": "FCDO has changed the areas of Lebanon where it advises against all travel or all but essential travel. FCDO no longer advises against all travel or all but essential travel to some parts of Lebanon. FCDO continues to advise against all travel and all but essential travel to other areas of Lebanon.",
+   "areas": "Areas in Beirut and Mount Lebanon Governorate\nFCDO advises against all travel to the following areas of Beirut and its southern suburbs, excluding Route 51 from central Beirut to Rafic Hariri International Airport:\n · Tariq el Jdideh and the area east of Tariq el Jdideh, south of Jalloul Street, west of Hourch and the war cemetery (not including the war cemetery), and south of the Soulieman Bastani\n · Ghobeiry and the area north of Ghobeiry but south of Yarmouk street, the war cemetery and Horsh park (not including Horsh park and the cemetery and Yarmouk street)\n · Chiyah (south and west of the Rizkallah Semaan road)\n · Haret Hraik\n · Burj Al Barajneh\n · Mraije\n · Laylaki\n · Jnah, south of El Imam Mousa El Sader street\n · The Golf Club of Lebanon\n · all other areas west of the Camil Chamoun Boulevard (south of Forn el Chebbak) that becomes the Old Saida Road through Hadath to Beirut …"
+  },
+  "LC": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:51:11Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "New information about dual nationals returning to the UK (‘ Entry requirements’ page).",
+   "areas": null
+  },
+  "LI": {
+   "status": [],
+   "updatedAt": "2026-10-07T12:05:12Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information on European Entry-Exit System (EES) (‘Entry requirements’ page). ",
+   "areas": null
+  },
+  "LK": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:31:16Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "Addition of information about heavy rainfall, flooding and landslides (‘Warnings and insurance’ page)",
+   "areas": null
+  },
+  "LR": {
+   "status": [],
+   "updatedAt": "2026-11-11T16:56:17Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about heightened health screening measures for travellers arriving into Liberia (See 'Ebola screening' on the ‘Entry requirements’ page).",
+   "areas": null
+  },
+  "LS": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:23:17Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "LT": {
+   "status": [],
+   "updatedAt": "2026-10-07T12:06:08Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information on European Entry-Exit System (EES) (‘Entry requirements’ page). ",
+   "areas": null
+  },
+  "LU": {
+   "status": [],
+   "updatedAt": "2026-10-07T12:06:53Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "Updated information on European Entry-Exit System (EES) (‘Entry requirements’ page). ",
+   "areas": null
+  },
+  "LV": {
+   "status": [],
+   "updatedAt": "2026-10-07T12:04:08Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information on European Entry-Exit System (EES) (‘Entry requirements’ page). ",
+   "areas": null
+  },
+  "LY": {
+   "status": [
+    "avoid_all_travel_to_parts",
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-07T11:10:19Z",
+   "level": 2,
+   "flags": [
+    "kidnap",
+    "mines",
+    "crime"
+   ],
+   "change": "FCDO now advises against all but essential travel to the cities of  Tripoli, Benghazi, Al-Bayda and Derna, and the surrounding area knows as Jebel Akhdar, either side of the coastal and desert roads between and including the towns of Al-Maqrun and Al-Tamimi, Misrata ('Warnings and insurance' and 'Regional risks' pages).\r\n\r\n",
+   "areas": "FCDO advises against all travel to Libya except for the cities of:\n · Tripoli\n · Benghazi, Al-Bayda and Derna, and the surrounding area known as Jebel Akhdar, either side of the coastal and desert roads between and including the towns of Al-Maqrun and Al-Tamimi\n · Misrata\nFCDO advises against all but essential travel to the cities of:\n · Tripoli\n · Benghazi, Al-Bayda and Derna, and the surrounding area knows as Jebel Akhdar, either side of the coastal and desert roads between and including the towns of Al-Maqrun and Al-Tamimi\n · Misrata"
+  },
+  "MA": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:09:33Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "This travel advice has been reviewed for accuracy with updates made throughout, including new information about passports, using dating applications, outdoor activities and adventure tourism, using electronic scooters and bikes, quad biking, hot air balloons and beaches and wildfires; information about rabies and food hygiene and allergies; updated information about taking money into or out of Morocco, and information about illegal drugs and prison sentences (See 'Entry requirements', 'Safety and security' and 'Health' pages).",
+   "areas": null
+  },
+  "MC": {
+   "status": [],
+   "updatedAt": "2026-10-07T12:44:19Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "MD": {
    "status": [
     "avoid_all_travel_to_parts"
    ],
-   "updatedAt": "2026-10-27T15:17:30Z",
-   "areas": "India-Pakistan border area\nFCDO advises against all travel within 10km of the India-Pakistan border, except for Wagah-Attari border crossing. While The Wagah-Attari border crossing is currently closed, visitors can still access and attend the daily border retreat ceremony.\nUnion Territory of Jammu and Kashmir\nFCDO advises against all travel to the Union Territory of Jammu and Kashmir (including Pahalgam, Gulmarg, Sonamarg, the city of Srinagar and the Jammu-Srinagar national highway), except for:\n · travel by air to and from the city of Jammu\n · travel within the city of Jammu\nManipur\nFCDO advises against all but essential travel to the state of Manipur including the capital, Imphal. Curfews and restrictions continue in parts of Manipur following ongoing ethnic violence since May 2023."
+   "updatedAt": "2026-11-04T14:54:38Z",
+   "level": 2,
+   "flags": [
+    "conflict",
+    "missile"
+   ],
+   "change": "This travel advice has been reviewed for accuracy with changes made throughout, including updated information about visa requirements, land border crossings, entering Moldova from Ukraine, political situation, humanitarian support workers, crime, using cameras, money and taxi's ('Entry requirements' and 'Safety and security' pages). ",
+   "areas": "Transnistria\nFCDO advises against all travel to Transnistria. There is widespread military activity in Ukraine, including close to some Moldovan borders. Transnistria is outside the control of the Moldovan government.  \nFCDO’s ability to offer support is extremely limited and will be more limited if there is military action on or near the Moldova-Ukraine border.   \nBefore you travel\nNo travel can be guaranteed safe. Read all the advice in this guide. You may also find it helpful to: \n · see general advice for women travellers\n · read our guide on disability and travel abroad\n · see general advice for LGBT+ travellers\n · read about safety for solo and independent travel\n · see advice on volunteering and adventure travel abroad\nTravel insurance\nIf you choose to travel, research your destinations and get appropriate travel insurance. Insurance should cover your itinerary, planned …"
   },
-  "AE": {
+  "ME": {
    "status": [],
-   "updatedAt": "2026-11-18T16:33:03Z",
+   "updatedAt": "2026-10-07T12:44:57Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "New information on wait times if travelling to and from the Schengen area from Montenegro and updated information about road travel and swimming safety ('Warnings and insurance' and ‘Safety and security’ pages).",
+   "areas": null
+  },
+  "MF": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:50:31Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about dual nationals returning to the UK (‘ Entry requirements’ page).",
+   "areas": null
+  },
+  "MG": {
+   "status": [],
+   "updatedAt": "2026-11-16T10:56:41Z",
+   "level": 1,
+   "flags": [
+    "kidnap",
+    "crime"
+   ],
+   "change": "New information on the presence of ‘Africa Corps’ in Madagascar (‘Safety and security’ page). ",
+   "areas": null
+  },
+  "MH": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:07:28Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about global travel impacts due to escalation in the Middle East (‘Warnings and insurance’ page).",
+   "areas": null
+  },
+  "MK": {
+   "status": [],
+   "updatedAt": "2026-10-07T12:46:07Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information on wait times if travelling to and from the Schengen area from North Macedonia ('Warnings and insurance' page).\r\n\r\n",
+   "areas": null
+  },
+  "ML": {
+   "status": [
+    "avoid_all_travel_to_whole_country"
+   ],
+   "updatedAt": "2026-10-07T10:21:12Z",
+   "level": 4,
+   "flags": [
+    "terror-high",
+    "kidnap",
+    "mines",
+    "crime",
+    "unrest"
+   ],
+   "change": "Updated information about recent terrorist attacks in Mali (‘Safety and security’ page). ",
+   "areas": null
+  },
+  "MM": {
+   "status": [
+    "avoid_all_travel_to_parts",
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-07T11:13:12Z",
+   "level": 2,
+   "flags": [
+    "conflict",
+    "scam-job",
+    "mines",
+    "unrest"
+   ],
+   "change": "New information about mobile device registration and drone use (‘Safety and security’ page).",
+   "areas": "FCDO advises against all travel to:\n · Chin State\n · Kachin State\n · Kayah State\n · Kayin Sate\n · Mon State\n · Rakhine State\n · Sagaing and Magway regions\n · Tanintharyi Region, excluding Myeik township, and the archipelago and townships south of Tanintharyi township\n · Shan State North\n · North Mandalay Region; the townships north of Mandalay City and Pyin Oo Lwin\n · East of the Yangon-Mandalay Expressway in Bago region\nFCDO advises against all but essential travel to:\n · Shan State South and East\n · Mandalay Region\n · Tanintharyi Region south of Tanintharyi township\n · the rest of Bago region\n · the townships of Kyangin, Myanaung, Ingapu, Lemyethna, Yegyi, Thabaung and Pathein in Ayeyarwady region\nThe conflict is Myanmar is increasingly volatile. The security situation may deteriorate at short notice and the military regime can introduce travel restrictions at any time. Consider your …"
+  },
+  "MN": {
+   "status": [],
+   "updatedAt": "2026-11-03T11:04:08Z",
+   "level": 0,
+   "flags": [
+    "unrest"
+   ],
+   "change": "New information on fuel shortages in Mongolia (‘Warnings and insurance’ page).",
+   "areas": null
+  },
+  "MO": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:05:03Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "MP": {
+   "status": [],
+   "updatedAt": "2026-11-20T19:57:12Z",
+   "level": 0,
+   "flags": [
+    "terror-high",
+    "crime"
+   ],
+   "change": "Removal of information about air traffic disruptions across the US",
+   "areas": null
+  },
+  "MQ": {
+   "status": [],
+   "updatedAt": "2026-10-23T15:16:42Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about demonstrations (‘Safety and security’ page).",
+   "areas": null
+  },
+  "MR": {
+   "status": [
+    "avoid_all_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-19T19:07:15Z",
+   "level": 2,
+   "flags": [],
+   "change": "New information on risks of travelling on the iron ore train (‘Safety and security’ page).",
+   "areas": "Eastern Mauritania \nFCDO advises against all travel to areas east of a line drawn between but excluding the towns of Kankossa, Akhreijit, Ghallaouia, Zouerat, Fderîck and onwards west to the border with Western Sahara. \nMauritania-Mali border \nFCDO advises against all travel to areas within 25km of the Malian border in the south, including Khabou.\nMauritania-Western Sahara border \nFCDO advises against all but essential travel to areas within 25km of the Western Sahara border, excluding the section of the Nouakchott-Nouadhibou road and the city of Nouadhibou.\nTiris Zemmour, Adrar, Tagant, Hodh el Gharbi, Assaba, Gorgol and Guidimaka provinces \nFCDO advises against all but essential travel to the rest of the province of Tiris Zemmour, Assaba, Hodh el Gharbi, Gorgol and Guidimaka, and areas of Adrar and Tagant provinces, west of a line drawn between the towns of Ghallaouia, Akhreijit and …"
+  },
+  "MS": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:54:37Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about travel to and from Montserrat including new information about completing an online immigration and customs form. New information about applying for a temporary visitors driving licence and updated information about healthcare in Montserrat ('Entry requirements', 'Safety and security' and 'Health' pages). ",
+   "areas": null
+  },
+  "MT": {
+   "status": [],
+   "updatedAt": "2026-10-07T12:08:40Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information on European Entry-Exit System (EES) (‘Entry requirements’ page). \r\n\r\n",
+   "areas": null
+  },
+  "MU": {
+   "status": [],
+   "updatedAt": "2026-10-19T14:45:58Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about local demonstrations and community unrest ('Safety and security' page).",
+   "areas": null
+  },
+  "MV": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:06:50Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "Updated information about swimming safety ( 'Safety and security’ page).",
+   "areas": null
+  },
+  "MW": {
+   "status": [],
+   "updatedAt": "2026-10-20T14:35:09Z",
+   "level": 1,
+   "flags": [
+    "kidnap"
+   ],
+   "change": "New information about foreign currency rules (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "MX": {
+   "status": [
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-19T10:25:34Z",
+   "level": 2,
+   "flags": [
+    "kidnap",
+    "crime"
+   ],
+   "change": "Removal of information about Hurricane Trudy ('Warnings and insurance' page).",
+   "areas": "Areas where FCDO advises against all but essential travel\nState of Baja California\nFCDO advises against all but essential travel to the city of Tijuana, except:\n · airside transit through Tijuana airport\n · the Cross Border Xpress bridge from the airport linking terminals across the Mexican-US border\n · the federal toll road 1D and Via Rápida through Tijuana to the border\nFCDO advises against all but essential travel to the city of Tecate in Baja California, including roads between Tijuana and Tecate.\n There is another state called Baja California Sur that is unaffected by these warnings.\nState of Chihuahua\nFCDO advises against all but essential travel to the state of Chihuahua, except:\n · the city of Chihuahua\n · the border crossing in Ciudad Juárez (accessed by federal toll road 45)\n · federal toll road 45D connecting the cities of Chihuahua and Ciudad Juárez\n · the Copper Canyon rail …"
+  },
+  "MY": {
+   "status": [
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-19T10:47:10Z",
+   "level": 2,
+   "flags": [
+    "kidnap"
+   ],
+   "change": "New information about cannabis and drug offences (‘Warnings and insurance’ page). ",
+   "areas": "Areas where FCDO advises against all but essential travel\nEastern Sabah coastal islands\nFCDO advises against all but essential travel to all islands and dive sites off the coast of eastern Sabah from Sandakan to Tawau, including Lankayan Island, due to the threat of kidnapping. This does not apply to the mainland of Sabah."
+  },
+  "MZ": {
+   "status": [
+    "avoid_all_travel_to_parts",
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-07T10:20:23Z",
+   "level": 2,
+   "flags": [
+    "terror-high",
+    "kidnap",
+    "mines",
+    "crime"
+   ],
+   "change": "New information about requirement for Electronic Travel Authorisation (ETA) ('Entry requirements' page).",
+   "areas": "Cabo Delgado Province\nFCDO advises against all travel to Cabo Delgado Province, except for Palma town and the area around Pemba and Afungi.\nFCDO advises against all but essential travel to Palma town and the area around Pemba and Afungi.\nNampula Province\nFCDO advises against all travel to the districts of Memba and Eráti in Nampula Province.\nNiassa Province\nFCDO advises against all travel to the districts of Mecula and Marrupa in Niassa Province."
+  },
+  "NA": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:19:57Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "NC": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:16:19Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "NE": {
+   "status": [
+    "avoid_all_travel_to_whole_country"
+   ],
+   "updatedAt": "2026-10-23T15:14:29Z",
+   "level": 4,
+   "flags": [
+    "terror-high",
+    "kidnap",
+    "mines",
+    "unrest"
+   ],
+   "change": "Updated information about attacks near the Presidential Palace and Niamey’s Diori International Airport ('Safety and security' page.)",
+   "areas": null
+  },
+  "NG": {
+   "status": [
+    "avoid_all_travel_to_parts",
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-10T14:13:23Z",
+   "level": 2,
+   "flags": [
+    "terror-high",
+    "kidnap",
+    "scam-job",
+    "crime"
+   ],
+   "change": "This travel advice has been reviewed for accuracy with changes made throughout, including on land borders, street and vehicle crime, withdrawing and exchanging money, financial scams, terrorism in Nigeria, kidnapping for ransom, transport risks, dangers at road checkpoints, taxis and buses, sea travel, swimming safety, North West Nigeria and South East and South South Nigeria (See ‘Entry requirements’, ‘Safety and security’ and ‘Regional risks’ pages).",
+   "areas": "North East Nigeria\nFCDO advises against all travel to:\n · Borno State\n · Yobe State\n · Adamawa State\n · Gombe State\nFCDO advises against all but essential travel to:\n · Bauchi State\nNorth West Nigeria\nFCDO advises against all travel to:\n · Katsina State\n · Zamfara State\n · Sokoto State\nFCDO advises against all but essential travel to:\n · Kaduna State\n · Kano State\n · Kebbi State\n · Jigawa State\nNorth Central Nigeria and the Federal Capital Territory, including Abuja\nFCDO advises against all but essential travel to:\n · Niger State\n · Kogi State\n · Plateau State\n · Taraba State\n · Kwara State\n · Benue State\nSouth East and South South Nigeria\nFCDO advises against all travel to the riverine areas (the river and swamp locations accessible by boat, but not by road) of Delta, Bayelsa, Rivers, Akwa Ibom and Cross River states.\nFCDO advises against all but essential travel to:\n · Abia State\n · …"
+  },
+  "NI": {
+   "status": [],
+   "updatedAt": "2026-11-05T14:10:53Z",
+   "level": 1,
+   "flags": [
+    "kidnap",
+    "crime"
+   ],
+   "change": "Updated information on visa requirements when travelling between Nicaragua, El Salvador, Guatemala and Honduras ('Entry requirements' page).",
+   "areas": null
+  },
+  "NL": {
+   "status": [],
+   "updatedAt": "2026-10-07T12:45:25Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "Updated information on European Entry-Exit System (EES) (‘Entry requirements’ page). ",
+   "areas": null
+  },
+  "NO": {
+   "status": [],
+   "updatedAt": "2026-10-07T12:46:52Z",
+   "level": 0,
+   "flags": [],
+   "change": "Removal of information about an ongoing air traffic controllers' strike ('Warnings and insurance' page).",
+   "areas": null
+  },
+  "NP": {
+   "status": [],
+   "updatedAt": "2026-11-06T15:25:12Z",
+   "level": 0,
+   "flags": [
+    "unrest"
+   ],
+   "change": "Removal of information about the Family Assistance Centre at the British Embassy Kathmandu (‘Warnings and insurance’ page).",
+   "areas": null
+  },
+  "NR": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:13:46Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about global travel impacts due to escalation in the Middle East (‘Warnings and insurance’ page).",
+   "areas": null
+  },
+  "NU": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:35:19Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "NZ": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:16:51Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about global travel impacts due to escalation in the Middle East (‘Warnings and insurance’ page). ",
+   "areas": null
+  },
+  "OM": {
+   "status": [],
+   "updatedAt": "2026-11-18T16:31:54Z",
+   "level": 0,
+   "flags": [
+    "missile"
+   ],
+   "change": "Updated information about regional tensions (See ‘Warnings and insurance’ page). ",
+   "areas": null
+  },
+  "PA": {
+   "status": [],
+   "updatedAt": "2026-10-09T20:08:09Z",
+   "level": 0,
+   "flags": [
+    "unrest"
+   ],
+   "change": "Information about a 7.6 earthquake in Panama (Warnings and insurance)",
+   "areas": null
+  },
+  "PE": {
+   "status": [
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-06T16:13:52Z",
+   "level": 2,
+   "flags": [
+    "kidnap"
+   ],
+   "change": "New information about Pope Leo XIV’s visit to Peru from 11-16 November, including increased security measures and travel disruption (’Warnings and insurance’ page).",
+   "areas": "Areas where FCDO advises against all but essential travel  \nWithin 20km south of the Peru-Colombia border \nFCDO advises against all but essential travel to areas within 20km south of the Putumayo River and the border between Peru and Colombia (Loreto region) except for: \n · the Amazon River\n · the area of the triple border with Brazil and Colombia from and including the towns of Caballococha in Peru up to the actual triple border at Santa Rosa de Yavari town\nValley of the Apurímac, Ene, and Mantaro Rivers (VRAEM)\nFCDO advises against all but essential travel to the Valley of the Apurímac, Ene, and Mantaro Rivers, also known as the VRAEM region.\nWe advise against all but essential travel to these two areas for safety and security reasons."
+  },
+  "PF": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:39:48Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "PG": {
+   "status": [
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-07T11:18:52Z",
+   "level": 2,
+   "flags": [
+    "kidnap",
+    "mines",
+    "crime"
+   ],
+   "change": "Updated information about interruptions to the supply of water and electricity (‘Warnings and insurance’ page).",
+   "areas": "Areas where FCDO advises against all but essential travel\nFCDO advises against all but essential travel to:\n · Hela and Southern Highlands Provinces due to the high risk of tribal fighting\n · Enga Province in the Highlands, except Wabag District"
+  },
+  "PH": {
+   "status": [
+    "avoid_all_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-07T11:19:22Z",
+   "level": 2,
+   "flags": [
+    "terror-high",
+    "kidnap",
+    "crime"
+   ],
+   "change": "Information about typhoon season (‘Warnings and insurance’ page).",
+   "areas": "Mindanao and the Sulu archipelago\nFCDO advises against all travel to western and central Mindanao and the Sulu archipelago.\nFCDO also advises against all but essential travel to the remainder of Mindanao, except for:\n · Camiguin Island\n · Dinagat Island\n · Siargao Island\nThis advice is due to terrorist activity and clashes between the military and insurgent groups in south Philippines."
+  },
+  "PK": {
+   "status": [
+    "avoid_all_travel_to_parts",
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-18T16:36:34Z",
+   "level": 2,
+   "flags": [
+    "terror-high",
+    "kidnap",
+    "crime",
+    "unrest"
+   ],
+   "change": "Updated information about regional tensions (See ‘Warnings and insurance’ page).",
+   "areas": "Pakistan-Afghanistan border\nFCDO advises against all travel to within 10 miles of the border between Pakistan and Afghanistan.\nKhyber Pakhtunkhwa Province\nFCDO advises against all travel to these areas in Khyber Pakhtunkhwa Province: \n · Bajaur \n · Bannu \n · Buner \n · Chārsadda\n · Dera Ismail Khan \n · Hangu\n · Karak\n · Khyber \n · Kohat \n · Kurram \n · Lakki Marwat \n · Upper Dir \n · Lower Dir \n · Mohmand \n · Orakzai \n · Peshawar, including the city of Peshawar \n · Swat \n · Tank \n · North Waziristan\n · Upper South Waziristan \n · Lower South Waziristan  \n · the Karakoram Highway between Mansehra and Chilas via Battagram, Besham City, Dasu and Sazin up to the junction with the N15  \n · the N45 Highway, from the north of the Mardan ring road, to the edge of Chitral City, including Kalash valley\nFCDO advises against all but essential travel to these areas in Khyber Pakhtunkhwa Province:\n · …"
+  },
+  "PL": {
+   "status": [],
+   "updatedAt": "2026-11-11T15:42:44Z",
+   "level": 1,
+   "flags": [
+    "conflict"
+   ],
+   "change": "Updated information following the terrorist attack in Kraków, including advice for those affected (‘Warnings and insurance’ page).",
+   "areas": null
+  },
+  "PM": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:49:50Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about dual nationals returning to the UK (‘ Entry requirements’ page).",
+   "areas": null
+  },
+  "PN": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:22:29Z",
+   "level": 0,
+   "flags": [],
+   "change": "This travel advice was reviewed for accuracy and reissued without any significant updates.",
+   "areas": null
+  },
+  "PR": {
+   "status": [],
+   "updatedAt": "2026-11-20T19:57:12Z",
+   "level": 0,
+   "flags": [
+    "terror-high",
+    "crime"
+   ],
+   "change": "Removal of information about air traffic disruptions across the US",
+   "areas": null
+  },
+  "PS": {
+   "status": [
+    "avoid_all_travel_to_parts",
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-18T16:32:19Z",
+   "level": 2,
+   "flags": [
+    "conflict",
+    "missile",
+    "terror-high",
+    "kidnap"
+   ],
+   "change": "Updated information about regional tensions (‘Warnings and insurance’ page).",
+   "areas": "Gaza\nFCDO advises against all travel to Gaza\nAreas near Gaza\nFCDO advises against all travel within 500m of the border with Gaza\nThe West Bank\nFCDO advises against all travel to:\n · Tulkarm Governorate, Jenin Governorate, and Tubas Governorate except Route 90\nNorthern Israel and Occupied Golan Heights\nFCDO advises against all travel to:\n · \n Areas north of Route 89 between Nahariyya and Dalton; north of a straight eastward line from Dalton to Route 91; and north of Route 91 across the Golan Heights, excluding routes 89 and 91 themselves\n · \n Within 500m of the Area of Separation in the occupied Golan Heights (the ‘Alpha line’). Do not attempt to enter the occupied Golan Heights through Syria\n · \n Sheba’a Farms and Ghajja\nAreas where FCDO advises against all but essential travel\nWest Bank\nFCDO advises against all but essential travel to:\n · The rest of the West Bank, except for: East …"
+  },
+  "PT": {
+   "status": [],
+   "updatedAt": "2026-11-12T11:00:21Z",
+   "level": 0,
+   "flags": [],
+   "change": "Removal of information on severe weather",
+   "areas": null
+  },
+  "PW": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:18:20Z",
+   "level": 0,
+   "flags": [
+    "mines"
+   ],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "PY": {
+   "status": [],
+   "updatedAt": "2026-11-03T20:29:30Z",
+   "level": 1,
+   "flags": [
+    "kidnap"
+   ],
+   "change": "Update on possible demonstrations and protests in Paraguay ('Safety and security' page).",
+   "areas": null
+  },
+  "QA": {
+   "status": [],
+   "updatedAt": "2026-11-18T16:32:02Z",
+   "level": 0,
+   "flags": [
+    "missile"
+   ],
+   "change": "Updated information about regional tensions (See ‘Warnings and insurance’ page). ",
+   "areas": null
+  },
+  "RE": {
+   "status": [],
+   "updatedAt": "2026-10-22T17:05:28Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about demonstrations (‘Warnings and insurance’ page).",
+   "areas": null
+  },
+  "RO": {
+   "status": [],
+   "updatedAt": "2026-10-07T12:49:29Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about drones crossing into Romanian airspace (‘Safety and security’ page). ",
+   "areas": null
+  },
+  "RS": {
+   "status": [],
+   "updatedAt": "2026-10-22T09:20:25Z",
+   "level": 0,
+   "flags": [
+    "mines"
+   ],
+   "change": "New information about Serbian parliamentary elections taking place on 25 October (‘Warnings and insurance’ and ‘Safety and security’ pages).\r\n\r\n",
+   "areas": null
+  },
+  "RU": {
+   "status": [
+    "avoid_all_travel_to_whole_country"
+   ],
+   "updatedAt": "2026-11-20T13:13:49Z",
+   "level": 4,
+   "flags": [
+    "conflict",
+    "missile",
+    "terror-high",
+    "crime"
+   ],
+   "change": "Updated information about drone attacks leading to short-notice restrictions on airspace use and airport operations (‘Warnings and insurance’ and ‘Safety and security’ pages).\r\n\r\n",
+   "areas": null
+  },
+  "RW": {
+   "status": [
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-07T10:17:57Z",
+   "level": 2,
+   "flags": [],
+   "change": "New information about vapes and e-cigarette bans in Rwanda and updated information about border measures introduced by the Rwandan Government in response to the Ebola outbreak in the Democratic Republic of Congo ('Entry requirements' and 'Safety and security' pages).\r\n\r\n",
+   "areas": "Areas where FCDO advises against all but essential travel\nRusizi District\nFCDO advises against all but essential travel to the parts of Rusizi District which are within 10km of the border with the Democratic Republic of Congo (DRC), including the Rwandan islands in Lake Kivu and Kamembe Airport.\n Rwanda-DRC border\n Risks associated with the proximity of potential fighting in Democratic Republic of Congo (DRC) may affect people on the Rwandan side of the border. International borders are often not well marked in remote areas, and you could unknowingly cross into DRC. You may see a presence of military personnel on both sides of the border.\n See Democratic Republic of the Congo’s travel advice for more information. Keep up to date with developments through local media.\n The border crossings between Rwanda and DRC could close at short notice.\nBefore you travel\nNo travel can be guaranteed …"
+  },
+  "SA": {
+   "status": [
+    "avoid_all_travel_to_parts",
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-18T16:32:22Z",
+   "level": 2,
+   "flags": [
+    "missile",
+    "crime"
+   ],
+   "change": "Updated information about regional tensions (See ‘Warnings and insurance’ page). ",
+   "areas": "FCDO advises against:\n · \n all travel to within 10km of the border with Yemen  \n · \n all but essential travel to the rest of Saudi Arabia"
+  },
+  "SB": {
+   "status": [],
+   "updatedAt": "2026-10-12T11:44:41Z",
+   "level": 0,
+   "flags": [
+    "mines",
+    "unrest"
+   ],
+   "change": "New information about Solomon Islands’ new electronic visa system (see ‘Visa requirements' on the ‘Entry requirements’ page). ",
+   "areas": null
+  },
+  "SC": {
+   "status": [],
+   "updatedAt": "2026-10-23T15:17:13Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about Ebola health measures for entry into Seychelles (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "SD": {
+   "status": [
+    "avoid_all_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-07T10:14:42Z",
+   "level": 2,
+   "flags": [
+    "conflict",
+    "kidnap",
+    "crime"
+   ],
+   "change": "Updated information on operations in Sudanese airports ('Safety and security' page).",
+   "areas": "FCDO advises against all travel to Sudan because of the ongoing military conflict in Khartoum and other parts of the country. This does not include the Hala’ib Triangle and the Bir Tawil Trapezoid where FCDO advises against all but essential travel.\nThere have been several ceasefires, but these have been regularly broken.  \nMonitor travel advice and other media reports for the latest information. \nFind out more about safety and security in Sudan. \nGet help in Sudan \nThe British Embassy in Khartoum is closed due to the conflict. There are no British consular staff in Sudan. Our ability to provide consular support is severely limited and we cannot provide in-person support inside Sudan. \nIf you’re a British national in Sudan, you can call our 24/7 telephone helpline: +44 1908 516 666. Select option 2 for consular services for British nationals. \nLeaving Sudan \nThe UK government is no …"
+  },
+  "SE": {
+   "status": [],
+   "updatedAt": "2026-10-07T12:53:50Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "Updated information on European Entry-Exit System (EES) (‘Entry requirements’ page). \r\n\r\n",
+   "areas": null
+  },
+  "SG": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:26:38Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "Updated information about global travel impacts due to escalation in the Middle East (‘Warnings and insurance’ page).",
+   "areas": null
+  },
+  "SH": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:39:12Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information on getting to Ascension Island ('Safety and Security' page)",
+   "areas": null
+  },
+  "SI": {
+   "status": [],
+   "updatedAt": "2026-10-07T12:52:43Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information on European Entry-Exit System (EES) (‘Entry requirements’ page). ",
+   "areas": null
+  },
+  "SK": {
+   "status": [],
+   "updatedAt": "2026-10-07T12:51:24Z",
+   "level": 0,
+   "flags": [],
+   "change": "This travel advice has been updated for accuracy with changes made throughout, including border with Ukraine, political demonstrations, skiing and hiking, taxi’s, and extreme weather and natural disasters (‘Safety and security page’).  ",
+   "areas": null
+  },
+  "SL": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:16:41Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about completing a health travel declaration (‘Entry Requirements’ page.)\r\n\r\n",
+   "areas": null
+  },
+  "SM": {
+   "status": [],
+   "updatedAt": "2026-10-07T12:50:17Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "SN": {
+   "status": [],
+   "updatedAt": "2026-10-15T09:10:52Z",
+   "level": 1,
+   "flags": [
+    "kidnap"
+   ],
+   "change": "Updated information about health risks you'll face in Senegal ('Health' page).",
+   "areas": null
+  },
+  "SO": {
+   "status": [
+    "avoid_all_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-07T10:16:15Z",
+   "level": 2,
+   "flags": [
+    "missile",
+    "terror-high",
+    "kidnap",
+    "crime"
+   ],
+   "change": "Updated information about the political situation ('Safety and security' page).\r\n\r\n",
+   "areas": "Parts of Somalia, including Somaliland   \nFCDO advises against all travel to Somalia, including Somaliland, except for the regions of Awdal, Maroodijeh, and Sahil. \nFCDO advises against all but essential travel to the regions of Awdal, Maroodijeh, and Sahil. \nThis is due to the threat from terrorist groups and continuing violence. If you choose to remain in Somalia, you do so at your own risk. You should have a personal emergency plan that does not rely on the UK government."
+  },
+  "SR": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:38:54Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "SS": {
+   "status": [
+    "avoid_all_travel_to_whole_country"
+   ],
+   "updatedAt": "2026-10-07T10:15:00Z",
+   "level": 4,
+   "flags": [
+    "conflict",
+    "kidnap",
+    "mines",
+    "crime"
+   ],
+   "change": "Updated information about Ebola ('Entry requirements' page).",
+   "areas": null
+  },
+  "ST": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:17:33Z",
+   "level": 0,
+   "flags": [
+    "unrest"
+   ],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "SV": {
+   "status": [],
+   "updatedAt": "2026-11-05T14:10:46Z",
+   "level": 1,
+   "flags": [
+    "kidnap",
+    "mines",
+    "crime"
+   ],
+   "change": "Updated information about visa requirements when travelling between El Salvador, Guatemala, Honduras and Nicaragua ('Entry requirements' page).",
+   "areas": null
+  },
+  "SX": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:50:51Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "New information about dual nationals returning to the UK (‘ Entry requirements’ page).",
+   "areas": null
+  },
+  "SY": {
+   "status": [
+    "avoid_all_travel_to_whole_country"
+   ],
+   "updatedAt": "2026-11-18T16:36:20Z",
+   "level": 4,
+   "flags": [
+    "conflict",
+    "missile",
+    "terror-high",
+    "kidnap",
+    "mines",
+    "crime"
+   ],
+   "change": "Updated information about regional tensions (See ‘Warnings and insurance’ page).",
+   "areas": null
+  },
+  "SZ": {
+   "status": [],
+   "updatedAt": "2026-11-09T14:38:31Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "Updated information about visa requirements, LGBT+ travellers, road travel and conditions and the health risks you’ll face in Eswatini (‘Entry requirements’, ‘Safety and security’ and ‘Health’ pages).\r\n\r\n",
+   "areas": null
+  },
+  "TC": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:48:46Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about passport validity requirements ('Entry requirements' page).",
+   "areas": null
+  },
+  "TD": {
+   "status": [
+    "avoid_all_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-04T14:33:29Z",
+   "level": 2,
+   "flags": [
+    "terror-high",
+    "kidnap",
+    "crime"
+   ],
+   "change": "This travel advice has been reviewed for accuracy with changes made throughout, including updated information about applying for a visa, terrorism in Chad, terrorist kidnapping, political situation, robbery, protecting yourself and your belongings, Ramadan, driving standards and security, travelling outside N'Djamena, regional risks, health risks you may face in Chad, including Dengue and emergency numbers if your require police, ambulance or fire services ('Entry requirements', 'Safety and security', 'Regional risks', 'Health' and 'Getting help' pages).",
+   "areas": "Borkou, Ennedi Ouest, Ennedi Est and Tibesti provinces\nFCDO advises against all travel to the northern provinces of Chad:\n · Borkou Province\n · Ennedi Ouest Province\n · Ennedi Est Province\n · Tibesti Province\nKanem Province, including Nokou\nFCDO advises against all travel to the western part of Kanem Province, including the town of Nokou.\nLake Chad region\nFCDO advises against all travel to the Lake Chad region.\nWithin 30km of all Chad’s other borders  \nFCDO advises against all travel to within 30km of all of Chad’s other borders.   \nThe rest of Chad\nFCDO advises against all but essential travel to the rest of Chad, including the capital, N’Djamena."
+  },
+  "TG": {
+   "status": [
+    "avoid_all_travel_to_parts",
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-04T16:27:19Z",
+   "level": 2,
+   "flags": [
+    "terror-high",
+    "kidnap",
+    "crime"
+   ],
+   "change": "Updated information about applying for a visa (see 'Visa requirements' on the 'Entry requirements' page).",
+   "areas": "Togo-Burkina Faso border\nFCDO advises against all travel to within 30km of the border with Burkina Faso, except for:\n · the city of Dapaong and the N1 highway leading to it from the south.\nSavanes Region\nFCDO advises against all but essential travel to the rest of the Savanes region."
+  },
+  "TH": {
+   "status": [
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-17T15:11:32Z",
+   "level": 2,
+   "flags": [
+    "conflict",
+    "missile",
+    "scam-job",
+    "mines",
+    "crime",
+    "unrest"
+   ],
+   "change": "Updated information about visa requirements for travellers entering Thailand by land or air (‘Entry requirements’ page).",
+   "areas": "Thailand-Malaysia border\nFCDO advises against all but essential travel to parts of the south, near the Thailand-Malaysia border:\n · Pattani Province\n · Yala Province\n · Narathiwat Province\n · The districts of Chana, Thepa, Na Thawi and Saba Yoi in southern Songkhla Province\nFCDO also advises against all but essential travel on the Hat Yai to Padang Besar train line that runs through these provinces.\nThis is due to regular attacks in the provinces by the border with Malaysia. See Safety and security .\nThailand-Cambodia border\nFCDO advises against all but essential travel to areas within 20km of the land border with Cambodia.\nFighting occurred along parts of the border in July 2025, and further clashes took place in early December, involving rocket and artillery fire. Land borders and crossings between Thailand and Cambodia remain suspended. Tourist sites close to the border, including …"
+  },
+  "TJ": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:32:15Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about terrorism and armed clashes near the Tajikistan-Afghanistan border ('Safety and security' and ‘Regional risks’ pages).",
+   "areas": null
+  },
+  "TK": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:35:19Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "TL": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:33:20Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "TM": {
+   "status": [],
+   "updatedAt": "2026-10-21T14:50:49Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about COVID-19 rules, applying for visas, transit visas and taking cash into Turkmenistan (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "TN": {
+   "status": [
+    "avoid_all_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-07T10:12:41Z",
+   "level": 2,
+   "flags": [
+    "unrest"
+   ],
+   "change": "This travel advice has been reviewed for accuracy with changes made throughout, including visa requirements, taking money into and out of Tunisia, electronic devices, drugs and illegal substances and power supply in summer months ('Entry requirements' and 'Safety and security') pages.",
+   "areas": "Western Tunisia, including the Tunisia-Algeria border\nFCDO advises against all travel to:\n · the Chaambi Mountains National Park\n · \n the designated military operations zones:\n · Mount Salloum\n · Mount Sammamma\n · Mount Mghila\nThis is due to cross-border terrorist activity and operations by the Tunisian security forces. \nIn addition, FCDO advises against all but essential travel to:\n · areas north and west of the town of Ghardimaou in Jendouba Governorate, including El Feidja National Park\n · within 20km of the Tunisia-Algeria border in El Kef and Jendouba governorates, south of the town of Jendouba\n · Kasserine Governorate, including the town of Sbeitla\n · within 10km of the rest of the Tunisia-Algeria border south of Kasserine Governorate\n · within 10km of Mount Mghila\n · Mount Orbata\nSouthern Tunisia, including the Tunisia-Libya border\nFCDO advises against all travel to:\n · the …"
+  },
+  "TO": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:35:48Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about global travel impacts due to escalation in the Middle East (‘Warnings and insurance’ page).",
    "areas": null
   },
   "TR": {
@@ -92,76 +2257,255 @@
     "avoid_all_travel_to_parts"
    ],
    "updatedAt": "2026-11-18T16:36:28Z",
+   "level": 2,
+   "flags": [
+    "missile"
+   ],
+   "change": "Updated information about regional tensions (See ‘Warnings and insurance’ page).",
    "areas": "Turkey-Syria border\nFCDO advises against all travel to within 10km of the border with Syria due to fighting and a heightened risk of terrorism. If you are in Syria, follow FCDO Travel Advice for Syria. The FCDO cannot facilitate entry for British nationals into Turkey from Syria."
+  },
+  "TT": {
+   "status": [],
+   "updatedAt": "2026-11-11T16:31:16Z",
+   "level": 1,
+   "flags": [
+    "kidnap",
+    "crime"
+   ],
+   "change": "New information about Arrival/Departure card (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "TV": {
+   "status": [],
+   "updatedAt": "2026-10-07T11:36:39Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about global travel impacts due to escalation in the Middle East (‘Warnings and insurance’ page). ",
+   "areas": null
+  },
+  "TW": {
+   "status": [],
+   "updatedAt": "2026-11-18T15:21:27Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about illegal drug offences and penalties (‘Warnings and insurance’ and ‘Safety and security’ pages). ",
+   "areas": null
+  },
+  "TZ": {
+   "status": [
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-30T14:45:53Z",
+   "level": 2,
+   "flags": [
+    "kidnap",
+    "crime",
+    "unrest"
+   ],
+   "change": "Additional information about use of security measures to reduce the risk of burglary in hotels and other accommodation (‘Safety and security’ page). ",
+   "areas": null
+  },
+  "UA": {
+   "status": [
+    "avoid_all_travel_to_parts",
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-10-30T13:01:27Z",
+   "level": 2,
+   "flags": [
+    "conflict",
+    "missile",
+    "mines",
+    "unrest"
+   ],
+   "change": "Updated information about the Russian invasion of Ukraine ('Warnings and insurance' page).",
+   "areas": "Crimea  \nFCDO advises against all travel to Crimea.\nBorder with Belarus  \nFCDO advises against all travel to within 50km of the border with Belarus in the following regions: \n · \n Volyn \n · \n Rivne \n · \n Zhytomyr \nThis is due to the ongoing presence of Russian and Belarusian military and security personnel on the Belarusian side of the border. \nAll other regions of Ukraine \nFCDO advises against all travel to all other regions of Ukraine (with the exception of some Western regions; see below).\nAreas where FCDO advises against all but essential travel\nFCDO advises against all but essential travel to the following regions in western Ukraine: \nAll parts: \n · Zakarpattia  \n · Ivano-Frankivsk \n · Ternopil \n · Chernivtsi \n · Lviv \nParts further than 50km from the border with Belarus:\n(see Border with Belarus above)\n · Volyn \n · Rivne \n · Zhytomyr\nRussian invasion of Ukraine\nRussia continues to …"
+  },
+  "UG": {
+   "status": [],
+   "updatedAt": "2026-11-06T10:16:14Z",
+   "level": 1,
+   "flags": [
+    "terror-high",
+    "kidnap"
+   ],
+   "change": "Updated information about precautionary measures in response to the Ebola outbreak in the region (‘Health’ page).",
+   "areas": null
   },
   "US": {
    "status": [],
    "updatedAt": "2026-11-20T19:57:12Z",
+   "level": 0,
+   "flags": [
+    "terror-high",
+    "crime"
+   ],
+   "change": "Removal of information about air traffic disruptions across the US",
    "areas": null
   },
-  "CA": {
+  "UY": {
    "status": [],
-   "updatedAt": "2026-10-07T11:01:35Z",
+   "updatedAt": "2026-10-07T10:38:35Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
    "areas": null
   },
-  "GU": {
+  "UZ": {
    "status": [],
-   "updatedAt": "2026-11-20T19:57:12Z",
+   "updatedAt": "2026-10-07T11:39:10Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about global travel impacts due to escalation in the Middle East (‘Warnings and insurance’ page).",
    "areas": null
   },
-  "AU": {
-   "status": [],
-   "updatedAt": "2026-10-07T10:24:13Z",
-   "areas": null
-  },
-  "NZ": {
-   "status": [],
-   "updatedAt": "2026-10-07T11:16:51Z",
-   "areas": null
-  },
-  "FR": {
-   "status": [],
-   "updatedAt": "2026-10-22T16:57:33Z",
-   "areas": null
-  },
-  "IT": {
+  "VA": {
    "status": [],
    "updatedAt": "2026-11-03T11:56:35Z",
+   "level": 0,
+   "flags": [],
+   "change": "Removal of information about national strike. ",
    "areas": null
   },
-  "ES": {
+  "VC": {
    "status": [],
-   "updatedAt": "2026-11-10T15:29:19Z",
+   "updatedAt": "2026-10-07T10:49:29Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about risks of crime, including in public areas (see ‘Crime’ on the ‘Safety and security’ page).",
    "areas": null
   },
-  "DE": {
+  "VE": {
+   "status": [
+    "avoid_all_travel_to_parts",
+    "avoid_all_but_essential_travel_to_parts"
+   ],
+   "updatedAt": "2026-11-18T11:13:15Z",
+   "level": 2,
+   "flags": [
+    "crime"
+   ],
+   "change": "Updated information about documents you must show to immigration authorities upon arrival and the ban on any vaping device, including those that do not contain nicotine (‘Entry requirements’ page). ",
+   "areas": "Areas where FCDO advises against all travel\nBorder areas\nFCDO advises against all travel to: \n · within 40km (25 miles) of the border with Colombia\n · within 40km (25 miles) of the border with Brazil\n · within 40km (25 miles) of the border with Guyana\nAmazonas\nFCDO advises against all travel to Amazonas state.\nBolívar\nFCDO advises against all travel to the Orinoco Mining Arc (‘Arco Minero’) region to the south of the Orinoco river. This includes:\n · all of Cedeño Municipality\n · the northern part of Sucre Municipality, from the Orinoco river to 80km south of the Troncal 19 road\n · the northern part of Raul Leoni Municipality, north of the Rio Paragua\n · all of Piar Municipality\n · all of Roscio Municipality\n · all of El Callo Municipality\n · all of Sifontes Municipality\nDelta Amacuro\nFCDO advises against all travel to the area to the south of the Orinoco river.\nThe FCDO advises against …"
+  },
+  "VG": {
    "status": [],
-   "updatedAt": "2026-10-07T11:56:20Z",
+   "updatedAt": "2026-10-07T11:02:01Z",
+   "level": 0,
+   "flags": [
+    "crime"
+   ],
+   "change": "New information about monitoring and reporting crime ('Safety and security' page).",
    "areas": null
   },
-  "CH": {
+  "VI": {
    "status": [],
-   "updatedAt": "2026-10-07T12:54:14Z",
+   "updatedAt": "2026-11-20T19:57:12Z",
+   "level": 0,
+   "flags": [
+    "terror-high",
+    "crime"
+   ],
+   "change": "Removal of information about air traffic disruptions across the US",
    "areas": null
   },
-  "AT": {
+  "VN": {
    "status": [],
-   "updatedAt": "2026-10-07T11:43:33Z",
+   "updatedAt": "2026-10-07T11:40:14Z",
+   "level": 1,
+   "flags": [
+    "scam-job",
+    "mines",
+    "crime",
+    "unrest"
+   ],
+   "change": "Addition of information about tropical storm season ('Warnings and insurance') page",
    "areas": null
   },
-  "CZ": {
+  "VU": {
    "status": [],
-   "updatedAt": "2026-10-07T11:51:15Z",
+   "updatedAt": "2026-10-07T11:39:37Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about global travel impacts due to escalation in the Middle East (‘Warnings and insurance’ page).",
    "areas": null
   },
-  "PT": {
+  "WF": {
    "status": [],
-   "updatedAt": "2026-11-12T11:00:21Z",
+   "updatedAt": "2026-10-07T11:40:36Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
    "areas": null
   },
-  "GR": {
+  "WS": {
    "status": [],
-   "updatedAt": "2026-11-03T11:18:20Z",
+   "updatedAt": "2026-10-07T11:22:52Z",
+   "level": 0,
+   "flags": [],
+   "change": "Updated information about global travel impacts due to escalation in the Middle East (‘Warnings and insurance’ page).",
+   "areas": null
+  },
+  "XK": {
+   "status": [],
+   "updatedAt": "2026-10-07T12:03:39Z",
+   "level": 0,
+   "flags": [
+    "mines"
+   ],
+   "change": "Updated information about large gatherings in Pristina and other urban areas of Kosovo (‘Warnings and insurance’ page). ",
+   "areas": null
+  },
+  "YE": {
+   "status": [
+    "avoid_all_travel_to_whole_country"
+   ],
+   "updatedAt": "2026-11-18T16:36:14Z",
+   "level": 4,
+   "flags": [
+    "conflict",
+    "missile",
+    "terror-high",
+    "kidnap",
+    "mines",
+    "crime"
+   ],
+   "change": "Updated information about regional tensions (See ‘Warnings and insurance’ page). ",
+   "areas": null
+  },
+  "YT": {
+   "status": [],
+   "updatedAt": "2026-10-07T12:09:15Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about dual nationals returning to the UK (‘Entry requirements’ page).",
+   "areas": null
+  },
+  "ZA": {
+   "status": [],
+   "updatedAt": "2026-11-05T11:07:46Z",
+   "level": 1,
+   "flags": [
+    "kidnap",
+    "crime"
+   ],
+   "change": "Updated information about fraud and scams, and taxis and ride-hailing apps (‘Safety and security’ page).",
+   "areas": null
+  },
+  "ZM": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:08:42Z",
+   "level": 0,
+   "flags": [],
+   "change": "New information about entry requirements for those entering from Ebola-affected regions ('Entry requirements' page).",
+   "areas": null
+  },
+  "ZW": {
+   "status": [],
+   "updatedAt": "2026-10-07T10:08:38Z",
+   "level": 0,
+   "flags": [],
+   "change": "Addition of  information about direct flights between London and Harare ('Safety and security' page).",
    "areas": null
   }
  }

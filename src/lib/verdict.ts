@@ -19,6 +19,10 @@ export interface VerdictInput {
   safety: Safety
   /** 나라 전체 경보 중 '모든 여행 자제'(가장 높음)인지 */
   allTravel?: boolean
+  /** 경보 원문에 적힌 위험 요인 (한국어 이름) */
+  riskNames?: string[]
+  /** 경보는 없지만 전쟁·납치·취업 사기가 언급됨 (위험도 1) */
+  mentionedRisk?: boolean
   /** 0~100 (좋은 시기 지수의 날씨 점수), 모르면 null */
   weatherScore: number | null
   weatherNote?: string
@@ -53,10 +57,19 @@ export function travelVerdict(v: VerdictInput): Verdict {
     down('caution')
     reasons.push('일부 지역(주로 국경·분쟁 지역)에 여행 자제 경보가 있어요. 가려는 도시가 포함되는지 확인하세요')
   } else if (v.safety === 'ok') {
-    reasons.push('영국 외무부 기준 여행 자제 지역이 없어요')
+    if (v.mentionedRisk) {
+      down('normal')
+      reasons.push('여행 자제 지역은 없지만 경보 원문에 위험 요인이 적혀 있어요')
+    } else reasons.push('영국 외무부 기준 여행 자제 지역이 없어요')
   } else {
     down('normal')
     reasons.push(v.safety === 'na' ? '이 나라는 영국 외무부 경보 대상이 아니라 외교부에서 직접 확인해야 해요' : '여행 경보를 확인하지 못했어요')
+  }
+
+  if (v.riskNames?.length) reasons.push(`경보 원문의 위험 요인: ${v.riskNames.join(', ')}`)
+  if (v.riskNames?.includes('전쟁·무력 충돌')) {
+    down('caution')
+    reasons.push('전쟁·무력 충돌이 적힌 나라는 한국 외교부가 더 높은 단계(전 지역 여행금지 등)로 정하기도 해요. 꼭 확인하세요')
   }
 
   // 2) 날씨

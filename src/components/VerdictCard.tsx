@@ -5,6 +5,7 @@ import { MOFA_URL, fcdoPage, getAdvisory } from '../lib/advisory'
 import { getGoodTime } from '../lib/goodTime'
 import { safetyOf, travelVerdict, type VerdictLevel } from '../lib/verdict'
 import { translateToKo } from '../lib/translate'
+import { RISK_FLAGS } from '../lib/advisoryText'
 
 const STYLE: Record<VerdictLevel, { dot: string; ring: string; text: string; emoji: string }> = {
   recommend: { dot: 'bg-teal-500', ring: 'border-teal-700/60', text: 'text-teal-700', emoji: '🟢' },
@@ -30,6 +31,8 @@ export function VerdictCard({ country, place, dates }: { country: Country; place
   const v = travelVerdict({
     safety,
     allTravel: a?.status.some((s) => s === 'avoid_all_travel_to_whole_country'),
+    riskNames: a?.flags?.map((f) => RISK_FLAGS.find((x) => x.id === f)?.label ?? f),
+    mentionedRisk: a?.level === 1,
     weatherScore: g?.weather.score ?? null,
     weatherNote: g?.weather.note,
     holidayScore: g?.holiday.score ?? null,
@@ -102,6 +105,10 @@ export function VerdictCard({ country, place, dates }: { country: Country; place
           )}
         </div>
       )}
+
+      <a href="#safety" className="mt-3 inline-block text-xs font-medium text-teal-700 underline underline-offset-2">
+        안전 탭에서 위험도·세계 위험 국가 보기
+      </a>
 
       {adv.status === 'error' && (
         <button type="button" onClick={adv.retry} className="mt-2 text-xs text-teal-700 underline underline-offset-2">
