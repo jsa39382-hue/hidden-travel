@@ -7,6 +7,7 @@ import { COUNTRIES } from '../lib/countries'
 import { translateToKo } from '../lib/translate'
 import { Flag } from './Flag'
 import { Loading } from './Status'
+import { KnownRisks } from './KnownRisks'
 
 const LEVEL_STYLE = [
   'border-stone-300 text-stone-600',
@@ -117,7 +118,7 @@ export function SafetySection({ country, onPickCountry }: { country: Country; on
           </ul>
         )}
         <p className="mt-3 text-[11px] leading-relaxed text-stone-500">
-          위험도는 영국 외무부(FCDO) 여행 경보 단계로 정했고, 위험 요인은 경보 원문에 실제로 적힌 표현만 표시해요. 뉴스를 대신 판단하지 않아요. 한국 외교부의 여행경보·특별여행주의보는 단계와 지역이 다를 수 있으니{' '}
+          위험도는 영국 외무부(FCDO) 여행 경보 단계로 정했고, 위험 요인은 경보 원문에 실제로 적힌 표현만 표시해요. '잘 알려진 주의사항'은 여행자에게 널리 알려진 내용을 직접 정리한 참고용이에요. 한국 외교부의 여행경보·특별여행주의보는 단계와 지역이 다를 수 있으니{' '}
           <a href={MOFA_URL} target="_blank" rel="noreferrer" className="font-medium text-stone-700 underline underline-offset-2">
             외교부 해외안전여행
           </a>
@@ -178,13 +179,14 @@ function HereCard({ country, a, failed, onRetry }: { country: Country; a?: Advis
           <span key={i} className={`h-2 flex-1 rounded-full ${i <= a.level ? (a.level >= 3 ? 'bg-rose-500' : a.level === 2 ? 'bg-orange-500' : 'bg-amber-400') : 'bg-stone-200'}`} />
         ))}
       </div>
+      <KnownRisks code={country.code} />
       {a.flags.length > 0 ? (
         <div>
-          <p className="mb-1 text-xs text-stone-500">경보 원문에 적힌 위험 요인</p>
+          <p className="mb-1 text-xs text-stone-500">영국 외무부 경보 원문에 적힌 위험 요인</p>
           <Flags flags={a.flags} />
         </div>
       ) : (
-        <p className="text-sm text-stone-600">경보 원문에서 전쟁·납치·취업 사기 같은 큰 위험 요인을 찾지 못했어요.</p>
+        <p className="text-sm text-stone-600">영국 외무부 경보 원문에서 전쟁·납치·취업 사기 같은 큰 위험 요인은 찾지 못했어요.</p>
       )}
       {a.flags.includes('conflict') && (
         <p className="rounded-xl border border-rose-500/60 bg-rose-50 px-3 py-2 text-xs leading-relaxed text-rose-700">

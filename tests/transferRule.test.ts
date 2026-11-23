@@ -162,14 +162,13 @@ test('여행 판단: 안전 우선, 확인 못 하면 추천하지 않음', asyn
 test('위험 요인·위험도: 단어 단위로 찾고 경보 단계로 0~4', async () => {
   const { riskFlags, riskLevel } = await import('../src/lib/advisoryText.ts')
   assert.deepEqual(riskFlags('Whilst most demonstrations are peaceful'), []) // 'war' 오탐 없음
-  assert.deepEqual(riskFlags('Terrorists are very likely to try to carry out attacks'), ['terror-high'])
+  assert.deepEqual(riskFlags('Terrorists are very likely to try to carry out attacks'), []) // 유럽·미국 대부분에 쓰는 표현이라 표시하지 않음
   assert.ok(riskFlags('the Russian invasion of Ukraine').includes('conflict'))
-  assert.deepEqual(riskFlags('North Korea has launched ballistic missiles'), ['missile']) // 미사일은 전쟁과 따로
+  assert.deepEqual(riskFlags('North Korea has launched ballistic missiles'), []) // 미사일·드론은 표시하지 않음
   assert.ok(riskFlags('workers held in scam centres').includes('scam-job'))
   assert.ok(!riskFlags('Drug offences, including trafficking of cannabis').includes('scam-job')) // 마약 밀매는 아님
   assert.equal(riskLevel(['avoid_all_travel_to_whole_country'], []), 4)
   assert.equal(riskLevel(['avoid_all_but_essential_travel_to_whole_country'], []), 3)
   assert.equal(riskLevel(['avoid_all_travel_to_parts'], []), 2)
   assert.equal(riskLevel([], ['conflict']), 1)
-  assert.equal(riskLevel([], ['terror-high']), 0) // 테러 '매우 높음'만으로는 올리지 않음(유럽 대도시 대부분)
 })

@@ -6,6 +6,7 @@ import { getGoodTime } from '../lib/goodTime'
 import { safetyOf, travelVerdict, type VerdictLevel } from '../lib/verdict'
 import { translateToKo } from '../lib/translate'
 import { RISK_FLAGS } from '../lib/advisoryText'
+import { KnownRisks } from './KnownRisks'
 
 const STYLE: Record<VerdictLevel, { dot: string; ring: string; text: string; emoji: string }> = {
   recommend: { dot: 'bg-teal-500', ring: 'border-teal-700/60', text: 'text-teal-700', emoji: '🟢' },
@@ -105,6 +106,10 @@ export function VerdictCard({ country, place, dates }: { country: Country; place
           )}
         </div>
       )}
+
+      <div className="mt-4">
+        <KnownRisks code={country.code} compact />
+      </div>
 
       <a href="#safety" className="mt-3 inline-block text-xs font-medium text-teal-700 underline underline-offset-2">
         안전 탭에서 위험도·세계 위험 국가 보기

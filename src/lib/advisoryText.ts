@@ -26,12 +26,9 @@ export function extractAreas(html: string): string | null {
 /** 경보 원문에서 찾는 위험 요인 (영국 외무부 문장 그대로의 표현으로, 단어 단위로 찾는다) */
 export const RISK_FLAGS = [
   { id: 'conflict', label: '전쟁·무력 충돌', re: /\b(invasion|armed conflict|military conflict|hostilities|airstrikes?|ongoing conflict|active conflict|fighting (has|is|took|occurred))\b/i },
-  { id: 'missile', label: '미사일·드론 위협', re: /\b(missiles?|drone attacks?|rocket (fire|attacks?)|artillery)\b/i },
-  { id: 'terror-high', label: '테러 위험 매우 높음', re: /terrorists are very likely to try/i },
   { id: 'kidnap', label: '납치', re: /\bkidnap/i },
   { id: 'scam-job', label: '취업 사기·감금', re: /\b(scam (centres?|centers?|compounds?)|fraudulent (job|employment)|job scams?|fake job|human trafficking|forced to work|forced labour)\b/i },
   { id: 'mines', label: '지뢰·불발탄', re: /\b(landmines?|unexploded (ordnance|weapons|bombs?|munitions))\b/i },
-  { id: 'crime', label: '강력 범죄', re: /\b(violent crime|armed robbery|carjackings?|gang violence)\b/i },
   { id: 'unrest', label: '정정 불안', re: /\b(civil unrest|political unrest|state of emergency|coup|curfew)\b/i },
 ] as const
 export type RiskFlag = (typeof RISK_FLAGS)[number]['id']
