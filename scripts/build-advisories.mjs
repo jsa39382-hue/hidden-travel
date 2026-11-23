@@ -1,5 +1,5 @@
 // 영국 외무부(FCDO) 여행 경보 사본을 src/data/advisories.json으로 저장한다 (인터넷이 안 될 때·시연용).
-// 사본을 새로 받으려면 이 스크립트를 실행한 뒤 커밋한다 (자동 배포에 매일 실행을 넣으면 자동으로 갱신된다). 실패하면 이전 사본을 그대로 둔다.
+// GitHub Actions가 매일 배포할 때 이 스크립트를 실행해 사본을 새로 받는다(.github/workflows/deploy.yml). 실패하면 이전 사본을 그대로 둔다.
 // 응답 (2026-11 실제 호출로 확인): https://www.gov.uk/api/content/foreign-travel-advice/thailand
 //   { details: { alert_status: ['avoid_all_but_essential_travel_to_parts'], updated_at, reviewed_at, parts: [{ slug: 'warnings-and-insurance', body: '<html>' }] } }
 // 실행: npm run build:advisories
