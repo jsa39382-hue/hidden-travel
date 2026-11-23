@@ -1702,10 +1702,13 @@
        "mode": "rail",
        "name": "두바이 메트로 레드라인 (1·3터미널역)",
        "minutes": null,
-       "price": null,
+       "price": [
+        3,
+        7.5
+       ],
        "firstLast": null,
        "where": "1터미널역 · 3터미널역",
-       "note": null,
+       "note": "놀(nol) 실버 카드 기준 구역 수에 따라 3~7.50디르함 (2025년 1월)",
        "transfers": null
       },
       {
@@ -1725,19 +1728,51 @@
        "price": null,
        "firstLast": null,
        "where": "택시 승강장",
-       "note": "거리로 계산해요",
+       "note": "공항 출발은 기본요금 25디르함 (계산기는 길에서 잡는 기본요금 5디르함 기준이라 20디르함쯤 더 나와요)",
        "transfers": 0
       }
      ]
     }
    ],
-   "cityTransit": [],
-   "taxi": null,
-   "rideApps": [],
+   "cityTransit": [
+    {
+     "city": "두바이",
+     "card": "놀(nol) 실버 카드 (25디르함, 이 중 19디르함 충전)",
+     "cardPrice": 25,
+     "passes": [
+      {
+       "name": "1일권 (레드 티켓, 모든 구역)",
+       "price": 22,
+       "days": 1
+      }
+     ],
+     "single": [
+      3,
+      7.5
+     ]
+    }
+   ],
+   "taxi": {
+    "city": "두바이",
+    "base": 5,
+    "includedKm": 0,
+    "perKm": 2.19,
+    "afterAmount": null,
+    "perKmAfter": null,
+    "nightMultiplier": null,
+    "nightHours": null,
+    "note": "밤(22~06시) 기본요금 5.50디르함, 최저 요금 12디르함. 미터 없는 차는 타지 마세요"
+   },
+   "rideApps": [
+    "Careem",
+    "Uber",
+    "Bolt"
+   ],
    "intercity": [],
    "sources": [
     "https://en.wikipedia.org/wiki/Dubai_International_Airport",
-    "https://www.wikidata.org/wiki/Q193439"
+    "https://www.wikidata.org/wiki/Q193439",
+    "https://en.wikivoyage.org/wiki/Dubai"
    ]
   },
   "TR": {
