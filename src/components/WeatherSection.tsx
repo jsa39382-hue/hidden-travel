@@ -17,10 +17,10 @@ export function WeatherSection({ country, place, dates }: { country: Country; pl
   const [showAll, setShowAll] = useState(false)
 
   // 여행 날짜 기준 정보 (예보가 없어도 나오는 것): 평년 기후 + 작년 실제 날씨 + 골든아워
-  const preview = (reason: 'error' | 'range') => (
+  const preview = (reason: 'error' | 'range' | 'partial', after?: string) => (
     <section aria-label="여행 기간 미리보기" className="space-y-3">
       <h3 className="text-sm font-semibold uppercase tracking-wider text-stone-500">
-        여행 기간 미리보기 · {formatKo(dates.start)}~{formatKo(dates.end)}
+        {after ? `예보가 아직 없는 날 미리보기 · ${formatKo(after)}부터` : `여행 기간 미리보기 · ${formatKo(dates.start)}~${formatKo(dates.end)}`}
       </h3>
       <ClimateCard place={place} dates={dates} reason={reason} />
       <LastYearCard place={place} dates={dates} />
@@ -30,7 +30,7 @@ export function WeatherSection({ country, place, dates }: { country: Country; pl
 
   if (w.status === 'error')
     return (
-      <div className="max-w-2xl space-y-6">
+      <div className="max-w-2xl space-y-6 lg:max-w-3xl">
         <ErrorBox message="날씨 예보를 불러오지 못했어요." detail={errorReasonKo(w.error)} onRetry={w.retry} />
         {preview('error')}
         {/* 대기질·바다는 다른 서버라 날씨 예보가 실패해도 따로 보여 준다 */}
@@ -107,7 +107,7 @@ export function WeatherSection({ country, place, dates }: { country: Country; pl
   )
 
   return (
-    <div className="max-w-2xl space-y-6">
+    <div className="max-w-2xl space-y-6 lg:max-w-3xl">
       {tripAfterRange ? (
         <>
           <Notice>
@@ -130,7 +130,8 @@ export function WeatherSection({ country, place, dates }: { country: Country; pl
           <section aria-label="날씨 예보" className="space-y-4">
             {now}
           </section>
-          <GoldenHour country={country} place={place} dates={dates} />
+          {/* 여행 앞부분만 예보 안에 들면, 나머지 날은 평년 기후·작년 날씨로 (골든아워 포함) */}
+          {tripCovered && dates.end > last ? preview('partial', new Date(Date.parse(last) + 86400000).toISOString().slice(0, 10)) : <GoldenHour country={country} place={place} dates={dates} />}
         </>
       )}
 

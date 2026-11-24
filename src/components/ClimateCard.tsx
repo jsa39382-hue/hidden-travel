@@ -8,7 +8,7 @@ const MONTH = (m: number) => `${m + 1}월`
 const deg = (n: number) => `${Math.round(n)}°`
 
 /** 예보를 못 받았거나 여행이 예보 범위 밖일 때: 위키백과 기후표의 평년 값 */
-export function ClimateCard({ place, dates, reason }: { place: Place; dates: TripDates; reason: 'error' | 'range' }) {
+export function ClimateCard({ place, dates, reason }: { place: Place; dates: TripDates; reason: 'error' | 'range' | 'partial' }) {
   const c = useAsync(() => nearestClimate(place.lat, place.lng), [place.lat, place.lng])
   if (c.status === 'loading' || c.status === 'idle') return <Loading label="평년 기후 찾는 중…" />
   if (c.status === 'error' || !c.data) return reason === 'error' ? <p className="text-xs text-stone-500">이 지역은 평년 기후 자료도 아직 없어요.</p> : null
@@ -30,7 +30,7 @@ export function ClimateCard({ place, dates, reason }: { place: Place; dates: Tri
         <span className="rounded-full border border-amber-500 px-2 py-0.5 text-[11px] font-semibold text-amber-700">예보 아님 · 평균</span>
       </div>
       <p className="mt-1 text-xs text-stone-500">
-        {reason === 'error' ? '날씨 예보를 받지 못해 대신 보여 드려요. ' : '여행 날짜가 예보 범위 밖이라 평소 날씨로 미리 알려 드려요. '}
+        {reason === 'error' ? '날씨 예보를 받지 못해 대신 보여 드려요. ' : reason === 'partial' ? '여행 뒷부분은 아직 예보가 없어 평소 날씨로 미리 알려 드려요. ' : '여행 날짜가 예보 범위 밖이라 평소 날씨로 미리 알려 드려요. '}
         {city.km > 30 && `가장 가까운 자료가 ${city.name}(약 ${Math.round(city.km)}km)예요.`}
       </p>
       <ul className="mt-4 divide-y divide-stone-100">
