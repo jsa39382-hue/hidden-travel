@@ -366,7 +366,7 @@ function fameLabel(s: Spot) {
   if (s.views === null && s.sitelinks) return { text: `위키 언어판 ${s.sitelinks}곳`, cls: s.hiddenScore >= 50 ? 'bg-teal-50 text-teal-800' : 'bg-violet-50 text-violet-800' }
   if (s.views === null) return { text: '조회수 확인 못 함', cls: 'bg-stone-100 text-stone-600' }
   return {
-    text: `위키 조회 30일 ${s.views.toLocaleString('ko-KR')}회`,
+    text: `위키 조회 30일 ${s.views.toLocaleString('ko-KR')}회${(s.sitelinks ?? 0) >= 20 ? ` · 위키 ${s.sitelinks}개 언어` : ''}`,
     cls: s.hiddenScore >= 50 ? 'bg-teal-50 text-teal-800' : 'bg-violet-50 text-violet-800',
   }
 }

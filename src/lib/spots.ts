@@ -151,11 +151,13 @@ function toSpot(e: OsmElement, center: [number, number]): Spot | null {
 
 // ---------- Wikidata: 문서 제목 ----------
 
-async function resolveTitles(qids: string[]): Promise<Map<string, { ko?: string; en?: string }>> {
-  const out = new Map<string, { ko?: string; en?: string }>()
+/** Wikidata: 한국어·영어 문서 제목과 위키 언어판 수(sitelinks, 세계적으로 알려진 정도) */
+async function resolveTitles(qids: string[]): Promise<Map<string, { ko?: string; en?: string; sl?: number }>> {
+  const out = new Map<string, { ko?: string; en?: string; sl?: number }>()
   for (let i = 0; i < qids.length; i += 150) {
     const part = qids.slice(i, i + 150)
-    const query = `SELECT ?item ?ko ?en WHERE { VALUES ?item { ${part.map((q) => 'wd:' + q).join(' ')} }
+    const query = `SELECT ?item ?ko ?en ?sl WHERE { VALUES ?item { ${part.map((q) => 'wd:' + q).join(' ')} }
+  OPTIONAL { ?item wikibase:sitelinks ?sl }
   OPTIONAL { ?k schema:about ?item ; schema:isPartOf <https://ko.wikipedia.org/> ; schema:name ?ko }
   OPTIONAL { ?e schema:about ?item ; schema:isPartOf <https://en.wikipedia.org/> ; schema:name ?en } }`
     const ctrl = new AbortController()
@@ -171,7 +173,8 @@ async function resolveTitles(qids: string[]): Promise<Map<string, { ko?: string;
       const json = (await res.json()) as { results: { bindings: Record<string, { value: string }>[] } }
       for (const b of json.results.bindings) {
         const q = b.item.value.slice(b.item.value.lastIndexOf('/') + 1)
-        out.set(q, { ko: b.ko?.value, en: b.en?.value })
+        const sl = Number(b.sl?.value)
+        out.set(q, { ko: b.ko?.value, en: b.en?.value, sl: Number.isFinite(sl) ? sl : undefined })
       }
     } finally {
       clearTimeout(timer)
@@ -240,6 +243,8 @@ const scoreFromSitelinks = (n: number) => (n <= 1 ? 68 : n <= 3 ? 58 : n <= 6 ? 
 const NO_WIKI_SCORE = 75
 const UNKNOWN_VIEWS_SCORE = 40
 const MAX_PAGEVIEW_LOOKUPS = 45
+/** 조회수를 먼저 확인할 '대표 명소' 수 (위키 언어판이 20개 이상인 곳 중) */
+const TOP_LANDMARKS = 8
 
 const hasWikiOf = (s: Spot) => !!(s.enTitle || s.wiki || s.koTitle || s.wikidata)
 
@@ -290,6 +295,7 @@ async function loadFame(base: Spot[]): Promise<SpotsResult> {
         if (t) {
           s.koTitle ??= t.ko
           s.enTitle ??= t.en
+          s.sitelinks ??= t.sl
         }
       }
     } catch {
@@ -298,7 +304,11 @@ async function loadFame(base: Spot[]): Promise<SpotsResult> {
   }
 
   // 조회수: 영어 문서(나라 간 비교 가능) → 원래 위키 태그 문서 → 한국어 문서 순
-  const withWiki = spots.filter((s) => s.enTitle || s.wiki || s.koTitle).sort((a, b) => a.distKm - b.distKm)
+  // 가까운 곳 위주로 묻되, 세계적으로 유명한 곳(위키 언어판이 많은 곳)은 멀어도 먼저 묻는다
+  //  → '유명 명소' 순서와 '가장 유명한 곳보다 몇 배' 비교가 정확해진다
+  const near = spots.filter((s) => s.enTitle || s.wiki || s.koTitle).sort((a, b) => a.distKm - b.distKm)
+  const landmarks = [...near].sort((a, b) => (b.sitelinks ?? 0) - (a.sitelinks ?? 0)).filter((s) => (s.sitelinks ?? 0) >= 20).slice(0, TOP_LANDMARKS)
+  const withWiki = [...landmarks, ...near.filter((s) => !landmarks.includes(s))]
   const lookup = withWiki.slice(0, MAX_PAGEVIEW_LOOKUPS)
   const results = await mapLimit(lookup, 6, (s) => {
     const [lang, title] = s.enTitle ? ['en', s.enTitle] : s.wiki ? [s.wiki.lang, s.wiki.title] : ['ko', s.koTitle!]
@@ -347,9 +357,10 @@ export function getSpotsFame(lat: number, lng: number, radiusKm: number, base: S
 export function splitSpots(spots: Spot[]) {
   // 인지도 확인 전인 곳은 아직 어느 쪽인지 모르므로 숨은 명소 뒤쪽에 둔다
   const hidden = spots.filter((s) => s.hiddenScore >= HIDDEN_THRESHOLD || s.pending).sort((a, b) => (a.pending ? 1 : 0) - (b.pending ? 1 : 0) || b.interest - a.interest)
+  // 유명 명소: 세계적으로 알려진 정도(위키 언어판 수) → 조회수 → 거리 순
   const famous = spots
     .filter((s) => s.hiddenScore < HIDDEN_THRESHOLD && !s.pending)
-    .sort((a, b) => (b.views ?? -1) - (a.views ?? -1) || a.distKm - b.distKm)
+    .sort((a, b) => (b.sitelinks ?? 0) - (a.sitelinks ?? 0) || (b.views ?? -1) - (a.views ?? -1) || a.distKm - b.distKm)
   return { hidden, famous }
 }
 
