@@ -235,7 +235,7 @@ export function SpotsSection({ country, place, dates, active = true }: { country
                         이 반경에서 {tab === 'hidden' ? '숨은' : '유명'} 명소를 찾지 못했어요.{sp.famePending ? ' 인지도 확인이 끝나면 다시 보여 드려요.' : ' 반경을 넓혀 보세요.'}
                       </p>
                     ) : (
-                      <ul className="space-y-3">
+                      <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-1">
                         {visible.map((s) => (
                           <SpotCard key={s.id} spot={s} countryCode={country.code} selected={s.id === selected} onMap={() => showOnMap(s)} onLodging={() => nearbyOf(s)} liked={likedIds.has(s.id)} onToggleLike={() => wl.toggle(s)} sun={sunInfo} top={top} />
                         ))}
@@ -790,7 +790,7 @@ function SavedList({
       <div className="mb-3">
         <ExplorerBadge scores={items.map((s) => s.hiddenScore).filter((v) => typeof v === 'number' && v > 0)} />
       </div>
-      <ul className="space-y-3">
+      <ul className="grid gap-3 md:grid-cols-2 lg:grid-cols-1">
         {items.map((s) =>
           full.has(s.id) ? (
             <SpotCard key={s.id} spot={s} countryCode={countryCode} selected={s.id === selected} onMap={() => onMap(s)} onLodging={() => onLodging(s)} liked onToggleLike={() => onToggle(s)} />

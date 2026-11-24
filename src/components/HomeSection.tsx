@@ -23,7 +23,7 @@ export function HomeSection({ country, place, dates, onPickCountry }: { country:
   return (
     <div className="space-y-8">
       <VerdictCard country={country} place={place} dates={dates} />
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid gap-4 md:grid-cols-2">
         <GoodTimeCard country={country} place={place} dates={dates} />
         <SurvivalCard country={country} place={place} />
       </div>

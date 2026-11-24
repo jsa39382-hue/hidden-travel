@@ -220,7 +220,7 @@ function Transfer({
         {far && ` · ${josa(airport.name, '은/는')} ${place.name}에서 멀어요. 다른 공항을 골라 보세요`}
       </p>
       {!result.recommended && <p className="rounded-2xl border border-stone-200 p-4 text-sm text-stone-600">{result.reason}</p>}
-      <ul className="grid gap-3 lg:grid-cols-2">
+      <ul className="grid gap-3 md:grid-cols-2">
         {rows.map((e, i) => (
           <OptionCard key={e.option.id} e={e} best={i === 0} reason={i === 0 ? result.reason : undefined} currency={t.currency} krwPer={krwPer} people={party.adults + party.kids} where={airport.options[Number(e.option.id.split('-')[1])]?.where ?? null} note={airport.options[Number(e.option.id.split('-')[1])]?.note ?? null} />
         ))}
@@ -322,7 +322,7 @@ function CityTransitBlock({ t, rides, setRides, krwPer }: { t: TransportCountry;
   return (
     <section aria-label="시내 이동">
       <h3 className="mb-3 text-sm font-semibold uppercase tracking-wider text-stone-500">시내 이동{city ? ` · ${city.city}` : ''}</h3>
-      <div className="grid gap-3 lg:grid-cols-2">
+      <div className="grid gap-3 md:grid-cols-2">
         {city && (
           <div className="rounded-2xl border border-stone-200 p-4">
             <p className="text-xs text-stone-500">교통카드</p>

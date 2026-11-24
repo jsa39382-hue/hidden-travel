@@ -83,9 +83,15 @@ async function load(lat: number, lng: number): Promise<Weather> {
   }
 }
 
-/** 지점의 16일 예보 (3시간 캐시, 실패하면 저장본) */
+/**
+ * 값이 하나도 없는 날은 뺀다: 예보 마지막 날은 시간대에 따라 일부만 나와 날씨·기온이 모두 비어 있을 수 있다.
+ * (빼지 않으면 '여행 중 · 정보 없음'으로 보이고, 여행 날짜가 예보 안에 든 것처럼 잘못 판단한다)
+ */
+export const hasForecast = (d: Pick<DayWeather, 'code' | 'max' | 'min'>) => d.code != null || d.max != null || d.min != null
+
+/** 지점의 16일 예보 (3시간 캐시, 실패하면 저장본) — 저장본에도 같은 거름을 적용한다 */
 export const getWeather = (lat: number, lng: number, force = false) =>
-  cachedJson(`weather:v3:${lat.toFixed(3)},${lng.toFixed(3)}`, TTL, () => load(lat, lng), { force })
+  cachedJson(`weather:v3:${lat.toFixed(3)},${lng.toFixed(3)}`, TTL, () => load(lat, lng), { force }).then((r) => ({ ...r, data: { ...r.data, days: r.data.days.filter(hasForecast) } }))
 
 /** WMO 날씨 코드 → [이모지, 한국어] */
 export function describeWeather(code: number | null): [string, string] {
@@ -165,5 +171,5 @@ export function getWeatherMulti(points: [number, number][], force = false) {
       ) as DayWeather[][]
     },
     { force },
-  )
+  ).then((r) => ({ ...r, data: r.data.map((days) => days.filter(hasForecast)) }))
 }
