@@ -96,7 +96,7 @@ export function SafetySection({ country, place, onPickCountry }: { country: Coun
               {label}
             </button>
           ))}
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="나라 이름 찾기" aria-label="나라 이름 찾기" className="h-9 min-w-0 flex-1 rounded-full border border-stone-300 bg-white px-3 text-sm sm:max-w-48" />
+          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="나라 이름 찾기" aria-label="나라 이름 찾기" className="h-10 min-w-0 basis-full rounded-full border border-stone-300 bg-white px-4 text-sm sm:h-9 sm:basis-auto sm:flex-1 sm:max-w-48" />
         </div>
         {world.status !== 'success' ? (
           <Loading label="세계 경보 불러오는 중…" />
